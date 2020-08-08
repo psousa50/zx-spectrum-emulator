@@ -95,6 +95,7 @@ void main() {
         z80a.start(0);
 
         expect(z80a.getReg2(r), 1235);
+        expect(z80a.PC, 1);
       });
     });
   });
@@ -115,6 +116,7 @@ void main() {
         z80a.start(0);
 
         expect(z80a.getReg2(r), 1233);
+        expect(z80a.PC, 1);
       });
     });
 
@@ -126,6 +128,7 @@ void main() {
         z80a.start(0);
 
         expect(z80a.getReg2(r), 65535);
+        expect(z80a.PC, 1);
       });
     });
   });
@@ -145,10 +148,12 @@ void main() {
       opcodes.forEach((opcode, r) {
         var program = [opcode];
         final z80a = Z80a(Memory.withBytes(program));
-        z80a.setReg(r, 123);
+        z80a.setReg(r, 127);
         z80a.start(0);
 
-        expect(z80a.getReg(r), 124);
+        expect(z80a.getReg(r), 128);
+        expect(z80a.signFlag, true);
+        expect(z80a.PC, 1);
       });
     });
 
@@ -157,10 +162,40 @@ void main() {
         var program = [opcode];
         final z80a = Z80a(Memory.withBytes(program));
         z80a.setReg(r, 255);
+        z80a.signFlag = true;
         z80a.start(0);
 
         expect(z80a.getReg(r), 0);
+        expect(z80a.zeroFlag, true);
+        expect(z80a.signFlag, false);
+        expect(z80a.PC, 1);
       });
+    });
+  });
+
+  group('INC (HL)', () {
+    test('increase', () {
+      var program = [0x34, 127];
+      final z80a = Z80a(Memory.withBytes(program));
+      z80a.HL = 1;
+      z80a.signFlag = true;
+      z80a.start(0);
+
+      expect(z80a.memory.peek(1), 128);
+      expect(z80a.signFlag, true);
+      expect(z80a.PC, 1);
+    });
+
+    test('increase with wrap', () {
+      var program = [0x34, 255];
+      final z80a = Z80a(Memory.withBytes(program));
+      z80a.HL = 1;
+      z80a.start(0);
+
+      expect(z80a.memory.peek(1), 0);
+      expect(z80a.zeroFlag, true);
+      expect(z80a.signFlag, false);
+      expect(z80a.PC, 1);
     });
   });
 
@@ -183,6 +218,7 @@ void main() {
         z80a.start(0);
 
         expect(z80a.getReg(r), 122);
+        expect(z80a.PC, 1);
       });
     });
 
@@ -194,27 +230,8 @@ void main() {
         z80a.start(0);
 
         expect(z80a.getReg(r), 255);
+        expect(z80a.PC, 1);
       });
-    });
-  });
-
-  group('INC (HL)', () {
-    test('increase', () {
-      var program = [0x34, 7];
-      final z80a = Z80a(Memory.withBytes(program));
-      z80a.HL = 1;
-      z80a.start(0);
-
-      expect(z80a.memory.peek(1), 8);
-    });
-
-    test('increase with wrap', () {
-      var program = [0x34, 255];
-      final z80a = Z80a(Memory.withBytes(program));
-      z80a.HL = 1;
-      z80a.start(0);
-
-      expect(z80a.memory.peek(1), 0);
     });
   });
 
@@ -226,6 +243,7 @@ void main() {
       z80a.start(0);
 
       expect(z80a.memory.peek(1), 6);
+      expect(z80a.PC, 1);
     });
 
     test('decrease with wrap', () {
@@ -235,6 +253,7 @@ void main() {
       z80a.start(0);
 
       expect(z80a.memory.peek(1), 255);
+      expect(z80a.PC, 1);
     });
   });
 
@@ -247,6 +266,7 @@ void main() {
 
     expect(z80a.AF, 5678);
     expect(z80a.AF_L, 1234);
+    expect(z80a.PC, 1);
   });
 
   test('LD (BC), A', () {

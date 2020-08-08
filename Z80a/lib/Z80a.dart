@@ -31,8 +31,8 @@ class Z80a {
   static const R_IY = R_IY_H;
 
   static const F_CARRY = 0x01;
-  static const F_ADD_SUBTRACT = 0x02;
-  static const F_PARITY_OVERFLOW = 0x04;
+  static const F_ADD_SUB = 0x02;
+  static const F_PARITY = 0x04;
   static const F_HALF_CARRY = 0x08;
   static const F_ZERO = 0x10;
   static const F_SIGN = 0x20;
@@ -101,9 +101,16 @@ class Z80a {
   set IY(int w) => sw(R_IY_H, w);
 
   bool get carryFlag => F & F_CARRY != 0;
-  bool get addSubtractFlag => F & F_CARRY != 0;
+  bool get addSubtractFlag => F & F_ADD_SUB != 0;
+  bool get parityOverFlowFlag => F & F_PARITY != 0;
+  bool get zeroFlag => F & F_ZERO != 0;
+  bool get signFlag => F & F_SIGN != 0;
 
-  set carryFlag(bool b) => F = b ? F | F_CARRY : F & F_CARRY;
+  set carryFlag(bool b) => F = b ? F | F_CARRY : F & ~F_CARRY;
+  set addSubtractFlag(bool b) => F = b ? F | F_ADD_SUB : F & ~F_ADD_SUB;
+  set parityOverFlowFlag(bool b) => F = b ? F | F_PARITY : F & ~F_PARITY;
+  set zeroFlag(bool b) => F = b ? F | F_ZERO : F & ~F_ZERO;
+  set signFlag(bool b) => F = b ? F | F_SIGN : F & ~F_SIGN;
 
   int fetch() {
     final v = this.memory.peek(this.PC);
@@ -132,10 +139,21 @@ class Z80a {
     registers[r + 1] = w % 256;
   }
 
+  int add(int b1, int b2) {
+    int r = b1 + b2;
+    carryFlag = r > 255;
+    return word(r);
+  }
+
   int addW(int w1, int w2) {
     int r = w1 + w2;
     carryFlag = r > 65535;
     return word(r);
+  }
+
+  void setFlagsOnResult(int b) {
+    zeroFlag = b == 0;
+    signFlag = b > 127;
   }
 
   void start(int pc) {
@@ -213,34 +231,42 @@ class Z80a {
 
       case 0x04:
         this.B = byte(this.B + 1);
+        setFlagsOnResult(B);
         break;
 
       case 0x0C:
         this.C = byte(this.C + 1);
+        setFlagsOnResult(C);
         break;
 
       case 0x14:
         this.D = byte(this.D + 1);
+        setFlagsOnResult(D);
         break;
 
       case 0x1C:
         this.E = byte(this.E + 1);
+        setFlagsOnResult(E);
         break;
 
       case 0x24:
         this.H = byte(this.H + 1);
+        setFlagsOnResult(H);
         break;
 
       case 0x2C:
         this.L = byte(this.L + 1);
+        setFlagsOnResult(L);
         break;
 
       case 0x34:
         this.memory.poke(this.HL, byte(this.memory.peek(this.HL) + 1));
+        setFlagsOnResult(this.memory.peek(this.HL));
         break;
 
       case 0x3C:
         this.A = byte(this.A + 1);
+        setFlagsOnResult(A);
         break;
 
       case 0x05:
