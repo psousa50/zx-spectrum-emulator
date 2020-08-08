@@ -20,6 +20,8 @@ class Z80a {
   static const R_IY_L = 12;
   static const R_IY_H = 13;
 
+  static const R_COUNT = 14;
+
   static const R_AF = R_A;
   static const R_BC = R_B;
   static const R_DE = R_D;
@@ -28,11 +30,18 @@ class Z80a {
   static const R_IX = R_IX_H;
   static const R_IY = R_IY_H;
 
+  static const F_CARRY = 0x01;
+  static const F_ADD_SUBTRACT = 0x02;
+  static const F_PARITY_OVERFLOW = 0x04;
+  static const F_HALF_CARRY = 0x08;
+  static const F_ZERO = 0x10;
+  static const F_SIGN = 0x20;
+
   final Memory memory;
 
   Z80a(this.memory);
 
-  var registers = List<int>.filled(14, 0);
+  var registers = List<int>.filled(R_COUNT, 0);
   var AF_L = 0;
   var BC_L = 0;
   var DE_L = 0;
@@ -91,6 +100,11 @@ class Z80a {
   set IX(int w) => sw(R_IX_H, w);
   set IY(int w) => sw(R_IY_H, w);
 
+  bool get carryFlag => F & F_CARRY != 0;
+  bool get addSubtractFlag => F & F_CARRY != 0;
+
+  set carryFlag(bool b) => F = b ? F | F_CARRY : F & F_CARRY;
+
   int fetch() {
     final v = this.memory.peek(this.PC);
     this.PC = this.PC + 1;
@@ -116,6 +130,12 @@ class Z80a {
   void setReg2(int r, int w) {
     registers[r] = w ~/ 256;
     registers[r + 1] = w % 256;
+  }
+
+  int addW(int w1, int w2) {
+    int r = w1 + w2;
+    carryFlag = r > 65535;
+    return word(r);
   }
 
   void start(int pc) {
@@ -160,11 +180,11 @@ class Z80a {
         break;
 
       case 0x09:
-        this.HL = word(this.HL + this.BC);
+        this.HL = addW(this.HL, this.BC);
         break;
 
       case 0x19:
-        this.HL = word(this.HL + this.DE);
+        this.HL = addW(this.HL, this.DE);
         break;
 
       case 0x29:
@@ -172,7 +192,7 @@ class Z80a {
         break;
 
       case 0x39:
-        this.HL = word(this.HL + this.SP);
+        this.HL = addW(this.HL, this.SP);
         break;
 
       case 0x04:
@@ -211,6 +231,14 @@ class Z80a {
         final af = AF;
         AF = AF_L;
         AF_L = af;
+        break;
+
+      case 0x0A:
+        this.A = this.memory.peek(BC);
+        break;
+
+      case 0x1A:
+        this.A = this.memory.peek(DE);
         break;
 
       case 0x12:
