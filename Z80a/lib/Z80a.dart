@@ -243,6 +243,38 @@ class Z80a {
         this.A = byte(this.A + 1);
         break;
 
+      case 0x05:
+        this.B = byte(this.B - 1);
+        break;
+
+      case 0x0D:
+        this.C = byte(this.C - 1);
+        break;
+
+      case 0x15:
+        this.D = byte(this.D - 1);
+        break;
+
+      case 0x1D:
+        this.E = byte(this.E - 1);
+        break;
+
+      case 0x25:
+        this.H = byte(this.H - 1);
+        break;
+
+      case 0x2D:
+        this.L = byte(this.L - 1);
+        break;
+
+      case 0x35:
+        this.memory.poke(this.HL, byte(this.memory.peek(this.HL) - 1));
+        break;
+
+      case 0x3D:
+        this.A = byte(this.A - 1);
+        break;
+
       case 0x08:
         final af = AF;
         AF = AF_L;

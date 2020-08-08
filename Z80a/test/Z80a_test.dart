@@ -164,6 +164,40 @@ void main() {
     });
   });
 
+  group('DEC [B C D E H L A]', () {
+    const opcodes = {
+      0x05: Z80a.R_B,
+      0x0D: Z80a.R_C,
+      0x15: Z80a.R_D,
+      0x1D: Z80a.R_E,
+      0x25: Z80a.R_H,
+      0x2D: Z80a.R_L,
+      0x3D: Z80a.R_A,
+    };
+
+    test('decrease', () {
+      opcodes.forEach((opcode, r) {
+        var program = [opcode];
+        final z80a = Z80a(Memory.withBytes(program));
+        z80a.setReg(r, 123);
+        z80a.start(0);
+
+        expect(z80a.getReg(r), 122);
+      });
+    });
+
+    test('decrease with wrap', () {
+      opcodes.forEach((opcode, r) {
+        var program = [opcode];
+        final z80a = Z80a(Memory.withBytes(program));
+        z80a.setReg(r, 0);
+        z80a.start(0);
+
+        expect(z80a.getReg(r), 255);
+      });
+    });
+  });
+
   group('INC (HL)', () {
     test('increase', () {
       var program = [0x34, 7];
@@ -181,6 +215,26 @@ void main() {
       z80a.start(0);
 
       expect(z80a.memory.peek(1), 0);
+    });
+  });
+
+  group('DEC (HL)', () {
+    test('decrease', () {
+      var program = [0x35, 7];
+      final z80a = Z80a(Memory.withBytes(program));
+      z80a.HL = 1;
+      z80a.start(0);
+
+      expect(z80a.memory.peek(1), 6);
+    });
+
+    test('decrease with wrap', () {
+      var program = [0x35, 0];
+      final z80a = Z80a(Memory.withBytes(program));
+      z80a.HL = 1;
+      z80a.start(0);
+
+      expect(z80a.memory.peek(1), 255);
     });
   });
 
