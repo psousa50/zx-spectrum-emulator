@@ -179,6 +179,22 @@ class Z80a {
         this.SP = word(this.SP + 1);
         break;
 
+      case 0x0B:
+        this.BC = word(this.BC - 1);
+        break;
+
+      case 0x1B:
+        this.DE = word(this.DE - 1);
+        break;
+
+      case 0x2B:
+        this.HL = word(this.HL - 1);
+        break;
+
+      case 0x3B:
+        this.SP = word(this.SP - 1);
+        break;
+
       case 0x09:
         this.HL = addW(this.HL, this.BC);
         break;

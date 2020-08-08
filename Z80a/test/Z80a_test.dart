@@ -97,15 +97,35 @@ void main() {
         expect(z80a.getReg2(r), 1235);
       });
     });
+  });
 
-    test('increase with wrap', () {
+  group('DEC [BC DE HL SP]', () {
+    const opcodes = {
+      0x0B: Z80a.R_BC,
+      0x1B: Z80a.R_DE,
+      0x2B: Z80a.R_HL,
+      0x3B: Z80a.R_SP,
+    };
+
+    test('decrease', () {
       opcodes.forEach((opcode, r) {
         var program = [opcode];
         final z80a = Z80a(Memory.withBytes(program));
-        z80a.setReg2(r, 65535);
+        z80a.setReg2(r, 1234);
         z80a.start(0);
 
-        expect(z80a.getReg2(r), 0);
+        expect(z80a.getReg2(r), 1233);
+      });
+    });
+
+    test('decrease with wrap', () {
+      opcodes.forEach((opcode, r) {
+        var program = [opcode];
+        final z80a = Z80a(Memory.withBytes(program));
+        z80a.setReg2(r, 0);
+        z80a.start(0);
+
+        expect(z80a.getReg2(r), 65535);
       });
     });
   });
