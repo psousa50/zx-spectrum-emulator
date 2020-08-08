@@ -50,6 +50,7 @@ class Z80a {
   int get B => registers[R_B];
   int get C => registers[R_C];
   int get D => registers[R_D];
+  int get E => registers[R_E];
   int get H => registers[R_H];
   int get L => registers[R_L];
   int get S => registers[R_S];
@@ -126,6 +127,18 @@ class Z80a {
         this.BC = fetch2();
         break;
 
+      case 0x11:
+        this.DE = fetch2();
+        break;
+
+      case 0x21:
+        this.HL = fetch2();
+        break;
+
+      case 0x31:
+        this.SP = fetch2();
+        break;
+
       case 0x02:
         this.memory.poke(BC, A);
         break;
@@ -146,8 +159,52 @@ class Z80a {
         this.SP = word(this.SP + 1);
         break;
 
+      case 0x09:
+        this.HL = word(this.HL + this.BC);
+        break;
+
+      case 0x19:
+        this.HL = word(this.HL + this.DE);
+        break;
+
+      case 0x29:
+        this.HL = word(this.HL + this.HL);
+        break;
+
+      case 0x39:
+        this.HL = word(this.HL + this.SP);
+        break;
+
       case 0x04:
         this.B = byte(this.B + 1);
+        break;
+
+      case 0x0C:
+        this.C = byte(this.C + 1);
+        break;
+
+      case 0x14:
+        this.D = byte(this.D + 1);
+        break;
+
+      case 0x1C:
+        this.E = byte(this.E + 1);
+        break;
+
+      case 0x24:
+        this.H = byte(this.H + 1);
+        break;
+
+      case 0x2C:
+        this.L = byte(this.L + 1);
+        break;
+
+      case 0x34:
+        this.memory.poke(this.HL, byte(this.memory.peek(this.HL) + 1));
+        break;
+
+      case 0x3C:
+        this.A = byte(this.A + 1);
         break;
 
       case 0x08:
@@ -156,7 +213,7 @@ class Z80a {
         AF_L = af;
         break;
 
-      case 0x0C:
+      case 0x12:
         this.memory.poke(DE, A);
         break;
     }

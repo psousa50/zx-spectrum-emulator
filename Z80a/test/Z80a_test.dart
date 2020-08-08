@@ -39,16 +39,52 @@ void main() {
     expect(z80a.PC, 1);
   });
 
-  test('LD BC, nn', () {
-    var program = [1, 4, 2];
-    final z80a = Z80a(TestMemory.withBytes(program));
-    z80a.start(0);
+  test('LD [BC DE HL SP], nn', () {
+    const opcodes = {
+      0x01: Z80a.R_BC,
+      0x11: Z80a.R_DE,
+      0x21: Z80a.R_HL,
+      0x31: Z80a.R_SP,
+    };
+    opcodes.forEach((opcode, r) {
+      var program = [opcode, 4, 2];
+      final z80a = Z80a(TestMemory.withBytes(program));
+      z80a.start(0);
 
-    expect(z80a.BC, 2 * 256 + 4);
-    expect(z80a.PC, 3);
+      expect(z80a.getReg2(r), 2 * 256 + 4);
+      expect(z80a.PC, 3);
+    });
   });
 
-  group('INC BC, DE, HL, SP', () {
+  test('ADD HL, [BC DE SP]', () {
+    const opcodes = {
+      0x09: Z80a.R_BC,
+      0x19: Z80a.R_DE,
+      0x39: Z80a.R_SP,
+    };
+    opcodes.forEach((opcode, r) {
+      var program = [opcode];
+      final z80a = Z80a(TestMemory.withBytes(program));
+      z80a.HL = 65530;
+      z80a.setReg2(r, 10);
+      z80a.start(0);
+
+      expect(z80a.HL, 4);
+      expect(z80a.PC, 1);
+    });
+  });
+
+  test('ADD HL, HL', () {
+    var program = [0x29];
+    final z80a = Z80a(TestMemory.withBytes(program));
+    z80a.HL = 65530;
+    z80a.start(0);
+
+    expect(z80a.HL, 65524);
+    expect(z80a.PC, 1);
+  });
+
+  group('INC [BC DE HL SP]', () {
     const opcodes = {
       0x03: Z80a.R_BC,
       0x13: Z80a.R_DE,
@@ -56,7 +92,7 @@ void main() {
       0x33: Z80a.R_SP,
     };
 
-    test('normal', () {
+    test('increase', () {
       opcodes.forEach((opcode, r) {
         var program = [opcode];
         final z80a = Z80a(TestMemory.withBytes(program));
@@ -67,7 +103,7 @@ void main() {
       });
     });
 
-    test('with wrap', () {
+    test('increase with wrap', () {
       opcodes.forEach((opcode, r) {
         var program = [opcode];
         final z80a = Z80a(TestMemory.withBytes(program));
@@ -79,32 +115,62 @@ void main() {
     });
   });
 
-  group('INC B', () {
-    Z80a setup(int v) {
-      var program = [4];
-      final z80a = Z80a(TestMemory.withBytes(program));
-      z80a.B = v;
-      z80a.start(0);
-      return z80a;
-    }
+  group('INC [B C D E H L A]', () {
+    const opcodes = {
+      0x04: Z80a.R_B,
+      0x0C: Z80a.R_C,
+      0x14: Z80a.R_D,
+      0x1C: Z80a.R_E,
+      0x24: Z80a.R_H,
+      0x2C: Z80a.R_L,
+      0x3C: Z80a.R_A,
+    };
 
-    test('normal', () {
-      final z80a = setup(200);
+    test('increase', () {
+      opcodes.forEach((opcode, r) {
+        var program = [opcode];
+        final z80a = Z80a(TestMemory.withBytes(program));
+        z80a.setReg(r, 123);
+        z80a.start(0);
 
-      expect(z80a.B, 201);
-      expect(z80a.PC, 1);
+        expect(z80a.getReg(r), 124);
+      });
     });
 
-    test('with wrap', () {
-      final z80a = setup(255);
+    test('increase with wrap', () {
+      opcodes.forEach((opcode, r) {
+        var program = [opcode];
+        final z80a = Z80a(TestMemory.withBytes(program));
+        z80a.setReg(r, 255);
+        z80a.start(0);
 
-      expect(z80a.B, 0);
-      expect(z80a.PC, 1);
+        expect(z80a.getReg(r), 0);
+      });
     });
   });
 
-  test('EX AF, AF' '', () {
-    var program = [8];
+  group('INC (HL)', () {
+    test('increase', () {
+      var program = [0x34, 7];
+      final z80a = Z80a(TestMemory.withBytes(program));
+      z80a.HL = 1;
+      z80a.start(0);
+
+      expect(z80a.memory.peek(1), 8);
+    });
+
+    test('increase with wrap', () {
+      var program = [0x34, 255];
+      final z80a = Z80a(TestMemory.withBytes(program));
+      z80a.HL = 1;
+      z80a.start(0);
+
+      expect(z80a.memory.peek(1), 0);
+    });
+  });
+
+  test('EX AF, AF"', () {
+    var program = [0x08];
     final z80a = Z80a(TestMemory.withBytes(program));
     z80a.AF = 1234;
     z80a.AF_L = 5678;
@@ -115,7 +181,7 @@ void main() {
   });
 
   test('LD (BC), A', () {
-    var program = [2, 0, 100];
+    var program = [0x02, 0, 100];
     final z80a = Z80a(TestMemory.withBytes(program));
     z80a.A = 123;
     z80a.BC = 1;
@@ -127,7 +193,7 @@ void main() {
   });
 
   test('LD (DE), A', () {
-    var program = [12, 0, 100];
+    var program = [0x12, 0, 100];
     final z80a = Z80a(TestMemory.withBytes(program));
     z80a.A = 123;
     z80a.DE = 1;
@@ -136,24 +202,5 @@ void main() {
     expect(z80a.memory.peek(1), 123);
     expect(z80a.memory.peek(2), 100);
     expect(z80a.PC, 1);
-  });
-
-  test('sets an 8bit register value', () {
-    final z80a = Z80a(TestMemory());
-    z80a.H = 3;
-    z80a.L = 4;
-
-    expect(z80a.HL, 772);
-    expect(z80a.H, 3);
-    expect(z80a.L, 4);
-  });
-
-  test('sets a 16bit register value', () {
-    final z80a = Z80a(TestMemory());
-    z80a.HL = 258;
-
-    expect(z80a.HL, 258);
-    expect(z80a.H, 1);
-    expect(z80a.L, 2);
   });
 }
