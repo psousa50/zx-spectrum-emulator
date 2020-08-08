@@ -102,13 +102,13 @@ class Z80a {
 
   bool get carryFlag => F & F_CARRY != 0;
   bool get addSubtractFlag => F & F_ADD_SUB != 0;
-  bool get parityOverFlowFlag => F & F_PARITY != 0;
+  bool get parityOverflowFlag => F & F_PARITY != 0;
   bool get zeroFlag => F & F_ZERO != 0;
   bool get signFlag => F & F_SIGN != 0;
 
   set carryFlag(bool b) => F = b ? F | F_CARRY : F & ~F_CARRY;
   set addSubtractFlag(bool b) => F = b ? F | F_ADD_SUB : F & ~F_ADD_SUB;
-  set parityOverFlowFlag(bool b) => F = b ? F | F_PARITY : F & ~F_PARITY;
+  set parityOverflowFlag(bool b) => F = b ? F | F_PARITY : F & ~F_PARITY;
   set zeroFlag(bool b) => F = b ? F | F_ZERO : F & ~F_ZERO;
   set signFlag(bool b) => F = b ? F | F_SIGN : F & ~F_SIGN;
 
@@ -230,75 +230,100 @@ class Z80a {
         break;
 
       case 0x04:
+        this.parityOverflowFlag = this.B == 0x7F;
         this.B = byte(this.B + 1);
         setFlagsOnResult(B);
         break;
 
       case 0x0C:
+        this.parityOverflowFlag = this.C == 0x7F;
+
         this.C = byte(this.C + 1);
         setFlagsOnResult(C);
         break;
 
       case 0x14:
+        this.parityOverflowFlag = this.D == 0x7F;
         this.D = byte(this.D + 1);
         setFlagsOnResult(D);
         break;
 
       case 0x1C:
+        this.parityOverflowFlag = this.E == 0x7F;
         this.E = byte(this.E + 1);
         setFlagsOnResult(E);
         break;
 
       case 0x24:
+        this.parityOverflowFlag = this.H == 0x7F;
         this.H = byte(this.H + 1);
         setFlagsOnResult(H);
         break;
 
       case 0x2C:
+        this.parityOverflowFlag = this.L == 0x7F;
         this.L = byte(this.L + 1);
         setFlagsOnResult(L);
         break;
 
       case 0x34:
+        this.parityOverflowFlag = this.memory.peek(this.HL) == 0x7F;
         this.memory.poke(this.HL, byte(this.memory.peek(this.HL) + 1));
         setFlagsOnResult(this.memory.peek(this.HL));
         break;
 
       case 0x3C:
+        this.parityOverflowFlag = this.A == 0x7F;
         this.A = byte(this.A + 1);
         setFlagsOnResult(A);
         break;
 
       case 0x05:
+        this.parityOverflowFlag = this.B == 0x80;
         this.B = byte(this.B - 1);
+        setFlagsOnResult(B);
         break;
 
       case 0x0D:
+        this.parityOverflowFlag = this.C == 0x80;
         this.C = byte(this.C - 1);
+        setFlagsOnResult(C);
         break;
 
       case 0x15:
+        this.parityOverflowFlag = this.D == 0x80;
         this.D = byte(this.D - 1);
+        setFlagsOnResult(D);
         break;
 
       case 0x1D:
+        this.parityOverflowFlag = this.E == 0x80;
         this.E = byte(this.E - 1);
+        setFlagsOnResult(E);
         break;
 
       case 0x25:
+        this.parityOverflowFlag = this.H == 0x80;
         this.H = byte(this.H - 1);
+        setFlagsOnResult(H);
         break;
 
       case 0x2D:
+        this.parityOverflowFlag = this.L == 0x80;
         this.L = byte(this.L - 1);
+        setFlagsOnResult(L);
         break;
 
       case 0x35:
+        this.parityOverflowFlag = this.memory.peek(this.HL) == 0x80;
         this.memory.poke(this.HL, byte(this.memory.peek(this.HL) - 1));
+        setFlagsOnResult(this.memory.peek(this.HL));
         break;
 
       case 0x3D:
+        this.parityOverflowFlag = this.A == 0x80;
         this.A = byte(this.A - 1);
+        setFlagsOnResult(A);
         break;
 
       case 0x08:

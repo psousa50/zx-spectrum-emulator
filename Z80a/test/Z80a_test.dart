@@ -152,7 +152,9 @@ void main() {
         z80a.start(0);
 
         expect(z80a.getReg(r), 128);
+        expect(z80a.carryFlag, false);
         expect(z80a.signFlag, true);
+        expect(z80a.parityOverflowFlag, true);
         expect(z80a.PC, 1);
       });
     });
@@ -162,12 +164,16 @@ void main() {
         var program = [opcode];
         final z80a = Z80a(Memory.withBytes(program));
         z80a.setReg(r, 255);
+        z80a.carryFlag = true;
         z80a.signFlag = true;
+        z80a.parityOverflowFlag = true;
         z80a.start(0);
 
         expect(z80a.getReg(r), 0);
+        expect(z80a.carryFlag, true);
         expect(z80a.zeroFlag, true);
         expect(z80a.signFlag, false);
+        expect(z80a.parityOverflowFlag, false);
         expect(z80a.PC, 1);
       });
     });
@@ -182,7 +188,9 @@ void main() {
       z80a.start(0);
 
       expect(z80a.memory.peek(1), 128);
+      expect(z80a.carryFlag, false);
       expect(z80a.signFlag, true);
+      expect(z80a.parityOverflowFlag, true);
       expect(z80a.PC, 1);
     });
 
@@ -190,11 +198,15 @@ void main() {
       var program = [0x34, 255];
       final z80a = Z80a(Memory.withBytes(program));
       z80a.HL = 1;
+      z80a.carryFlag = true;
+      z80a.parityOverflowFlag = true;
       z80a.start(0);
 
       expect(z80a.memory.peek(1), 0);
+      expect(z80a.carryFlag, true);
       expect(z80a.zeroFlag, true);
       expect(z80a.signFlag, false);
+      expect(z80a.parityOverflowFlag, false);
       expect(z80a.PC, 1);
     });
   });
@@ -214,10 +226,13 @@ void main() {
       opcodes.forEach((opcode, r) {
         var program = [opcode];
         final z80a = Z80a(Memory.withBytes(program));
-        z80a.setReg(r, 123);
+        z80a.setReg(r, 128);
+        z80a.signFlag = true;
         z80a.start(0);
 
-        expect(z80a.getReg(r), 122);
+        expect(z80a.getReg(r), 127);
+        expect(z80a.signFlag, false);
+        expect(z80a.parityOverflowFlag, true);
         expect(z80a.PC, 1);
       });
     });
@@ -230,6 +245,20 @@ void main() {
         z80a.start(0);
 
         expect(z80a.getReg(r), 255);
+        expect(z80a.signFlag, true);
+        expect(z80a.PC, 1);
+      });
+    });
+
+    test('decrease to 0', () {
+      opcodes.forEach((opcode, r) {
+        var program = [opcode];
+        final z80a = Z80a(Memory.withBytes(program));
+        z80a.setReg(r, 1);
+        z80a.start(0);
+
+        expect(z80a.getReg(r), 0);
+        expect(z80a.zeroFlag, true);
         expect(z80a.PC, 1);
       });
     });
@@ -237,12 +266,16 @@ void main() {
 
   group('DEC (HL)', () {
     test('decrease', () {
-      var program = [0x35, 7];
+      var program = [0x35, 128];
       final z80a = Z80a(Memory.withBytes(program));
       z80a.HL = 1;
+      z80a.signFlag = true;
+      z80a.parityOverflowFlag = false;
       z80a.start(0);
 
-      expect(z80a.memory.peek(1), 6);
+      expect(z80a.memory.peek(1), 127);
+      expect(z80a.signFlag, false);
+      expect(z80a.parityOverflowFlag, true);
       expect(z80a.PC, 1);
     });
 
@@ -253,6 +286,19 @@ void main() {
       z80a.start(0);
 
       expect(z80a.memory.peek(1), 255);
+      expect(z80a.signFlag, true);
+      expect(z80a.PC, 1);
+    });
+
+    test('decrease to 0', () {
+      var program = [0x35, 1];
+      final z80a = Z80a(Memory.withBytes(program));
+      z80a.HL = 1;
+      z80a.zeroFlag = false;
+      z80a.start(0);
+
+      expect(z80a.memory.peek(1), 0);
+      expect(z80a.zeroFlag, true);
       expect(z80a.PC, 1);
     });
   });
