@@ -5,6 +5,27 @@ import './Memory.dart';
 // ignore_for_file: non_constant_identifier_names
 
 class Z80a {
+  static const r8Names = {
+    R_A: "A",
+    R_F: "F",
+    R_B: "B",
+    R_C: "C",
+    R_D: "D",
+    R_E: "E",
+    R_H: "H",
+    R_L: "L",
+  };
+
+  static const r16Names = {
+    R_AF: "AF",
+    R_BC: "BC",
+    R_DE: "DE",
+    R_HL: "HL",
+    R_SP: "SP",
+    R_IX: "IX",
+    R_IY: "IY",
+  };
+
   static const R_A = 0;
   static const R_F = 1;
   static const R_B = 2;
@@ -161,6 +182,9 @@ class Z80a {
     final opcode = fetch();
 
     switch (opcode) {
+      case 0x00:
+        break;
+
       case 0x01:
         this.BC = fetch2();
         break;
