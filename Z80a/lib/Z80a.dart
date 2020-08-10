@@ -14,6 +14,14 @@ class Z80a {
     R_E: "E",
     R_H: "H",
     R_L: "L",
+    R_At: "A'",
+    R_Ft: "F'",
+    R_Bt: "B'",
+    R_Ct: "C'",
+    R_Dt: "D'",
+    R_Et: "E'",
+    R_Ht: "H'",
+    R_Lt: "L'",
   };
 
   static const r16Names = {
@@ -24,6 +32,19 @@ class Z80a {
     R_SP: "SP",
     R_IX: "IX",
     R_IY: "IY",
+    R_AFt: "AF'",
+    R_BCt: "BC'",
+    R_DEt: "DE'",
+    R_HLt: "HL'",
+  };
+
+  static const flagNames = {
+    F_CARRY: "C",
+    F_ADD_SUB: "N",
+    F_PARITY: "P",
+    F_HALF_CARRY: "H",
+    F_ZERO: "Z",
+    F_SIGN: "S",
   };
 
   static const R_A = 0;
@@ -40,8 +61,16 @@ class Z80a {
   static const R_IX_L = 11;
   static const R_IY_L = 12;
   static const R_IY_H = 13;
+  static const R_At = 14;
+  static const R_Ft = 15;
+  static const R_Bt = 16;
+  static const R_Ct = 17;
+  static const R_Dt = 18;
+  static const R_Et = 19;
+  static const R_Ht = 20;
+  static const R_Lt = 21;
 
-  static const R_COUNT = 14;
+  static const R_COUNT = 22;
 
   static const R_AF = R_A;
   static const R_BC = R_B;
@@ -50,6 +79,10 @@ class Z80a {
   static const R_SP = R_S;
   static const R_IX = R_IX_H;
   static const R_IY = R_IY_H;
+  static const R_AFt = R_At;
+  static const R_BCt = R_Bt;
+  static const R_DEt = R_Dt;
+  static const R_HLt = R_Ht;
 
   static const F_CARRY = 0x01;
   static const F_ADD_SUB = 0x02;
@@ -63,10 +96,6 @@ class Z80a {
   Z80a(this.memory);
 
   var registers = List<int>.filled(R_COUNT, 0);
-  var AF_L = 0;
-  var BC_L = 0;
-  var DE_L = 0;
-  var HL_L = 0;
   var PC = 0;
 
   int gw(int r) => 256 * registers[r] + registers[r + 1];
@@ -112,6 +141,10 @@ class Z80a {
   int get SP => gw(R_S);
   int get IX => gw(R_IX_H);
   int get IY => gw(R_IY_H);
+  int get AFt => gw(R_At);
+  int get BCt => gw(R_Bt);
+  int get DEt => gw(R_Dt);
+  int get HLt => gw(R_Ht);
 
   set AF(int w) => sw(R_A, w);
   set BC(int w) => sw(R_B, w);
@@ -120,16 +153,22 @@ class Z80a {
   set SP(int w) => sw(R_S, w);
   set IX(int w) => sw(R_IX_H, w);
   set IY(int w) => sw(R_IY_H, w);
+  set AFt(int w) => sw(R_At, w);
+  set BCt(int w) => sw(R_Bt, w);
+  set DEt(int w) => sw(R_Dt, w);
+  set HLt(int w) => sw(R_Ht, w);
 
   bool get carryFlag => F & F_CARRY != 0;
   bool get addSubtractFlag => F & F_ADD_SUB != 0;
   bool get parityOverflowFlag => F & F_PARITY != 0;
+  bool get halfCarryFlag => F & F_HALF_CARRY != 0;
   bool get zeroFlag => F & F_ZERO != 0;
   bool get signFlag => F & F_SIGN != 0;
 
   set carryFlag(bool b) => F = b ? F | F_CARRY : F & ~F_CARRY;
   set addSubtractFlag(bool b) => F = b ? F | F_ADD_SUB : F & ~F_ADD_SUB;
   set parityOverflowFlag(bool b) => F = b ? F | F_PARITY : F & ~F_PARITY;
+  set halfCarryFlag(bool b) => F = b ? F | F_HALF_CARRY : F & ~F_HALF_CARRY;
   set zeroFlag(bool b) => F = b ? F | F_ZERO : F & ~F_ZERO;
   set signFlag(bool b) => F = b ? F | F_SIGN : F & ~F_SIGN;
 
@@ -177,12 +216,17 @@ class Z80a {
     signFlag = b > 127;
   }
 
-  void start(int pc) {
-    this.PC = pc;
+  void step() {
     final opcode = fetch();
 
     switch (opcode) {
       case 0x00:
+        break;
+
+      case 0x08:
+        final af = AF;
+        AF = AFt;
+        AFt = af;
         break;
 
       case 0x01:
@@ -246,7 +290,7 @@ class Z80a {
         break;
 
       case 0x29:
-        this.HL = word(this.HL + this.HL);
+        this.HL = addW(this.HL, this.HL);
         break;
 
       case 0x39:
@@ -257,103 +301,112 @@ class Z80a {
         this.parityOverflowFlag = this.B == 0x7F;
         this.B = byte(this.B + 1);
         setFlagsOnResult(B);
+        this.addSubtractFlag = false;
         break;
 
       case 0x0C:
         this.parityOverflowFlag = this.C == 0x7F;
-
         this.C = byte(this.C + 1);
         setFlagsOnResult(C);
+        this.addSubtractFlag = false;
         break;
 
       case 0x14:
         this.parityOverflowFlag = this.D == 0x7F;
         this.D = byte(this.D + 1);
         setFlagsOnResult(D);
+        this.addSubtractFlag = false;
         break;
 
       case 0x1C:
         this.parityOverflowFlag = this.E == 0x7F;
         this.E = byte(this.E + 1);
         setFlagsOnResult(E);
+        this.addSubtractFlag = false;
         break;
 
       case 0x24:
         this.parityOverflowFlag = this.H == 0x7F;
         this.H = byte(this.H + 1);
         setFlagsOnResult(H);
+        this.addSubtractFlag = false;
         break;
 
       case 0x2C:
         this.parityOverflowFlag = this.L == 0x7F;
         this.L = byte(this.L + 1);
         setFlagsOnResult(L);
+        this.addSubtractFlag = false;
         break;
 
       case 0x34:
         this.parityOverflowFlag = this.memory.peek(this.HL) == 0x7F;
         this.memory.poke(this.HL, byte(this.memory.peek(this.HL) + 1));
         setFlagsOnResult(this.memory.peek(this.HL));
+        this.addSubtractFlag = false;
         break;
 
       case 0x3C:
         this.parityOverflowFlag = this.A == 0x7F;
         this.A = byte(this.A + 1);
         setFlagsOnResult(A);
+        this.addSubtractFlag = false;
         break;
 
       case 0x05:
         this.parityOverflowFlag = this.B == 0x80;
         this.B = byte(this.B - 1);
         setFlagsOnResult(B);
+        this.addSubtractFlag = true;
         break;
 
       case 0x0D:
         this.parityOverflowFlag = this.C == 0x80;
         this.C = byte(this.C - 1);
         setFlagsOnResult(C);
+        this.addSubtractFlag = true;
         break;
 
       case 0x15:
         this.parityOverflowFlag = this.D == 0x80;
         this.D = byte(this.D - 1);
         setFlagsOnResult(D);
+        this.addSubtractFlag = true;
         break;
 
       case 0x1D:
         this.parityOverflowFlag = this.E == 0x80;
         this.E = byte(this.E - 1);
         setFlagsOnResult(E);
+        this.addSubtractFlag = true;
         break;
 
       case 0x25:
         this.parityOverflowFlag = this.H == 0x80;
         this.H = byte(this.H - 1);
         setFlagsOnResult(H);
+        this.addSubtractFlag = true;
         break;
 
       case 0x2D:
         this.parityOverflowFlag = this.L == 0x80;
         this.L = byte(this.L - 1);
         setFlagsOnResult(L);
+        this.addSubtractFlag = true;
         break;
 
       case 0x35:
         this.parityOverflowFlag = this.memory.peek(this.HL) == 0x80;
         this.memory.poke(this.HL, byte(this.memory.peek(this.HL) - 1));
         setFlagsOnResult(this.memory.peek(this.HL));
+        this.addSubtractFlag = true;
         break;
 
       case 0x3D:
         this.parityOverflowFlag = this.A == 0x80;
         this.A = byte(this.A - 1);
         setFlagsOnResult(A);
-        break;
-
-      case 0x08:
-        final af = AF;
-        AF = AF_L;
-        AF_L = af;
+        this.addSubtractFlag = true;
         break;
 
       case 0x0A:

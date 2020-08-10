@@ -1,5 +1,5 @@
 class Memory {
-  var bytes;
+  List<int> bytes;
 
   Memory.withBytes(this.bytes);
 
