@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../lib/Memory.dart';
 import '../lib/Z80a.dart';
+import '../lib/Util.dart';
 
 class State {
   Map<int, int> registerValues = {};
@@ -20,8 +21,8 @@ class State {
       this.registerValues[r] = value;
     });
     register16Values.forEach((r, value) {
-      this.registerValues[r] = value ~/ 256;
-      this.registerValues[r + 1] = value % 256;
+      this.registerValues[r] = hi(value);
+      this.registerValues[r + 1] = lo(value);
     });
   }
 }

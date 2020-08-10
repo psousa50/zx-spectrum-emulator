@@ -1,3 +1,5 @@
+import './Util.dart';
+
 class Memory {
   List<int> bytes;
   int baseAddress;
@@ -18,7 +20,7 @@ class Memory {
   }
 
   poke2(int address, int b) {
-    this.bytes[address - baseAddress] = b % 256;
-    this.bytes[address - baseAddress + 1] = b ~/ 256;
+    this.bytes[address - baseAddress] = lo(b);
+    this.bytes[address - baseAddress + 1] = hi(b);
   }
 }

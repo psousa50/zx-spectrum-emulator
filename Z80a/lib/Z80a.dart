@@ -103,8 +103,8 @@ class Z80a {
 
   int gw(int r) => 256 * registers[r] + registers[r + 1];
   void sw(int r, int w) {
-    registers[r] = w ~/ 256;
-    registers[r + 1] = w % 256;
+    registers[r] = hi(w);
+    registers[r + 1] = lo(w);
   }
 
   int get A => registers[R_A];
@@ -198,8 +198,8 @@ class Z80a {
   void setReg(int r, int b) => registers[r] = byte(b);
 
   void setReg2(int r, int w) {
-    registers[r] = w ~/ 256;
-    registers[r + 1] = w % 256;
+    registers[r] = hi(w);
+    registers[r + 1] = lo(w);
   }
 
   int add(int b1, int b2) {
