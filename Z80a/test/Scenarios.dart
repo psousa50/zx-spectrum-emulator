@@ -1,6 +1,8 @@
 import '../lib/Z80a.dart';
 import './Scenario.dart';
 
+int binary(String b) => int.parse(b, radix: 2);
+
 List<Scenario> nop(int opcode) => [
       Scenario("nop", [0x00], State(), State())
     ];
@@ -69,26 +71,27 @@ List<Scenario> decR16(int opcode, int r16) => [
           ))
     ];
 
-Scenario changeR8N(
-        String name, int opcode, int r8, int value, int result, String flags) =>
+Scenario changeR8(
+        String name, int opcode, int r8, int value, int result, String flags,
+        {String inFlags = ""}) =>
     Scenario(
         '$name ${Z80a.r8Names[r8]}',
         [opcode],
-        State(register8Values: {r8: value}),
+        State(register8Values: {r8: value}, flags: inFlags),
         State(register8Values: {r8: result}, flags: flags));
 
 List<Scenario> incR8(int opcode, int r8) => [
-      changeR8N("INC", opcode, r8, 10, 11, "~Z ~S ~P ~N"),
-      changeR8N("INC", opcode, r8, 255, 0, "Z ~S ~P ~N"),
-      changeR8N("INC", opcode, r8, 127, 128, "~Z S P ~N"),
-      changeR8N("INC", opcode, r8, 130, 131, "~Z S ~P ~N"),
+      changeR8("INC", opcode, r8, 10, 11, "~Z ~S ~P ~N"),
+      changeR8("INC", opcode, r8, 255, 0, "Z ~S ~P ~N"),
+      changeR8("INC", opcode, r8, 127, 128, "~Z S P ~N"),
+      changeR8("INC", opcode, r8, 130, 131, "~Z S ~P ~N"),
     ];
 
 List<Scenario> decR8(int opcode, int r8) => [
-      changeR8N("DEC", opcode, r8, 10, 9, "~Z ~S ~P N"),
-      changeR8N("DEC", opcode, r8, 1, 0, "Z ~S ~P N"),
-      changeR8N("DEC", opcode, r8, 128, 127, "~Z ~S P N"),
-      changeR8N("DEC", opcode, r8, 131, 130, "~Z S ~P N"),
+      changeR8("DEC", opcode, r8, 10, 9, "~Z ~S ~P N"),
+      changeR8("DEC", opcode, r8, 1, 0, "Z ~S ~P N"),
+      changeR8("DEC", opcode, r8, 128, 127, "~Z ~S P N"),
+      changeR8("DEC", opcode, r8, 131, 130, "~Z S ~P N"),
     ];
 
 List<Scenario> exAFAFt(int opcode) => [
@@ -122,4 +125,48 @@ List<Scenario> ldAR16(int opcode, int r16) => [
         ),
         State(register8Values: {Z80a.R_A: 55}, ram: [0, 55]),
       )
+    ];
+
+List<Scenario> rlca(int opcode) => [
+      changeR8("RLCA", 0x07, Z80a.R_A, binary("00010011"), binary("00100110"),
+          "~C ~N"),
+      changeR8("RLCA", 0x07, Z80a.R_A, binary("10010011"), binary("00100111"),
+          "C ~N"),
+    ];
+
+List<Scenario> rrca(int opcode) => [
+      changeR8("RRCA", 0x0F, Z80a.R_A, binary("10100010"), binary("01010001"),
+          "~C ~N"),
+      changeR8("RRCA", 0x0F, Z80a.R_A, binary("10100011"), binary("11010001"),
+          "C ~N"),
+    ];
+
+List<Scenario> rla(int opcode) => [
+      changeR8("RLA", 0x17, Z80a.R_A, binary("00100010"), binary("01000100"),
+          "~C ~N",
+          inFlags: "~C"),
+      changeR8(
+          "RLA", 0x17, Z80a.R_A, binary("10100010"), binary("01000100"), "C ~N",
+          inFlags: "~C"),
+      changeR8("RLA", 0x17, Z80a.R_A, binary("00100010"), binary("01000101"),
+          "~C ~N",
+          inFlags: "C"),
+      changeR8(
+          "RLA", 0x17, Z80a.R_A, binary("10100010"), binary("01000101"), "C ~N",
+          inFlags: "C"),
+    ];
+
+List<Scenario> rra(int opcode) => [
+      changeR8("RRA", 0x1F, Z80a.R_A, binary("00100010"), binary("00010001"),
+          "~C ~N",
+          inFlags: "~C"),
+      changeR8(
+          "RRA", 0x1F, Z80a.R_A, binary("00100011"), binary("00010001"), "C ~N",
+          inFlags: "~C"),
+      changeR8("RRA", 0x1F, Z80a.R_A, binary("00100010"), binary("10010001"),
+          "~C ~N",
+          inFlags: "C"),
+      changeR8(
+          "RRA", 0x1F, Z80a.R_A, binary("00100011"), binary("10010001"), "C ~N",
+          inFlags: "C"),
     ];

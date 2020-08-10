@@ -420,6 +420,38 @@ class Z80a {
       case 0x12:
         this.memory.poke(DE, A);
         break;
+
+      // RLCA
+      case 0x07:
+        int b7 = (this.A & 0x80) >> 7;
+        this.A = byte(this.A << 1) | b7;
+        this.carryFlag = b7 == 1;
+        this.addSubtractFlag = false;
+        break;
+
+      // RRCA
+      case 0x0F:
+        int b0 = (this.A & 0x01);
+        this.A = byte(this.A >> 1) | (b0 << 7);
+        this.carryFlag = b0 == 1;
+        this.addSubtractFlag = false;
+        break;
+
+      // RLA
+      case 0x17:
+        int b7 = (this.A & 0x80) >> 7;
+        this.A = byte(this.A << 1) | (this.carryFlag ? 0x01 : 0x00);
+        this.carryFlag = b7 == 1;
+        this.addSubtractFlag = false;
+        break;
+
+      // RRA
+      case 0x1F:
+        int b0 = (this.A & 0x01);
+        this.A = byte(this.A >> 1) | (this.carryFlag ? 0x80 : 0x00);
+        this.carryFlag = b0 == 1;
+        this.addSubtractFlag = false;
+        break;
     }
   }
 }

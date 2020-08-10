@@ -40,6 +40,8 @@ var allScenarios = [
   ...decR8(0x25, Z80a.R_H),
   ...decR8(0x2D, Z80a.R_L),
   ...decR8(0x3D, Z80a.R_A),
+  ...rlca(0x07),
+  ...rrca(0x0F),
 ];
 
 void main() {
@@ -50,7 +52,7 @@ void main() {
   }, skip: true);
 
   test('One Scenario', () {
-    var scenarios = [];
+    var scenarios = rra(0x1F);
     scenarios.forEach((scenario) {
       scenario.run();
     });

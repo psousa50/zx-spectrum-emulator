@@ -137,6 +137,9 @@ class Scenario {
     var initialRegisterValues =
         mergeRegisterValues(zeroValues, initialState.registerValues);
 
+    initialRegisterValues[Z80a.R_F] =
+        setFlags(initialRegisterValues[Z80a.R_F], initialState.flags);
+
     return initialRegisterValues;
   }
 
