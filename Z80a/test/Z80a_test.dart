@@ -42,19 +42,25 @@ var allScenarios = [
   ...decR8(0x3D, Z80a.R_A),
   ...rlca(0x07),
   ...rrca(0x0F),
+  ...rra(0x17),
+  ...rla(0x1F),
+  ...callNN(0xCD),
+  ...ret(0xC9),
 ];
 
 void main() {
+  const runOne = false;
+
   test('All Scenarios', () {
     allScenarios.forEach((scenario) {
       scenario.run();
     });
-  }, skip: true);
+  }, skip: runOne);
 
   test('One Scenario', () {
-    var scenarios = rra(0x1F);
+    var scenarios = ldR16A(0x02, Z80a.R_BC);
     scenarios.forEach((scenario) {
       scenario.run();
     });
-  });
+  }, skip: !runOne);
 }

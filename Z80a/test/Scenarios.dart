@@ -1,10 +1,9 @@
 import '../lib/Z80a.dart';
 import './Scenario.dart';
-
-int binary(String b) => int.parse(b, radix: 2);
+import '../lib/Util.dart';
 
 List<Scenario> nop(int opcode) => [
-      Scenario("nop", [0x00], State(), State())
+      Scenario("NOP", [opcode], State(), State(pc: 1))
     ];
 
 List<Scenario> ldR16NN(int opcode, int r16) => [
@@ -27,6 +26,7 @@ Scenario addHLR16Spec(int opcode, int r16, int hlValue, int r16Value,
       State(
         register16Values: {Z80a.R_HL: result, r16: r16Value},
         flags: flags,
+        pc: 1,
       ),
     );
 
@@ -43,6 +43,7 @@ Scenario addHLHLSpec(int opcode, int hlValue, int result, String flags) =>
       State(
         register16Values: {Z80a.R_HL: result},
         flags: flags,
+        pc: 1,
       ),
     );
 
@@ -58,6 +59,7 @@ List<Scenario> incR16(int opcode, int r16) => [
           State(register16Values: {r16: 10000}),
           State(
             register16Values: {r16: 10001},
+            pc: 1,
           ))
     ];
 
@@ -68,6 +70,7 @@ List<Scenario> decR16(int opcode, int r16) => [
           State(register16Values: {r16: 10000}),
           State(
             register16Values: {r16: 9999},
+            pc: 1,
           ))
     ];
 
@@ -77,8 +80,15 @@ Scenario changeR8(
     Scenario(
         '$name ${Z80a.r8Names[r8]}',
         [opcode],
-        State(register8Values: {r8: value}, flags: inFlags),
-        State(register8Values: {r8: result}, flags: flags));
+        State(
+          register8Values: {r8: value},
+          flags: inFlags,
+        ),
+        State(
+          register8Values: {r8: result},
+          flags: flags,
+          pc: 1,
+        ));
 
 List<Scenario> incR8(int opcode, int r8) => [
       changeR8("INC", opcode, r8, 10, 11, "~Z ~S ~P ~N"),
@@ -98,8 +108,13 @@ List<Scenario> exAFAFt(int opcode) => [
       Scenario(
           'EX AF, AF' '',
           [opcode],
-          State(register16Values: {Z80a.R_AF: 1000, Z80a.R_AFt: 1500}),
-          State(register16Values: {Z80a.R_AF: 1500, Z80a.R_AFt: 1000}))
+          State(
+            register16Values: {Z80a.R_AF: 1000, Z80a.R_AFt: 1500},
+          ),
+          State(
+            register16Values: {Z80a.R_AF: 1500, Z80a.R_AFt: 1000},
+            pc: 1,
+          ))
     ];
 
 List<Scenario> ldR16A(int opcode, int r16) => [
@@ -111,7 +126,10 @@ List<Scenario> ldR16A(int opcode, int r16) => [
           register16Values: {r16: Scenario.RAM_START + 1},
           ram: [0, 0],
         ),
-        State(ram: [0, 55]),
+        State(
+          ram: [0, 55],
+          pc: 1,
+        ),
       )
     ];
 
@@ -123,7 +141,11 @@ List<Scenario> ldAR16(int opcode, int r16) => [
           register16Values: {r16: Scenario.RAM_START + 1},
           ram: [0, 55],
         ),
-        State(register8Values: {Z80a.R_A: 55}, ram: [0, 55]),
+        State(
+          register8Values: {Z80a.R_A: 55},
+          ram: [0, 55],
+          pc: 1,
+        ),
       )
     ];
 
@@ -169,4 +191,34 @@ List<Scenario> rra(int opcode) => [
       changeR8(
           "RRA", 0x1F, Z80a.R_A, binary("00100011"), binary("10010001"), "C ~N",
           inFlags: "C"),
+    ];
+
+List<Scenario> callNN(int opcode) => [
+      Scenario(
+          "CALL NN",
+          [opcode, 12, 34],
+          State(
+              register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 2},
+              ram: [0, 0, 0],
+              pc: 50000),
+          State(
+              register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
+              ram: [lo(50003), hi(50003), 0],
+              pc: w(12, 34)),
+          baseAddress: 50000)
+    ];
+
+List<Scenario> ret(int opcode) => [
+      Scenario(
+          "RET",
+          [opcode],
+          State(
+              register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
+              ram: [lo(12345), hi(12345), 0],
+              pc: 50000),
+          State(
+              register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 2},
+              ram: [lo(12345), hi(12345), 0],
+              pc: 12345),
+          baseAddress: 50000)
     ];

@@ -13,7 +13,7 @@ class State {
     Map<int, int> register8Values = const {},
     Map<int, int> register16Values = const {},
     this.ram = const [],
-    this.pc = 1,
+    this.pc = 0,
     this.flags = "",
   }) {
     register8Values.forEach((r, value) {
@@ -33,8 +33,10 @@ class Scenario {
   final List<int> opcodes;
   State initialState;
   State expectedState;
+  int baseAddress;
 
-  Scenario(this.name, this.opcodes, this.initialState, this.expectedState);
+  Scenario(this.name, this.opcodes, this.initialState, this.expectedState,
+      {this.baseAddress = 0});
 
   String scenarioName(List<int> opcodes) =>
       '${this.name} <=> ${opcodes.map((e) => e.toRadixString(16))}';
@@ -74,7 +76,7 @@ class Scenario {
     Map<int, int> expectedRegisterValues =
         setupExpectedRegisterValues(initialRegisterValues);
 
-    var z80a = Z80a(Memory.withBytes(memory));
+    var z80a = Z80a(Memory.withBytes(memory, baseAddress: this.baseAddress));
 
     setZ80Registers(z80a, initialRegisterValues);
 
@@ -97,9 +99,11 @@ class Scenario {
     checkFlag(z80a.zeroFlag, Z80a.F_ZERO, expectedRegisterValues);
     checkFlag(z80a.signFlag, Z80a.F_SIGN, expectedRegisterValues);
 
-    expect(z80a.memory.bytes.sublist(10), expectedState.ram);
+    expect(z80a.memory.bytes.sublist(10), expectedState.ram,
+        reason: '${scenarioName(opcodes)}\nReason: RAM is wrong');
 
-    expect(z80a.PC, expectedState.pc, reason: "PC is wrong");
+    expect(z80a.PC, expectedState.pc,
+        reason: '${scenarioName(opcodes)}\nReason: PC is wrong');
   }
 
   Map<int, int> getZ80Registers(Z80a z80a) {
@@ -114,6 +118,8 @@ class Scenario {
     initialRegisterValues.keys.forEach((r) {
       z80a.setReg(r, initialRegisterValues[r]);
     });
+
+    z80a.PC = initialState.pc;
   }
 
   void run() {

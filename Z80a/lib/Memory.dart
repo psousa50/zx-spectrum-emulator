@@ -1,22 +1,24 @@
 class Memory {
   List<int> bytes;
+  int baseAddress;
 
-  Memory.withBytes(this.bytes);
+  Memory.withBytes(this.bytes, {this.baseAddress = 0});
 
-  Memory({int size = 10}) {
+  Memory({size = 10, this.baseAddress = 0}) {
     this.bytes = List<int>(size);
   }
 
-  peek(int address) => bytes[address];
+  peek(int address) => bytes[address - baseAddress];
 
-  peek2(int address) => bytes[address] + 256 * bytes[address + 1];
+  peek2(int address) =>
+      bytes[address - baseAddress] + 256 * bytes[address - baseAddress + 1];
 
   poke(int address, int b) {
-    this.bytes[address] = b;
+    this.bytes[address - baseAddress] = b;
   }
 
   poke2(int address, int b) {
-    this.bytes[address] = b % 256;
-    this.bytes[address + 1] = b ~/ 256;
+    this.bytes[address - baseAddress] = b % 256;
+    this.bytes[address - baseAddress + 1] = b ~/ 256;
   }
 }

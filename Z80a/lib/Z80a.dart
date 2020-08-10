@@ -1,6 +1,7 @@
 library z80a;
 
 import './Memory.dart';
+import './Util.dart';
 
 // ignore_for_file: non_constant_identifier_names
 
@@ -14,6 +15,8 @@ class Z80a {
     R_E: "E",
     R_H: "H",
     R_L: "L",
+    R_S: "S",
+    R_P: "P",
     R_At: "A'",
     R_Ft: "F'",
     R_Bt: "B'",
@@ -216,6 +219,17 @@ class Z80a {
     signFlag = b > 127;
   }
 
+  void push2(int w) {
+    this.memory.poke(SP - 1, hi(w));
+    this.memory.poke(SP - 2, lo(w));
+    this.SP = this.SP - 2;
+  }
+
+  int pop2() {
+    this.SP = this.SP + 2;
+    return w(this.memory.peek(this.SP - 2), this.memory.peek(this.SP - 1));
+  }
+
   void step() {
     final opcode = fetch();
 
@@ -243,10 +257,6 @@ class Z80a {
 
       case 0x31:
         this.SP = fetch2();
-        break;
-
-      case 0x02:
-        this.memory.poke(BC, A);
         break;
 
       case 0x03:
@@ -409,16 +419,20 @@ class Z80a {
         this.addSubtractFlag = true;
         break;
 
+      case 0x02:
+        this.memory.poke(BC, A);
+        break;
+
+      case 0x12:
+        this.memory.poke(DE, A);
+        break;
+
       case 0x0A:
         this.A = this.memory.peek(BC);
         break;
 
       case 0x1A:
         this.A = this.memory.peek(DE);
-        break;
-
-      case 0x12:
-        this.memory.poke(DE, A);
         break;
 
       // RLCA
@@ -451,6 +465,17 @@ class Z80a {
         this.A = byte(this.A >> 1) | (this.carryFlag ? 0x80 : 0x00);
         this.carryFlag = b0 == 1;
         this.addSubtractFlag = false;
+        break;
+
+      // CALL NN
+      case 0xCD:
+        push2(PC + 2);
+        this.PC = fetch2();
+        break;
+
+      // RET
+      case 0xC9:
+        this.PC = pop2();
         break;
     }
   }
