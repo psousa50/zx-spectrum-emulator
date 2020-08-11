@@ -1,6 +1,6 @@
-import '../lib/Z80a.dart';
-import './Scenario.dart';
-import '../lib/Util.dart';
+import 'package:Z80a/Util.dart';
+import 'package:Z80a/Z80a.dart';
+import 'Scenario.dart';
 
 List<Scenario> nop(int opcode) => [
       Scenario("NOP", [opcode], State(), State(pc: 1))
@@ -286,4 +286,32 @@ List<Scenario> popR16(int opcode, int r16) => [
             pc: 50001,
           ),
           baseAddress: 50000)
+    ];
+
+List<Scenario> exx(int opcode) => [
+      Scenario(
+        'EXX',
+        [opcode],
+        State(
+          register16Values: {
+            Z80a.R_BC: 10000,
+            Z80a.R_DE: 20000,
+            Z80a.R_HL: 30000,
+            Z80a.R_BCt: 11111,
+            Z80a.R_DEt: 22222,
+            Z80a.R_HLt: 33333,
+          },
+        ),
+        State(
+          register16Values: {
+            Z80a.R_BC: 11111,
+            Z80a.R_DE: 22222,
+            Z80a.R_HL: 33333,
+            Z80a.R_BCt: 10000,
+            Z80a.R_DEt: 20000,
+            Z80a.R_HLt: 30000,
+          },
+          pc: 1,
+        ),
+      ),
     ];

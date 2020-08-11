@@ -107,6 +107,7 @@ var allScenarios = [
   ...popR16(0xD1, Z80a.R_DE),
   ...popR16(0xE1, Z80a.R_HL),
   ...popR16(0xF1, Z80a.R_AF),
+  ...exx(0xD9),
 ];
 
 void main() {

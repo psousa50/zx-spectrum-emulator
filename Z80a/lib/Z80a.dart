@@ -506,6 +506,18 @@ class Z80a {
       case 0xF1: // POP AF
         this.AF = pop2();
         break;
+
+      case 0xD9: // EXX
+        var bc = this.BC;
+        var de = this.DE;
+        var hl = this.HL;
+        this.BC = this.BCt;
+        this.DE = this.DEt;
+        this.HL = this.HLt;
+        this.BCt = bc;
+        this.DEt = de;
+        this.HLt = hl;
+        break;
     }
   }
 }
