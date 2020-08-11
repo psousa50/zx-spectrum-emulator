@@ -469,8 +469,25 @@ class Z80a {
         break;
 
       case 0xCD: // CALL NN
-        push2(PC + 2);
-        this.PC = fetch2();
+        var address = fetch2();
+        push2(PC);
+        this.PC = address;
+        break;
+
+      case 0xC4: // CALL NZ
+      case 0xCC: // CALL Z
+      case 0xD4: // CALL NC
+      case 0xDC: // CALL C
+      case 0xE4: // CALL PO
+      case 0xEC: // CALL PE
+      case 0xF4: // CALL P
+      case 0xFC: // CALL M
+        bool cond = getFlagCondition((opcode & 0x38) >> 3);
+        var address = fetch2();
+        if (cond) {
+          push2(PC);
+          this.PC = address;
+        }
         break;
 
       case 0xC9: // RET
@@ -503,6 +520,10 @@ class Z80a {
         if (cond) {
           this.PC = fetch2();
         }
+        break;
+
+      case 0xC3: // JP NN
+        this.PC = fetch2();
         break;
 
       case 0xC1: // POP BC

@@ -237,6 +237,34 @@ List<Scenario> ret(int opcode) => [
           baseAddress: 50000)
     ];
 
+Scenario callCCNNJump(int opcode, String flag) => Scenario(
+    "CALL $flag, NN",
+    [opcode, 12, 34],
+    State(
+        flags: flag,
+        register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 2},
+        ram: [0, 0, 0],
+        pc: 50000),
+    State(
+        register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
+        ram: [lo(50003), hi(50003), 0],
+        pc: w(12, 34)),
+    baseAddress: 50000);
+
+Scenario callCCNNNotJump(int opcode, String flag) => Scenario(
+      "CALL ~$flag, NN",
+      [opcode, 12, 34],
+      State(
+        flags: flag,
+      ),
+      State(pc: 3),
+    );
+
+List<Scenario> callCCNN(int opcode, String flag, bool jumpIfSet) => [
+      callCCNNJump(opcode, jumpIfSet ? flag : '~$flag'),
+      callCCNNNotJump(opcode, jumpIfSet ? '~$flag' : flag),
+    ];
+
 Scenario retCCJump(int opcode, String flag) => Scenario(
     "RET $flag",
     [opcode],
@@ -265,7 +293,7 @@ List<Scenario> retCC(int opcode, String flag, bool jumpIfSet) => [
       retCCNotJump(opcode, jumpIfSet ? '~$flag' : flag),
     ];
 
-Scenario jpCCJump(int opcode, String flag) => Scenario(
+Scenario jpCCNNJump(int opcode, String flag) => Scenario(
       "JP $flag, NN",
       [opcode, 12, 34],
       State(
@@ -274,7 +302,7 @@ Scenario jpCCJump(int opcode, String flag) => Scenario(
       State(pc: w(12, 34)),
     );
 
-Scenario jpCCNotJump(int opcode, String flag) => Scenario(
+Scenario jpCCNNNotJump(int opcode, String flag) => Scenario(
       "RET ~$flag",
       [opcode],
       State(
@@ -283,9 +311,18 @@ Scenario jpCCNotJump(int opcode, String flag) => Scenario(
       State(pc: 1),
     );
 
-List<Scenario> jpCC(int opcode, String flag, bool jumpIfSet) => [
-      jpCCJump(opcode, jumpIfSet ? flag : '~$flag'),
-      jpCCNotJump(opcode, jumpIfSet ? '~$flag' : flag),
+List<Scenario> jpCCNN(int opcode, String flag, bool jumpIfSet) => [
+      jpCCNNJump(opcode, jumpIfSet ? flag : '~$flag'),
+      jpCCNNNotJump(opcode, jumpIfSet ? '~$flag' : flag),
+    ];
+
+List<Scenario> jpNN(int opcode) => [
+      Scenario(
+        "JP NN",
+        [opcode, 12, 34],
+        State(),
+        State(pc: w(12, 34)),
+      )
     ];
 
 List<Scenario> popR16(int opcode, int r16) => [
