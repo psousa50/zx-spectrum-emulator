@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '../lib/Memory.dart';
-import '../lib/Z80a.dart';
-import '../lib/Util.dart';
+import 'package:Z80a/Memory.dart';
+import 'package:Z80a/Util.dart';
+import 'package:Z80a/Z80a.dart';
 
 class State {
   Map<int, int> registerValues = {};
@@ -86,7 +86,7 @@ class Scenario {
     Map<int, int> actualRegisterValues = getZ80Registers(z80a);
 
     for (var r = 0; r < Z80a.R_COUNT; r++) {
-      if (r != Z80a.R_F) {
+      if (![Z80a.R_F, Z80a.R_S, Z80a.R_P].contains(r)) {
         // FLAGS are checked later, individually
         expect(actualRegisterValues[r], expectedRegisterValues[r],
             reason: wrongRegister(opcodes, r));
@@ -102,6 +102,12 @@ class Scenario {
 
     expect(z80a.memory.bytes.sublist(10), expectedState.ram,
         reason: '${scenarioName(opcodes)}\nReason: RAM is wrong');
+
+    expect(
+        z80a.SP,
+        256 * expectedRegisterValues[Z80a.R_SP] +
+            expectedRegisterValues[Z80a.R_SP + 1],
+        reason: '${scenarioName(opcodes)}\nReason: SP is wrong');
 
     expect(z80a.PC, expectedState.pc,
         reason: '${scenarioName(opcodes)}\nReason: PC is wrong');

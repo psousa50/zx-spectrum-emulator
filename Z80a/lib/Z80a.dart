@@ -254,6 +254,31 @@ class Z80a {
     return w(this.memory.peek(this.SP - 2), this.memory.peek(this.SP - 1));
   }
 
+  bool getFlagCondition(int b) {
+    bool flag;
+    switch (b ~/ 2) {
+      case 0:
+        flag = this.zeroFlag;
+        break;
+
+      case 1:
+        flag = this.carryFlag;
+        break;
+
+      case 2:
+        flag = this.parityOverflowFlag;
+        break;
+
+      case 3:
+        flag = this.signFlag;
+        break;
+    }
+
+    if (b % 2 == 0) flag = !flag;
+
+    return flag;
+  }
+
   void step() {
     final opcode = fetch();
 
@@ -450,6 +475,20 @@ class Z80a {
 
       case 0xC9: // RET
         this.PC = pop2();
+        break;
+
+      case 0xC0: // RET NZ
+      case 0xC8: // RET Z
+      case 0xD0: // RET NC
+      case 0xD8: // RET C
+      case 0xE0: // RET PO
+      case 0xE8: // RET PE
+      case 0xF0: // RET P
+      case 0xF8: // RET M
+        bool cond = getFlagCondition((opcode & 0x38) >> 3);
+        if (cond) {
+          this.PC = pop2();
+        }
         break;
     }
   }

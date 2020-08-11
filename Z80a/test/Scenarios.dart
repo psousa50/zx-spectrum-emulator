@@ -236,3 +236,31 @@ List<Scenario> ret(int opcode) => [
               pc: 12345),
           baseAddress: 50000)
     ];
+
+Scenario retCCJump(int opcode, String flag) => Scenario(
+    "RET $flag",
+    [opcode],
+    State(
+        flags: flag,
+        register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
+        ram: [lo(12345), hi(12345), 0],
+        pc: 50000),
+    State(
+        register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 2},
+        ram: [lo(12345), hi(12345), 0],
+        pc: 12345),
+    baseAddress: 50000);
+
+Scenario retCCNotJump(int opcode, String flag) => Scenario(
+      "RET ~$flag",
+      [opcode],
+      State(
+        flags: flag,
+      ),
+      State(pc: 1),
+    );
+
+List<Scenario> retCC(int opcode, String flag, bool jumpIfSet) => [
+      retCCJump(opcode, jumpIfSet ? flag : '~$flag'),
+      retCCNotJump(opcode, jumpIfSet ? '~$flag' : flag),
+    ];

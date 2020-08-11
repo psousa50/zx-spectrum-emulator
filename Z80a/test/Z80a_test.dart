@@ -95,6 +95,14 @@ var allScenarios = [
   ...ldR8R8(0x7F, Z80a.R_A, Z80a.R_A),
   ...callNN(0xCD),
   ...ret(0xC9),
+  ...retCC(0xC0, "Z", false),
+  ...retCC(0xC8, "Z", true),
+  ...retCC(0xD0, "C", false),
+  ...retCC(0xD8, "C", true),
+  ...retCC(0xE0, "P", false),
+  ...retCC(0xE8, "P", true),
+  ...retCC(0xF0, "S", false),
+  ...retCC(0xF8, "S", true),
 ];
 
 void main() {
@@ -107,7 +115,10 @@ void main() {
   }, skip: !runAll);
 
   test('One Scenario', () {
-    var scenarios = ldR8R8(0x41, Z80a.R_B, Z80a.R_C);
+    var scenarios = [
+      ...retCC(0xC0, "Z", false),
+      ...retCC(0xC8, "Z", true),
+    ];
     scenarios.forEach((scenario) {
       scenario.run();
     });
