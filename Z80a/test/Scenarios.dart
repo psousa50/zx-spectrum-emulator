@@ -265,6 +265,29 @@ List<Scenario> retCC(int opcode, String flag, bool jumpIfSet) => [
       retCCNotJump(opcode, jumpIfSet ? '~$flag' : flag),
     ];
 
+Scenario jpCCJump(int opcode, String flag) => Scenario(
+      "JP $flag, NN",
+      [opcode, 12, 34],
+      State(
+        flags: flag,
+      ),
+      State(pc: w(12, 34)),
+    );
+
+Scenario jpCCNotJump(int opcode, String flag) => Scenario(
+      "RET ~$flag",
+      [opcode],
+      State(
+        flags: flag,
+      ),
+      State(pc: 1),
+    );
+
+List<Scenario> jpCC(int opcode, String flag, bool jumpIfSet) => [
+      jpCCJump(opcode, jumpIfSet ? flag : '~$flag'),
+      jpCCNotJump(opcode, jumpIfSet ? '~$flag' : flag),
+    ];
+
 List<Scenario> popR16(int opcode, int r16) => [
       Scenario(
           'POP ${Z80a.r16Names[r16]}',

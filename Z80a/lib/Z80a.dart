@@ -491,6 +491,20 @@ class Z80a {
         }
         break;
 
+      case 0xC2: // JP NZ
+      case 0xCA: // JP Z
+      case 0xD2: // JP NC
+      case 0xDA: // JP C
+      case 0xE2: // JP PO
+      case 0xEA: // JP PE
+      case 0xF2: // JP P
+      case 0xFA: // JP M
+        bool cond = getFlagCondition((opcode & 0x38) >> 3);
+        if (cond) {
+          this.PC = fetch2();
+        }
+        break;
+
       case 0xC1: // POP BC
         this.BC = pop2();
         break;
