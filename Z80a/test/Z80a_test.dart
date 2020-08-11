@@ -98,18 +98,18 @@ var allScenarios = [
 ];
 
 void main() {
-  const runOne = false;
+  const runAll = true;
 
   test('All Scenarios', () {
     allScenarios.forEach((scenario) {
       scenario.run();
     });
-  }, skip: runOne);
+  }, skip: !runAll);
 
   test('One Scenario', () {
     var scenarios = ldR8R8(0x41, Z80a.R_B, Z80a.R_C);
     scenarios.forEach((scenario) {
       scenario.run();
     });
-  }, skip: !runOne);
+  }, skip: runAll);
 }
