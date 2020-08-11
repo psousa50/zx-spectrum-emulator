@@ -306,10 +306,12 @@ class Z80a {
       case 0x24: // INC H
       case 0x2C: // INC L
       case 0x3C: // INC A
-        int r8 = (opcode & 0x38) >> 3;
-        this.parityOverflowFlag = this.registers[r8Table[r8]] == 0x7F;
-        this.registers[r8Table[r8]] = byte(this.registers[r8Table[r8]] + 1);
-        setFlagsOnResult(this.registers[r8Table[r8]]);
+        int r8 = r8Table[(opcode & 0x38) >> 3];
+        int value = this.getReg(r8);
+        this.parityOverflowFlag = value == 0x7F;
+        int newValue = byte(value + 1);
+        setReg(r8, newValue);
+        setFlagsOnResult(newValue);
         this.addSubtractFlag = false;
         break;
 
@@ -327,10 +329,12 @@ class Z80a {
       case 0x25: // DEC H
       case 0x2D: // DEC L
       case 0x3D: // DEC A
-        int r8 = (opcode & 0x38) >> 3;
-        this.parityOverflowFlag = this.registers[r8Table[r8]] == 0x80;
-        this.registers[r8Table[r8]] = byte(this.registers[r8Table[r8]] - 1);
-        setFlagsOnResult(registers[r8Table[r8]]);
+        int r8 = r8Table[(opcode & 0x38) >> 3];
+        int value = this.getReg(r8);
+        this.parityOverflowFlag = value == 0x80;
+        int newValue = byte(value - 1);
+        setReg(r8, newValue);
+        setFlagsOnResult(newValue);
         this.addSubtractFlag = true;
         break;
 
