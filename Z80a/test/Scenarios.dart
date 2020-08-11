@@ -193,6 +193,20 @@ List<Scenario> rra(int opcode) => [
           inFlags: "C"),
     ];
 
+List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
+      Scenario(
+        'LD ${Z80a.r8Names[r8Source]}, ${Z80a.r8Names[r8Dest]}',
+        [opcode],
+        State(
+          register8Values: {r8Source: 10, r8Dest: r8Source == r8Dest ? 10 : 5},
+        ),
+        State(
+          register8Values: {r8Source: 10, r8Dest: 10},
+          pc: 1,
+        ),
+      )
+    ];
+
 List<Scenario> callNN(int opcode) => [
       Scenario(
           "CALL NN",

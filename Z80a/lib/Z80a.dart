@@ -385,6 +385,60 @@ class Z80a {
         this.addSubtractFlag = false;
         break;
 
+      case 0x40: // LD B, B
+      case 0x41: // LD B, C
+      case 0x42: // LD B, D
+      case 0x43: // LD B, E
+      case 0x44: // LD B, H
+      case 0x45: // LD B, L
+      case 0x47: // LD B, A
+      case 0x48: // LD C, B
+      case 0x49: // LD C, C
+      case 0x4A: // LD C, D
+      case 0x4B: // LD C, E
+      case 0x4C: // LD C, H
+      case 0x4D: // LD C, L
+      case 0x4F: // LD C, A
+      case 0x50: // LD D, B
+      case 0x51: // LD D, C
+      case 0x52: // LD D, D
+      case 0x53: // LD D, E
+      case 0x54: // LD D, H
+      case 0x55: // LD D, L
+      case 0x57: // LD D, A
+      case 0x58: // LD E, B
+      case 0x59: // LD E, C
+      case 0x5A: // LD E, D
+      case 0x5B: // LD E, E
+      case 0x5C: // LD E, H
+      case 0x5D: // LD E, L
+      case 0x5F: // LD E, A
+      case 0x60: // LD H, B
+      case 0x61: // LD H, C
+      case 0x62: // LD H, D
+      case 0x63: // LD H, E
+      case 0x64: // LD H, H
+      case 0x65: // LD H, L
+      case 0x67: // LD H, A
+      case 0x68: // LD L, B
+      case 0x69: // LD L, C
+      case 0x6A: // LD L, D
+      case 0x6B: // LD L, E
+      case 0x6C: // LD L, H
+      case 0x6D: // LD L, L
+      case 0x6F: // LD L, A
+      case 0x78: // LD A, B
+      case 0x79: // LD A, C
+      case 0x7A: // LD A, D
+      case 0x7B: // LD A, E
+      case 0x7C: // LD A, H
+      case 0x7D: // LD A, L
+      case 0x7F: // LD A, A
+        int r8Source = r8Table[(opcode & 0x38) >> 3];
+        int r8Dest = r8Table[(opcode & 0x07)];
+        this.setReg(r8Dest, getReg(r8Source));
+        break;
+
       case 0xCD: // CALL NN
         push2(PC + 2);
         this.PC = fetch2();
