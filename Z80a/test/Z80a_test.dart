@@ -58,7 +58,7 @@ void main() {
   }, skip: runOne);
 
   test('One Scenario', () {
-    var scenarios = ldR16A(0x02, Z80a.R_BC);
+    var scenarios = incR8(0x04, Z80a.R_B);
     scenarios.forEach((scenario) {
       scenario.run();
     });

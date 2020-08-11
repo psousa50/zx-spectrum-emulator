@@ -94,6 +94,30 @@ class Z80a {
   static const F_ZERO = 0x10;
   static const F_SIGN = 0x20;
 
+  static const r8Table = {
+    0: R_B,
+    1: R_C,
+    2: R_D,
+    3: R_E,
+    4: R_H,
+    5: R_L,
+    7: R_A,
+  };
+
+  static const r16SPTable = {
+    0: R_BC,
+    1: R_DE,
+    2: R_HL,
+    3: R_SP,
+  };
+
+  static const r16SAFTable = {
+    0: R_BC,
+    1: R_DE,
+    2: R_HL,
+    3: R_AF,
+  };
+
   final Memory memory;
 
   Z80a(this.memory);
@@ -234,265 +258,139 @@ class Z80a {
     final opcode = fetch();
 
     switch (opcode) {
-      // NOP
-      case 0x00:
+      case 0x00: // NOP
         break;
 
-      // EX AF, AF'
-      case 0x08:
+      case 0x08: // EX AF, AF'
         final af = AF;
         AF = AFt;
         AFt = af;
         break;
 
-      // LD BC, nn
-      case 0x01:
-        this.BC = fetch2();
+      case 0x01: // LD BC, nn
+      case 0x11: // LD DE, nn
+      case 0x21: // LD HL, nn
+      case 0x31: // LD SP, nn
+        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        setReg2(r16, fetch2());
         break;
 
-      // LD DE, nn
-      case 0x11:
-        this.DE = fetch2();
+      case 0x03: // INC BC
+      case 0x13: // INC DE
+      case 0x23: // INC HL
+      case 0x33: // INC SP
+        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        setReg2(r16, word(getReg2(r16) + 1));
         break;
 
-      // LD HL, nn
-      case 0x21:
-        this.HL = fetch2();
+      case 0x0B: // DEC BC
+      case 0x1B: // DEC DE
+      case 0x2B: // DEC HL
+      case 0x3B: // DEC SP
+        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        setReg2(r16, word(getReg2(r16) - 1));
         break;
 
-      // LD SP, nn
-      case 0x31:
-        this.SP = fetch2();
+      case 0x09: // ADD HL, BC
+      case 0x19: // ADD HL, DE
+      case 0x29: // ADD HL, HL
+      case 0x39: // ADD HL, SP
+        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        this.HL = addW(this.HL, getReg2(r16));
         break;
 
-      // INC BC
-      case 0x03:
-        this.BC = word(this.BC + 1);
-        break;
-
-      // INC DE
-      case 0x13:
-        this.DE = word(this.DE + 1);
-        break;
-
-      // INC HL
-      case 0x23:
-        this.HL = word(this.HL + 1);
-        break;
-
-      // INC SP
-      case 0x33:
-        this.SP = word(this.SP + 1);
-        break;
-
-      // DEC BC
-      case 0x0B:
-        this.BC = word(this.BC - 1);
-        break;
-
-      // DEC DE
-      case 0x1B:
-        this.DE = word(this.DE - 1);
-        break;
-
-      // DEC HL
-      case 0x2B:
-        this.HL = word(this.HL - 1);
-        break;
-
-      // DEC SP
-      case 0x3B:
-        this.SP = word(this.SP - 1);
-        break;
-
-      // ADD HL, BC
-      case 0x09:
-        this.HL = addW(this.HL, this.BC);
-        break;
-
-      // ADD HL, DE
-      case 0x19:
-        this.HL = addW(this.HL, this.DE);
-        break;
-
-      // ADD HL, HL
-      case 0x29:
-        this.HL = addW(this.HL, this.HL);
-        break;
-
-      // ADD HL, SP
-      case 0x39:
-        this.HL = addW(this.HL, this.SP);
-        break;
-
-      case 0x04:
-        this.parityOverflowFlag = this.B == 0x7F;
-        this.B = byte(this.B + 1);
-        setFlagsOnResult(B);
+      case 0x04: // INC B
+      case 0x0C: // INC C
+      case 0x14: // INC D
+      case 0x1C: // INC E
+      case 0x24: // INC H
+      case 0x2C: // INC L
+      case 0x3C: // INC A
+        int r8 = (opcode & 0x38) >> 3;
+        this.parityOverflowFlag = this.registers[r8Table[r8]] == 0x7F;
+        this.registers[r8Table[r8]] = byte(this.registers[r8Table[r8]] + 1);
+        setFlagsOnResult(this.registers[r8Table[r8]]);
         this.addSubtractFlag = false;
         break;
 
-      case 0x0C:
-        this.parityOverflowFlag = this.C == 0x7F;
-        this.C = byte(this.C + 1);
-        setFlagsOnResult(C);
-        this.addSubtractFlag = false;
-        break;
-
-      case 0x14:
-        this.parityOverflowFlag = this.D == 0x7F;
-        this.D = byte(this.D + 1);
-        setFlagsOnResult(D);
-        this.addSubtractFlag = false;
-        break;
-
-      case 0x1C:
-        this.parityOverflowFlag = this.E == 0x7F;
-        this.E = byte(this.E + 1);
-        setFlagsOnResult(E);
-        this.addSubtractFlag = false;
-        break;
-
-      case 0x24:
-        this.parityOverflowFlag = this.H == 0x7F;
-        this.H = byte(this.H + 1);
-        setFlagsOnResult(H);
-        this.addSubtractFlag = false;
-        break;
-
-      case 0x2C:
-        this.parityOverflowFlag = this.L == 0x7F;
-        this.L = byte(this.L + 1);
-        setFlagsOnResult(L);
-        this.addSubtractFlag = false;
-        break;
-
-      case 0x34:
+      case 0x34: // INC (HL)
         this.parityOverflowFlag = this.memory.peek(this.HL) == 0x7F;
         this.memory.poke(this.HL, byte(this.memory.peek(this.HL) + 1));
         setFlagsOnResult(this.memory.peek(this.HL));
         this.addSubtractFlag = false;
         break;
 
-      case 0x3C:
-        this.parityOverflowFlag = this.A == 0x7F;
-        this.A = byte(this.A + 1);
-        setFlagsOnResult(A);
-        this.addSubtractFlag = false;
-        break;
-
-      case 0x05:
-        this.parityOverflowFlag = this.B == 0x80;
-        this.B = byte(this.B - 1);
-        setFlagsOnResult(B);
+      case 0x05: // DEC B
+      case 0x0D: // DEC C
+      case 0x15: // DEC D
+      case 0x1D: // DEC E
+      case 0x25: // DEC H
+      case 0x2D: // DEC L
+      case 0x3D: // DEC A
+        int r8 = (opcode & 0x38) >> 3;
+        this.parityOverflowFlag = this.registers[r8Table[r8]] == 0x80;
+        this.registers[r8Table[r8]] = byte(this.registers[r8Table[r8]] - 1);
+        setFlagsOnResult(registers[r8Table[r8]]);
         this.addSubtractFlag = true;
         break;
 
-      case 0x0D:
-        this.parityOverflowFlag = this.C == 0x80;
-        this.C = byte(this.C - 1);
-        setFlagsOnResult(C);
-        this.addSubtractFlag = true;
-        break;
-
-      case 0x15:
-        this.parityOverflowFlag = this.D == 0x80;
-        this.D = byte(this.D - 1);
-        setFlagsOnResult(D);
-        this.addSubtractFlag = true;
-        break;
-
-      case 0x1D:
-        this.parityOverflowFlag = this.E == 0x80;
-        this.E = byte(this.E - 1);
-        setFlagsOnResult(E);
-        this.addSubtractFlag = true;
-        break;
-
-      case 0x25:
-        this.parityOverflowFlag = this.H == 0x80;
-        this.H = byte(this.H - 1);
-        setFlagsOnResult(H);
-        this.addSubtractFlag = true;
-        break;
-
-      case 0x2D:
-        this.parityOverflowFlag = this.L == 0x80;
-        this.L = byte(this.L - 1);
-        setFlagsOnResult(L);
-        this.addSubtractFlag = true;
-        break;
-
-      case 0x35:
+      case 0x35: // DEC (HL)
         this.parityOverflowFlag = this.memory.peek(this.HL) == 0x80;
         this.memory.poke(this.HL, byte(this.memory.peek(this.HL) - 1));
         setFlagsOnResult(this.memory.peek(this.HL));
         this.addSubtractFlag = true;
         break;
 
-      case 0x3D:
-        this.parityOverflowFlag = this.A == 0x80;
-        this.A = byte(this.A - 1);
-        setFlagsOnResult(A);
-        this.addSubtractFlag = true;
-        break;
-
-      case 0x02:
+      case 0x02: // LD (BC), A
         this.memory.poke(BC, A);
         break;
 
-      case 0x12:
+      case 0x12: // LD (DE), A
         this.memory.poke(DE, A);
         break;
 
-      case 0x0A:
+      case 0x0A: // LD A, (BC)
         this.A = this.memory.peek(BC);
         break;
 
-      case 0x1A:
+      case 0x1A: // LD A, (DE)
         this.A = this.memory.peek(DE);
         break;
 
-      // RLCA
-      case 0x07:
+      case 0x07: // RLCA
         int b7 = (this.A & 0x80) >> 7;
         this.A = byte(this.A << 1) | b7;
         this.carryFlag = b7 == 1;
         this.addSubtractFlag = false;
         break;
 
-      // RRCA
-      case 0x0F:
+      case 0x0F: // RRCA
         int b0 = (this.A & 0x01);
         this.A = byte(this.A >> 1) | (b0 << 7);
         this.carryFlag = b0 == 1;
         this.addSubtractFlag = false;
         break;
 
-      // RLA
-      case 0x17:
+      case 0x17: // RLA
         int b7 = (this.A & 0x80) >> 7;
         this.A = byte(this.A << 1) | (this.carryFlag ? 0x01 : 0x00);
         this.carryFlag = b7 == 1;
         this.addSubtractFlag = false;
         break;
 
-      // RRA
-      case 0x1F:
+      case 0x1F: // RRA
         int b0 = (this.A & 0x01);
         this.A = byte(this.A >> 1) | (this.carryFlag ? 0x80 : 0x00);
         this.carryFlag = b0 == 1;
         this.addSubtractFlag = false;
         break;
 
-      // CALL NN
-      case 0xCD:
+      case 0xCD: // CALL NN
         push2(PC + 2);
         this.PC = fetch2();
         break;
 
-      // RET
-      case 0xC9:
+      case 0xC9: // RET
         this.PC = pop2();
         break;
     }
