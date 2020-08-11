@@ -490,6 +490,22 @@ class Z80a {
           this.PC = pop2();
         }
         break;
+
+      case 0xC1: // POP BC
+        this.BC = pop2();
+        break;
+
+      case 0xD1: // POP DE
+        this.DE = pop2();
+        break;
+
+      case 0xE1: // POP HL
+        this.HL = pop2();
+        break;
+
+      case 0xF1: // POP AF
+        this.AF = pop2();
+        break;
     }
   }
 }

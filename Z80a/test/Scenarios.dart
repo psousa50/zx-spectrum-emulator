@@ -264,3 +264,26 @@ List<Scenario> retCC(int opcode, String flag, bool jumpIfSet) => [
       retCCJump(opcode, jumpIfSet ? flag : '~$flag'),
       retCCNotJump(opcode, jumpIfSet ? '~$flag' : flag),
     ];
+
+List<Scenario> popR16(int opcode, int r16) => [
+      Scenario(
+          'POP ${Z80a.r16Names[r16]}',
+          [opcode],
+          State(
+              register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
+              ram: [lo(12345), hi(12345), 0],
+              pc: 50000),
+          State(
+            register16Values: {
+              Z80a.R_SP: Scenario.RAM_START + 50000 + 2,
+              r16: 12345,
+            },
+            ram: [
+              lo(12345),
+              hi(12345),
+              0,
+            ],
+            pc: 50001,
+          ),
+          baseAddress: 50000)
+    ];

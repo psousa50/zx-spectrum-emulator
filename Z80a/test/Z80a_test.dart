@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '../lib/Z80a.dart';
-import './Scenarios.dart';
+import 'package:Z80a/Z80a.dart';
+import 'Scenarios.dart';
 
 var allScenarios = [
   ...nop(0x00),
@@ -103,6 +103,10 @@ var allScenarios = [
   ...retCC(0xE8, "P", true),
   ...retCC(0xF0, "S", false),
   ...retCC(0xF8, "S", true),
+  ...popR16(0xC1, Z80a.R_BC),
+  ...popR16(0xD1, Z80a.R_DE),
+  ...popR16(0xE1, Z80a.R_HL),
+  ...popR16(0xF1, Z80a.R_AF),
 ];
 
 void main() {
@@ -115,10 +119,7 @@ void main() {
   }, skip: !runAll);
 
   test('One Scenario', () {
-    var scenarios = [
-      ...retCC(0xC0, "Z", false),
-      ...retCC(0xC8, "Z", true),
-    ];
+    var scenarios = popR16(0xC1, Z80a.R_BC);
     scenarios.forEach((scenario) {
       scenario.run();
     });
