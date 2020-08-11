@@ -234,75 +234,93 @@ class Z80a {
     final opcode = fetch();
 
     switch (opcode) {
+      // NOP
       case 0x00:
         break;
 
+      // EX AF, AF'
       case 0x08:
         final af = AF;
         AF = AFt;
         AFt = af;
         break;
 
+      // LD BC, nn
       case 0x01:
         this.BC = fetch2();
         break;
 
+      // LD DE, nn
       case 0x11:
         this.DE = fetch2();
         break;
 
+      // LD HL, nn
       case 0x21:
         this.HL = fetch2();
         break;
 
+      // LD SP, nn
       case 0x31:
         this.SP = fetch2();
         break;
 
+      // INC BC
       case 0x03:
         this.BC = word(this.BC + 1);
         break;
 
+      // INC DE
       case 0x13:
         this.DE = word(this.DE + 1);
         break;
 
+      // INC HL
       case 0x23:
         this.HL = word(this.HL + 1);
         break;
 
+      // INC SP
       case 0x33:
         this.SP = word(this.SP + 1);
         break;
 
+      // DEC BC
       case 0x0B:
         this.BC = word(this.BC - 1);
         break;
 
+      // DEC DE
       case 0x1B:
         this.DE = word(this.DE - 1);
         break;
 
+      // DEC HL
       case 0x2B:
         this.HL = word(this.HL - 1);
         break;
 
+      // DEC SP
       case 0x3B:
         this.SP = word(this.SP - 1);
         break;
 
+      // ADD HL, BC
       case 0x09:
         this.HL = addW(this.HL, this.BC);
         break;
 
+      // ADD HL, DE
       case 0x19:
         this.HL = addW(this.HL, this.DE);
         break;
 
+      // ADD HL, HL
       case 0x29:
         this.HL = addW(this.HL, this.HL);
         break;
 
+      // ADD HL, SP
       case 0x39:
         this.HL = addW(this.HL, this.SP);
         break;
