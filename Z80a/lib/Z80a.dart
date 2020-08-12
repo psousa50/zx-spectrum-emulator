@@ -499,7 +499,7 @@ class Z80a {
       case 0xEC: // CALL PE
       case 0xF4: // CALL P
       case 0xFC: // CALL M
-        bool cond = getFlagCondition((opcode & 0x38) >> 3);
+        var cond = getFlagCondition((opcode & 0x38) >> 3);
         var address = fetch2();
         if (cond) {
           push2(PC);
@@ -519,7 +519,7 @@ class Z80a {
       case 0xE8: // RET PE
       case 0xF0: // RET P
       case 0xF8: // RET M
-        bool cond = getFlagCondition((opcode & 0x38) >> 3);
+        var cond = getFlagCondition((opcode & 0x38) >> 3);
         if (cond) {
           this.PC = pop2();
         }
@@ -533,7 +533,7 @@ class Z80a {
       case 0xEA: // JP PE
       case 0xF2: // JP P
       case 0xFA: // JP M
-        bool cond = getFlagCondition((opcode & 0x38) >> 3);
+        var cond = getFlagCondition((opcode & 0x38) >> 3);
         if (cond) {
           this.PC = fetch2();
         }
@@ -604,7 +604,23 @@ class Z80a {
         var d = fetch();
         this.B = byte(this.B - 1);
         if (this.B == 0) {
-          this.PC = this.PC + d - 2;
+          this.PC = this.PC + d;
+        }
+        break;
+
+      case 0x18: // JR NN
+        var d = fetch();
+        this.PC = this.PC + d;
+        break;
+
+      case 0x20: // JR NZ
+      case 0x28: // JR Z
+      case 0x30: // JR NC
+      case 0x38: // JR C
+        var d = fetch();
+        var cond = getFlagCondition(((opcode & 0x38) >> 3) - 4);
+        if (cond) {
+          this.PC = this.PC + d;
         }
         break;
 

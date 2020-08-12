@@ -147,6 +147,11 @@ var allScenarios = [
   ...rstNN(0xFF, 56),
   ...exx(0xD9),
   ...djnzN(0x10),
+  ...jrN(0x18),
+  ...jrCCNN(0x20, "Z", false),
+  ...jrCCNN(0x28, "Z", true),
+  ...jrCCNN(0x30, "C", false),
+  ...jrCCNN(0x38, "C", true),
 ];
 
 void main() {

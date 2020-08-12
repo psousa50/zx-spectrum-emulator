@@ -338,7 +338,7 @@ Scenario jpCCNNJump(int opcode, String flag) => Scenario(
     );
 
 Scenario jpCCNNNotJump(int opcode, String flag) => Scenario(
-      "RET ~$flag",
+      "JP $flag",
       [opcode],
       initialState: State(
         flags: flag,
@@ -464,7 +464,7 @@ Scenario djnzNJump(int opcode) => Scenario(
       ),
       expectedState: State(
         register8Values: {Z80a.R_B: 0},
-        pc: 10,
+        pc: 12,
       ),
     );
 
@@ -483,4 +483,34 @@ Scenario djnzNNotJump(int opcode) => Scenario(
 List<Scenario> djnzN(int opcode) => [
       djnzNJump(opcode),
       djnzNNotJump(opcode),
+    ];
+
+List<Scenario> jrN(int opcode) => [
+      Scenario(
+        "JR n",
+        [opcode, 10],
+        initialState: State(),
+        expectedState: State(
+          pc: 12,
+        ),
+      )
+    ];
+
+Scenario jrCCNJump(int opcode, String flag) => Scenario(
+      "JR $flag, NN",
+      [opcode, 10],
+      initialState: State(flags: flag),
+      expectedState: State(pc: 12),
+    );
+
+Scenario jrCCNNotJump(int opcode, String flag) => Scenario(
+      "JR $flag, NN",
+      [opcode, 10],
+      initialState: State(flags: flag),
+      expectedState: State(pc: 2),
+    );
+
+List<Scenario> jrCCNN(int opcode, String flag, bool jumpIfSet) => [
+      jrCCNJump(opcode, jumpIfSet ? flag : '~$flag'),
+      jrCCNNotJump(opcode, jumpIfSet ? '~$flag' : flag),
     ];
