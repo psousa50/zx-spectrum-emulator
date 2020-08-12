@@ -381,3 +381,25 @@ List<Scenario> pushR16(int opcode, int r16) => [
         baseAddress: 50000,
       )
     ];
+
+List<Scenario> rstNN(int opcode, int rst) => [
+      Scenario(
+        'RST $rst',
+        [opcode],
+        initialState: State(
+          register16Values: {
+            Z80a.R_SP: Scenario.RAM_START + 50000 + 2,
+          },
+          ram: [0, 0, 0],
+          pc: 50000,
+        ),
+        expectedState: State(
+          register16Values: {
+            Z80a.R_SP: Scenario.RAM_START + 50000 + 0,
+          },
+          ram: [lo(50001), hi(50001), 0],
+          pc: rst,
+        ),
+        baseAddress: 50000,
+      )
+    ];

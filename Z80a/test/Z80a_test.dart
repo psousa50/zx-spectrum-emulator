@@ -128,6 +128,14 @@ var allScenarios = [
   ...popR16(0xD1, Z80a.R_DE),
   ...popR16(0xE1, Z80a.R_HL),
   ...popR16(0xF1, Z80a.R_AF),
+  ...rstNN(0xC7, 00),
+  ...rstNN(0xCF, 08),
+  ...rstNN(0xD7, 16),
+  ...rstNN(0xDF, 24),
+  ...rstNN(0xE7, 32),
+  ...rstNN(0xEF, 40),
+  ...rstNN(0xF7, 48),
+  ...rstNN(0xFF, 56),
   ...exx(0xD9),
 ];
 

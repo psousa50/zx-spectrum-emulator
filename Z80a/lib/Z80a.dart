@@ -558,6 +558,19 @@ class Z80a {
         this.AF = pop2();
         break;
 
+      case 0xC7: // RST 00
+      case 0xCF: // RST 08
+      case 0xD7: // RST 16
+      case 0xDF: // RST 24
+      case 0xE7: // RST 32
+      case 0xEF: // RST 40
+      case 0xF7: // RST 48
+      case 0xFF: // RST 56
+        var rst = opcode & 0x38;
+        push2(this.PC);
+        this.PC = rst;
+        break;
+
       case 0xD9: // EXX
         var bc = this.BC;
         var de = this.DE;
