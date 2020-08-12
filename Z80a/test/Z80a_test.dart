@@ -19,6 +19,7 @@ var allScenarios = [
   ...ldR8NN(0x2E, Z80a.R_L),
   ...ldR8NN(0x3E, Z80a.R_A),
   ...ldMHLNN(0x36),
+  ...ldMNNHL(0x22),
   ...ldR16NN(0x01, Z80a.R_BC),
   ...ldR16NN(0x11, Z80a.R_DE),
   ...ldR16NN(0x21, Z80a.R_HL),

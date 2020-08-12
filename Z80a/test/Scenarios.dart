@@ -23,6 +23,27 @@ List<Scenario> ldR8NN(int opcode, int r8) => [
       )
     ];
 
+List<Scenario> ldMNNHL(int opcode) => [
+      Scenario(
+        'LD (NN), HL',
+        [
+          opcode,
+          lo(Scenario.RAM_START + 50000),
+          hi(Scenario.RAM_START + 50000)
+        ],
+        initialState: State(
+          register16Values: {Z80a.R_HL: 10000},
+          ram: [0, 0, 0],
+          pc: 50000,
+        ),
+        expectedState: State(
+          ram: [lo(10000), hi(10000), 0],
+          pc: 50003,
+        ),
+        baseAddress: 50000,
+      )
+    ];
+
 List<Scenario> ldMHLNN(int opcode) => [
       Scenario(
         'LD (HL), NN',
