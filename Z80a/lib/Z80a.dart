@@ -526,6 +526,22 @@ class Z80a {
         this.PC = fetch2();
         break;
 
+      case 0xC5: // PUSH BC
+        push2(this.BC);
+        break;
+
+      case 0xD5: // PUSH DE
+        push2(this.DE);
+        break;
+
+      case 0xE5: // PUSH HL
+        push2(this.HL);
+        break;
+
+      case 0xF5: // PUSH AF
+        push2(this.AF);
+        break;
+
       case 0xC1: // POP BC
         this.BC = pop2();
         break;

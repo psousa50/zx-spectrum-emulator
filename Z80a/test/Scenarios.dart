@@ -358,3 +358,26 @@ List<Scenario> exx(int opcode) => [
         ),
       ),
     ];
+
+List<Scenario> pushR16(int opcode, int r16) => [
+      Scenario(
+        'PUSH ${Z80a.r16Names[r16]}',
+        [opcode],
+        initialState: State(
+          register16Values: {
+            r16: 10000,
+            Z80a.R_SP: Scenario.RAM_START + 50000 + 2,
+          },
+          ram: [0, 0, 0],
+          pc: 50000,
+        ),
+        expectedState: State(
+          register16Values: {
+            Z80a.R_SP: Scenario.RAM_START + 50000 + 0,
+          },
+          ram: [lo(10000), hi(10000), 0],
+          pc: 50001,
+        ),
+        baseAddress: 50000,
+      )
+    ];
