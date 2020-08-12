@@ -455,3 +455,32 @@ List<Scenario> rstNN(int opcode, int rst) => [
         baseAddress: 50000,
       )
     ];
+
+Scenario djnzNJump(int opcode) => Scenario(
+      "DJNZ n",
+      [opcode, 10],
+      initialState: State(
+        register8Values: {Z80a.R_B: 1},
+      ),
+      expectedState: State(
+        register8Values: {Z80a.R_B: 0},
+        pc: 10,
+      ),
+    );
+
+Scenario djnzNNotJump(int opcode) => Scenario(
+      "DJNZ n",
+      [opcode, 10],
+      initialState: State(
+        register8Values: {Z80a.R_B: 5},
+      ),
+      expectedState: State(
+        register8Values: {Z80a.R_B: 4},
+        pc: 2,
+      ),
+    );
+
+List<Scenario> djnzN(int opcode) => [
+      djnzNJump(opcode),
+      djnzNNotJump(opcode),
+    ];

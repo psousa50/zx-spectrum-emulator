@@ -146,6 +146,7 @@ var allScenarios = [
   ...rstNN(0xF7, 48),
   ...rstNN(0xFF, 56),
   ...exx(0xD9),
+  ...djnzN(0x10),
 ];
 
 void main() {

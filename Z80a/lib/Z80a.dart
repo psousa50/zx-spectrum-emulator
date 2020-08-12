@@ -600,6 +600,14 @@ class Z80a {
         this.HLt = hl;
         break;
 
+      case 0x10: // DJNZ NN
+        var d = fetch();
+        this.B = byte(this.B - 1);
+        if (this.B == 0) {
+          this.PC = this.PC + d - 2;
+        }
+        break;
+
       default:
         processed = false;
         break;
