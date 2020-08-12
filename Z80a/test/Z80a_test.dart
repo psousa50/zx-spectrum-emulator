@@ -1,3 +1,4 @@
+import 'package:Z80a/Memory.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Z80a/Z80a.dart';
@@ -10,6 +11,14 @@ var allScenarios = [
   ...ldAR16(0x0A, Z80a.R_BC),
   ...ldAR16(0x1A, Z80a.R_DE),
   ...exAFAFt(0x08),
+  ...ldR8NN(0x06, Z80a.R_B),
+  ...ldR8NN(0x0E, Z80a.R_C),
+  ...ldR8NN(0x16, Z80a.R_D),
+  ...ldR8NN(0x1E, Z80a.R_E),
+  ...ldR8NN(0x26, Z80a.R_H),
+  ...ldR8NN(0x2E, Z80a.R_L),
+  ...ldR8NN(0x3E, Z80a.R_A),
+  ...ldMHLNN(0x36),
   ...ldR16NN(0x01, Z80a.R_BC),
   ...ldR16NN(0x11, Z80a.R_DE),
   ...ldR16NN(0x21, Z80a.R_HL),
@@ -154,4 +163,16 @@ void main() {
       scenario.run();
     });
   }, skip: runAll);
+
+  test('All opcodes should be processed', () {
+    var z80a = Z80a(Memory(size: 10));
+    for (var opcode = 0; opcode < 256; opcode++) {
+      z80a.memory.poke(0, opcode);
+      z80a.memory.poke(1, 0);
+      z80a.memory.poke(2, 0);
+      z80a.memory.poke(3, 0);
+      z80a.PC = 0;
+      expect(z80a.step(), true, reason: 'Opcode $opcode not processed');
+    }
+  }, skip: true);
 }

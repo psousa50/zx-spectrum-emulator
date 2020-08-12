@@ -279,7 +279,9 @@ class Z80a {
     return flag;
   }
 
-  void step() {
+  bool step() {
+    var processed = true;
+
     final opcode = fetch();
 
     switch (opcode) {
@@ -290,6 +292,21 @@ class Z80a {
         final af = AF;
         AF = AFt;
         AFt = af;
+        break;
+
+      case 0x06: // LD B, nn
+      case 0x0E: // LD C, nn
+      case 0x16: // LD D, nn
+      case 0x1E: // LD E, nn
+      case 0x26: // LD H, nn
+      case 0x2E: // LD L, nn
+      case 0x3E: // LD A, nn
+        int r8 = r8Table[(opcode & 0x38) >> 3];
+        setReg(r8, fetch());
+        break;
+
+      case 0x36: // LD (HL), nn
+        this.memory.poke(this.HL, fetch());
         break;
 
       case 0x01: // LD BC, nn
@@ -582,6 +599,12 @@ class Z80a {
         this.DEt = de;
         this.HLt = hl;
         break;
+
+      default:
+        processed = false;
+        break;
     }
+
+    return processed;
   }
 }

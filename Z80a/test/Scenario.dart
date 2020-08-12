@@ -77,7 +77,7 @@ class Scenario {
     Map<int, int> expectedRegisterValues =
         setupExpectedRegisterValues(initialRegisterValues);
 
-    var z80a = Z80a(Memory.withBytes(memory, baseAddress: this.baseAddress));
+    var z80a = Z80a(Memory.fromBytes(memory, baseAddress: this.baseAddress));
 
     setZ80Registers(z80a, initialRegisterValues);
 

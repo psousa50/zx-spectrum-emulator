@@ -4,7 +4,7 @@ class Memory {
   List<int> bytes;
   int baseAddress;
 
-  Memory.withBytes(this.bytes, {this.baseAddress = 0});
+  Memory.fromBytes(this.bytes, {this.baseAddress = 0});
 
   Memory({size = 10, this.baseAddress = 0}) {
     this.bytes = List<int>(size);
