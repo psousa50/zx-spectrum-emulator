@@ -36,8 +36,8 @@ class Scenario {
   State expectedState;
   int baseAddress;
 
-  Scenario(this.name, this.opcodes, this.initialState, this.expectedState,
-      {this.baseAddress = 0});
+  Scenario(this.name, this.opcodes,
+      {this.initialState, this.expectedState, this.baseAddress = 0});
 
   String scenarioName(List<int> opcodes) =>
       '${this.name} <=> ${opcodes.map((e) => e.toRadixString(16))}';

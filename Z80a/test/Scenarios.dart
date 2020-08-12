@@ -3,15 +3,14 @@ import 'package:Z80a/Z80a.dart';
 import 'Scenario.dart';
 
 List<Scenario> nop(int opcode) => [
-      Scenario("NOP", [opcode], State(), State(pc: 1))
+      Scenario("NOP", [opcode],
+          initialState: State(), expectedState: State(pc: 1))
     ];
 
 List<Scenario> ldR16NN(int opcode, int r16) => [
-      Scenario(
-          'LD ${Z80a.r16Names[r16]}, NN',
-          [opcode, 12, 34],
-          State(),
-          State(
+      Scenario('LD ${Z80a.r16Names[r16]}, NN', [opcode, 12, 34],
+          initialState: State(),
+          expectedState: State(
             register16Values: {r16: 34 * 256 + 12},
             pc: 3,
           ))
@@ -22,8 +21,9 @@ Scenario addHLR16Spec(int opcode, int r16, int hlValue, int r16Value,
     Scenario(
       "ADD HL, ${Z80a.r16Names[r16]}",
       [opcode],
-      State(register16Values: {Z80a.R_HL: hlValue, r16: r16Value}),
-      State(
+      initialState:
+          State(register16Values: {Z80a.R_HL: hlValue, r16: r16Value}),
+      expectedState: State(
         register16Values: {Z80a.R_HL: result, r16: r16Value},
         flags: flags,
         pc: 1,
@@ -39,8 +39,8 @@ Scenario addHLHLSpec(int opcode, int hlValue, int result, String flags) =>
     Scenario(
       "ADD HL, HL",
       [opcode],
-      State(register16Values: {Z80a.R_HL: hlValue}),
-      State(
+      initialState: State(register16Values: {Z80a.R_HL: hlValue}),
+      expectedState: State(
         register16Values: {Z80a.R_HL: result},
         flags: flags,
         pc: 1,
@@ -53,22 +53,18 @@ List<Scenario> addHLHL(int opcode) => [
     ];
 
 List<Scenario> incR16(int opcode, int r16) => [
-      Scenario(
-          'INC ${Z80a.r16Names[r16]}',
-          [opcode],
-          State(register16Values: {r16: 10000}),
-          State(
+      Scenario('INC ${Z80a.r16Names[r16]}', [opcode],
+          initialState: State(register16Values: {r16: 10000}),
+          expectedState: State(
             register16Values: {r16: 10001},
             pc: 1,
           ))
     ];
 
 List<Scenario> decR16(int opcode, int r16) => [
-      Scenario(
-          'DEC ${Z80a.r16Names[r16]}',
-          [opcode],
-          State(register16Values: {r16: 10000}),
-          State(
+      Scenario('DEC ${Z80a.r16Names[r16]}', [opcode],
+          initialState: State(register16Values: {r16: 10000}),
+          expectedState: State(
             register16Values: {r16: 9999},
             pc: 1,
           ))
@@ -77,14 +73,12 @@ List<Scenario> decR16(int opcode, int r16) => [
 Scenario changeR8(
         String name, int opcode, int r8, int value, int result, String flags,
         {String inFlags = ""}) =>
-    Scenario(
-        '$name ${Z80a.r8Names[r8]}',
-        [opcode],
-        State(
+    Scenario('$name ${Z80a.r8Names[r8]}', [opcode],
+        initialState: State(
           register8Values: {r8: value},
           flags: inFlags,
         ),
-        State(
+        expectedState: State(
           register8Values: {r8: result},
           flags: flags,
           pc: 1,
@@ -105,13 +99,11 @@ List<Scenario> decR8(int opcode, int r8) => [
     ];
 
 List<Scenario> exAFAFt(int opcode) => [
-      Scenario(
-          'EX AF, AF' '',
-          [opcode],
-          State(
+      Scenario('EX AF, AF' '', [opcode],
+          initialState: State(
             register16Values: {Z80a.R_AF: 1000, Z80a.R_AFt: 1500},
           ),
-          State(
+          expectedState: State(
             register16Values: {Z80a.R_AF: 1500, Z80a.R_AFt: 1000},
             pc: 1,
           ))
@@ -121,12 +113,12 @@ List<Scenario> ldR16A(int opcode, int r16) => [
       Scenario(
         'LD (${Z80a.r16Names[r16]}), A',
         [opcode],
-        State(
+        initialState: State(
           register8Values: {Z80a.R_A: 55},
           register16Values: {r16: Scenario.RAM_START + 1},
           ram: [0, 0],
         ),
-        State(
+        expectedState: State(
           ram: [0, 55],
           pc: 1,
         ),
@@ -137,11 +129,11 @@ List<Scenario> ldAR16(int opcode, int r16) => [
       Scenario(
         'LD A, (${Z80a.r16Names[r16]})',
         [opcode],
-        State(
+        initialState: State(
           register16Values: {r16: Scenario.RAM_START + 1},
           ram: [0, 55],
         ),
-        State(
+        expectedState: State(
           register8Values: {Z80a.R_A: 55},
           ram: [0, 55],
           pc: 1,
@@ -197,10 +189,10 @@ List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
       Scenario(
         'LD ${Z80a.r8Names[r8Source]}, ${Z80a.r8Names[r8Dest]}',
         [opcode],
-        State(
+        initialState: State(
           register8Values: {r8Source: 10, r8Dest: r8Source == r8Dest ? 10 : 5},
         ),
-        State(
+        expectedState: State(
           register8Values: {r8Source: 10, r8Dest: 10},
           pc: 1,
         ),
@@ -208,14 +200,12 @@ List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
     ];
 
 List<Scenario> callNN(int opcode) => [
-      Scenario(
-          "CALL NN",
-          [opcode, 12, 34],
-          State(
+      Scenario("CALL NN", [opcode, 12, 34],
+          initialState: State(
               register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 2},
               ram: [0, 0, 0],
               pc: 50000),
-          State(
+          expectedState: State(
               register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
               ram: [lo(50003), hi(50003), 0],
               pc: w(12, 34)),
@@ -223,41 +213,38 @@ List<Scenario> callNN(int opcode) => [
     ];
 
 List<Scenario> ret(int opcode) => [
-      Scenario(
-          "RET",
-          [opcode],
-          State(
+      Scenario("RET", [opcode],
+          initialState: State(
               register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
               ram: [lo(12345), hi(12345), 0],
               pc: 50000),
-          State(
+          expectedState: State(
               register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 2},
               ram: [lo(12345), hi(12345), 0],
               pc: 12345),
           baseAddress: 50000)
     ];
 
-Scenario callCCNNJump(int opcode, String flag) => Scenario(
-    "CALL $flag, NN",
-    [opcode, 12, 34],
-    State(
-        flags: flag,
-        register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 2},
-        ram: [0, 0, 0],
-        pc: 50000),
-    State(
-        register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
-        ram: [lo(50003), hi(50003), 0],
-        pc: w(12, 34)),
-    baseAddress: 50000);
+Scenario callCCNNJump(int opcode, String flag) =>
+    Scenario("CALL $flag, NN", [opcode, 12, 34],
+        initialState: State(
+            flags: flag,
+            register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 2},
+            ram: [0, 0, 0],
+            pc: 50000),
+        expectedState: State(
+            register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
+            ram: [lo(50003), hi(50003), 0],
+            pc: w(12, 34)),
+        baseAddress: 50000);
 
 Scenario callCCNNNotJump(int opcode, String flag) => Scenario(
       "CALL ~$flag, NN",
       [opcode, 12, 34],
-      State(
+      initialState: State(
         flags: flag,
       ),
-      State(pc: 3),
+      expectedState: State(pc: 3),
     );
 
 List<Scenario> callCCNN(int opcode, String flag, bool jumpIfSet) => [
@@ -265,15 +252,13 @@ List<Scenario> callCCNN(int opcode, String flag, bool jumpIfSet) => [
       callCCNNNotJump(opcode, jumpIfSet ? '~$flag' : flag),
     ];
 
-Scenario retCCJump(int opcode, String flag) => Scenario(
-    "RET $flag",
-    [opcode],
-    State(
+Scenario retCCJump(int opcode, String flag) => Scenario("RET $flag", [opcode],
+    initialState: State(
         flags: flag,
         register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
         ram: [lo(12345), hi(12345), 0],
         pc: 50000),
-    State(
+    expectedState: State(
         register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 2},
         ram: [lo(12345), hi(12345), 0],
         pc: 12345),
@@ -282,10 +267,10 @@ Scenario retCCJump(int opcode, String flag) => Scenario(
 Scenario retCCNotJump(int opcode, String flag) => Scenario(
       "RET ~$flag",
       [opcode],
-      State(
+      initialState: State(
         flags: flag,
       ),
-      State(pc: 1),
+      expectedState: State(pc: 1),
     );
 
 List<Scenario> retCC(int opcode, String flag, bool jumpIfSet) => [
@@ -296,19 +281,19 @@ List<Scenario> retCC(int opcode, String flag, bool jumpIfSet) => [
 Scenario jpCCNNJump(int opcode, String flag) => Scenario(
       "JP $flag, NN",
       [opcode, 12, 34],
-      State(
+      initialState: State(
         flags: flag,
       ),
-      State(pc: w(12, 34)),
+      expectedState: State(pc: w(12, 34)),
     );
 
 Scenario jpCCNNNotJump(int opcode, String flag) => Scenario(
       "RET ~$flag",
       [opcode],
-      State(
+      initialState: State(
         flags: flag,
       ),
-      State(pc: 1),
+      expectedState: State(pc: 1),
     );
 
 List<Scenario> jpCCNN(int opcode, String flag, bool jumpIfSet) => [
@@ -320,20 +305,18 @@ List<Scenario> jpNN(int opcode) => [
       Scenario(
         "JP NN",
         [opcode, 12, 34],
-        State(),
-        State(pc: w(12, 34)),
+        initialState: State(),
+        expectedState: State(pc: w(12, 34)),
       )
     ];
 
 List<Scenario> popR16(int opcode, int r16) => [
-      Scenario(
-          'POP ${Z80a.r16Names[r16]}',
-          [opcode],
-          State(
+      Scenario('POP ${Z80a.r16Names[r16]}', [opcode],
+          initialState: State(
               register16Values: {Z80a.R_SP: Scenario.RAM_START + 50000 + 0},
               ram: [lo(12345), hi(12345), 0],
               pc: 50000),
-          State(
+          expectedState: State(
             register16Values: {
               Z80a.R_SP: Scenario.RAM_START + 50000 + 2,
               r16: 12345,
@@ -352,7 +335,7 @@ List<Scenario> exx(int opcode) => [
       Scenario(
         'EXX',
         [opcode],
-        State(
+        initialState: State(
           register16Values: {
             Z80a.R_BC: 10000,
             Z80a.R_DE: 20000,
@@ -362,7 +345,7 @@ List<Scenario> exx(int opcode) => [
             Z80a.R_HLt: 33333,
           },
         ),
-        State(
+        expectedState: State(
           register16Values: {
             Z80a.R_BC: 11111,
             Z80a.R_DE: 22222,
