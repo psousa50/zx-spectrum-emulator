@@ -310,7 +310,7 @@ class Z80a {
         break;
 
       case 0x22: // LD (nn), HL
-        this.memory.poke(fetch2(), this.HL);
+        this.memory.poke2(fetch2(), this.HL);
         break;
 
       case 0x01: // LD BC, nn

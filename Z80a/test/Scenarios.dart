@@ -29,7 +29,7 @@ List<Scenario> ldMNNHL(int opcode) => [
         [
           opcode,
           lo(Scenario.RAM_START + 50000),
-          hi(Scenario.RAM_START + 50000)
+          hi(Scenario.RAM_START + 50000),
         ],
         initialState: State(
           register16Values: {Z80a.R_HL: 10000},
