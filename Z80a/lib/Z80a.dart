@@ -501,6 +501,21 @@ class Z80a {
         this.A = or(this.memory.peek(this.HL));
         break;
 
+      case 0xB8: // CP B
+      case 0xB9: // CP C
+      case 0xBA: // CP D
+      case 0xBB: // CP E
+      case 0xBC: // CP H
+      case 0xBD: // CP L
+      case 0xBF: // CP A
+        int r8 = r8Table[opcode & 0x07];
+        sub(getReg(r8));
+        break;
+
+      case 0xBE: // CP (HL)
+        sub(this.memory.peek(this.HL));
+        break;
+
       case 0x22: // LD (nn), HL
         this.memory.poke2(fetch2(), this.HL);
         break;
