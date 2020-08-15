@@ -5,8 +5,8 @@ import 'package:Z80a/Z80a.dart';
 
 void main() {
   test('All opcodes should be processed', () {
-    var z80a = Z80a(Memory(size: 20));
     for (var opcode = 0; opcode < 256; opcode++) {
+      var z80a = Z80a(Memory(size: 20));
       if (![0x27].contains(opcode)) {
         z80a.memory.poke(0, opcode);
         z80a.memory.poke(1, 0);
