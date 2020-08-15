@@ -347,6 +347,58 @@ List<Scenario> ldR8MHL(int opcode, int r8) => [
       )
     ];
 
+List<Scenario> ldMHLR8(int opcode, int r8) => [
+      Scenario(
+        'LD (HL), ${Z80a.r8Names[r8]}',
+        [opcode],
+        initialState: State(
+          register8Values: {r8: 12},
+          register16Values: {Z80a.R_HL: Scenario.RAM_START + 50002},
+          ram: [0, 0, 0],
+          pc: 50000,
+        ),
+        expectedState: State(
+          ram: [0, 0, 12],
+          pc: 50001,
+        ),
+        baseAddress: 50000,
+      )
+    ];
+
+List<Scenario> ldMHLH(int opcode) => [
+      Scenario(
+        'LD (HL), H',
+        [opcode],
+        initialState: State(
+          register16Values: {Z80a.R_HL: Scenario.RAM_START + 50002},
+          ram: [0, 0, 0],
+          pc: 50000,
+        ),
+        expectedState: State(
+          ram: [0, 0, hi(Scenario.RAM_START + 50002)],
+          pc: 50001,
+        ),
+        baseAddress: 50000,
+      )
+    ];
+
+List<Scenario> ldMHLL(int opcode) => [
+      Scenario(
+        'LD (HL), H',
+        [opcode],
+        initialState: State(
+          register16Values: {Z80a.R_HL: Scenario.RAM_START + 50002},
+          ram: [0, 0, 0],
+          pc: 50000,
+        ),
+        expectedState: State(
+          ram: [0, 0, lo(Scenario.RAM_START + 50002)],
+          pc: 50001,
+        ),
+        baseAddress: 50000,
+      )
+    ];
+
 List<Scenario> callNN(int opcode) => [
       Scenario("CALL NN", [opcode, 12, 34],
           initialState: State(

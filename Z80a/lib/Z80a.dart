@@ -316,6 +316,17 @@ class Z80a {
         setReg(r8, this.memory.peek(this.HL));
         break;
 
+      case 0x70: // LD (HL), B
+      case 0x71: // LD (HL), C
+      case 0x72: // LD (HL), D
+      case 0x73: // LD (HL), E
+      case 0x74: // LD (HL), H
+      case 0x75: // LD (HL), L
+      case 0x77: // LD (HL), A
+        int r8 = r8Table[opcode & 0x07];
+        this.memory.poke(this.HL, getReg(r8));
+        break;
+
       case 0x22: // LD (nn), HL
         this.memory.poke2(fetch2(), this.HL);
         break;

@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Z80a/Memory.dart';
 import 'package:Z80a/Z80a.dart';
 import 'Scenarios.dart';
 
@@ -25,6 +24,14 @@ var allScenarios = [
   ...ldR8MHL(0x66, Z80a.R_H),
   ...ldR8MHL(0x6E, Z80a.R_L),
   ...ldR8MHL(0x7E, Z80a.R_A),
+  ...ldMHLR8(0x70, Z80a.R_B),
+  ...ldMHLR8(0x70, Z80a.R_B),
+  ...ldMHLR8(0x71, Z80a.R_C),
+  ...ldMHLR8(0x72, Z80a.R_D),
+  ...ldMHLR8(0x73, Z80a.R_E),
+  ...ldMHLH(0x74),
+  ...ldMHLL(0x75),
+  ...ldMHLR8(0x77, Z80a.R_A),
   ...ldMNNHL(0x22),
   ...ldHLMNN(0x2A),
   ...ldMNNA(0x32),
