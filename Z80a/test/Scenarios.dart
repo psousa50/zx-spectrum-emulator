@@ -797,3 +797,14 @@ List<Scenario> adcAR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("ADC A,", opcode, r8, 254, 1, 0, "~S Z ~N C ~P",
             inFlags: "C"),
       ];
+
+List<Scenario> subAR8(int opcode, int r8) => r8 == Z80a.R_A
+    ? [
+        r8Operation("SUB", opcode, r8, 20, 20, 0, "~S Z N ~C ~P"),
+        r8Operation("SUB", opcode, r8, 128, 128, 0, "~S Z N ~C P"),
+      ]
+    : [
+        r8Operation("SUB", opcode, r8, 10, 2, 8, "~S ~Z N ~C ~P"),
+        r8Operation("SUB", opcode, r8, 129, 2, 127, "~S ~Z N ~C ~P"),
+        r8Operation("SUB", opcode, r8, 3, 5, 254, "S ~Z N C P"),
+      ];

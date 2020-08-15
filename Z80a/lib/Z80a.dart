@@ -296,6 +296,17 @@ class Z80a {
     addA(value + (this.carryFlag ? 1 : 0));
   }
 
+  void sub(int value) {
+    int diff = this.A - value;
+    this.carryFlag = diff < 0;
+    int result = byte(diff);
+    this.parityOverflowFlag = (((this.A & 0x80) ^ (value & 0x80)) == 0) &&
+        (value & 0x80 != (result & 0x80));
+    this.A = result;
+    setFlagsOnResult(result);
+    this.addSubtractFlag = true;
+  }
+
   bool step() {
     var processed = true;
 
@@ -372,6 +383,21 @@ class Z80a {
 
       case 0x8E: // ADC A, (HL)
         adcA(this.memory.peek(this.HL));
+        break;
+
+      case 0x90: // SUB B
+      case 0x91: // SUB C
+      case 0x92: // SUB D
+      case 0x93: // SUB E
+      case 0x94: // SUB H
+      case 0x95: // SUB L
+      case 0x97: // SUB A
+        int r8 = r8Table[opcode & 0x07];
+        sub(getReg(r8));
+        break;
+
+      case 0x96: // SUB (HL)
+        sub(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL
