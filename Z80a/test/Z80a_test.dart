@@ -1,6 +1,6 @@
-import 'package:Z80a/Memory.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:Z80a/Memory.dart';
 import 'package:Z80a/Z80a.dart';
 import 'Scenarios.dart';
 
@@ -176,22 +176,4 @@ void main() {
       scenario.run();
     });
   }, skip: runAll);
-
-  test('All opcodes should be processed', () {
-    var z80a = Z80a(Memory(size: 10));
-    for (var opcode = 0; opcode < 256; opcode++) {
-      if (![0x27].contains(opcode)) {
-        z80a.memory.poke(0, opcode);
-        z80a.memory.poke(1, 0);
-        z80a.memory.poke(2, 0);
-        z80a.memory.poke(3, 0);
-        z80a.PC = 0;
-        if (!z80a.step()) {
-          print('Opcode ${opcode.toRadixString(16)} not processed');
-        }
-        // expect(z80a.step(), true,
-        //     reason: 'Opcode ${opcode.toRadixString(16)} not processed');
-      }
-    }
-  }, skip: true);
 }

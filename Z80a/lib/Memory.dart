@@ -7,7 +7,7 @@ class Memory {
   Memory.fromBytes(this.bytes, {this.baseAddress = 0});
 
   Memory({size = 10, this.baseAddress = 0}) {
-    this.bytes = List<int>(size);
+    this.bytes = List<int>.filled(size, 0);
   }
 
   peek(int address) => bytes[address - baseAddress];
