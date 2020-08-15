@@ -281,6 +281,15 @@ class Z80a {
     return flag;
   }
 
+  bool parity(int b) {
+    var count = 0;
+    for (var i = 0; i < 8; i++) {
+      count += b & 0x01;
+      b = b >> 1;
+    }
+    return count & 0x01 == 0x01;
+  }
+
   void addA(int value) {
     int sum = this.A + value;
     this.carryFlag = sum > 255;
@@ -309,6 +318,15 @@ class Z80a {
 
   void sbcA(int value) {
     sub(value + (this.carryFlag ? 1 : 0));
+  }
+
+  void and(int value) {
+    int result = this.A & value;
+    this.A = result;
+    setFlagsOnResult(result);
+    this.carryFlag = false;
+    this.addSubtractFlag = false;
+    this.parityOverflowFlag = parity(result);
   }
 
   bool step() {
@@ -417,6 +435,21 @@ class Z80a {
 
       case 0x9E: // SBC A, (HL)
         sbcA(this.memory.peek(this.HL));
+        break;
+
+      case 0xA0: // AND B
+      case 0xA1: // AND C
+      case 0xA2: // AND D
+      case 0xA3: // AND E
+      case 0xA4: // AND H
+      case 0xA5: // AND L
+      case 0xA7: // AND A
+        int r8 = r8Table[opcode & 0x07];
+        and(getReg(r8));
+        break;
+
+      case 0xA6: // AND (HL)
+        and(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL

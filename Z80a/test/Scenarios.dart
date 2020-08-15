@@ -841,3 +841,14 @@ List<Scenario> sbcAR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("SBC A,", opcode, r8, 3, 5, 253, "S ~Z N C P",
             inFlags: "C"),
       ];
+
+List<Scenario> andR8(int opcode, int r8) => r8 == Z80a.R_A
+    ? [
+        r8Operation("AND", opcode, r8, 0x07, 0x07, 0x07, "~S ~Z ~N ~C P"),
+        r8Operation("AND", opcode, r8, 0x00, 0x00, 0x00, "~S Z ~N ~C ~P"),
+        r8Operation("AND", opcode, r8, 0x90, 0x90, 0x90, "S ~Z ~N ~C ~P"),
+      ]
+    : [
+        r8Operation("AND", opcode, r8, 0x03, 0x01, 0x01, "~S ~Z ~N ~C P"),
+        r8Operation("AND", opcode, r8, 0x03, 0x04, 0x00, "~S Z ~N ~C ~P"),
+      ];
