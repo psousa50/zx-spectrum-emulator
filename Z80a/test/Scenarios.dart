@@ -754,8 +754,10 @@ Scenario r8HLOperation(String name, int opcode, int aValue, int mhlValue,
 Scenario r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
         int result, String flags, {String inFlags = ""}) =>
     r8 == Z80a.R_MHL
-        ? r8HLOperation(name, opcode, aValue, r8Value, result, flags)
-        : r8r8Operation(name, opcode, r8, aValue, r8Value, result, flags);
+        ? r8HLOperation(name, opcode, aValue, r8Value, result, flags,
+            inFlags: inFlags)
+        : r8r8Operation(name, opcode, r8, aValue, r8Value, result, flags,
+            inFlags: inFlags);
 
 List<Scenario> addAR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [
@@ -766,4 +768,32 @@ List<Scenario> addAR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("ADD A,", opcode, r8, 10, 2, 12, "~S ~Z ~N ~C ~P"),
         r8Operation("ADD A,", opcode, r8, 127, 2, 129, "S ~Z ~N ~C P"),
         r8Operation("ADD A,", opcode, r8, 254, 2, 0, "~S Z ~N C ~P"),
+      ];
+
+List<Scenario> adcAR8(int opcode, int r8) => r8 == Z80a.R_A
+    ? [
+        r8Operation("ADC A,", opcode, r8, 10, 10, 20, "~S ~Z ~N ~C ~P",
+            inFlags: "~C"),
+        r8Operation("ADC A,", opcode, r8, 10, 10, 21, "~S ~Z ~N ~C ~P",
+            inFlags: "C"),
+        r8Operation("ADC A,", opcode, r8, 128, 128, 0, "~S Z ~N C P",
+            inFlags: "~C"),
+      ]
+    : [
+        r8Operation("ADC A,", opcode, r8, 10, 2, 12, "~S ~Z ~N ~C ~P",
+            inFlags: "~C"),
+        r8Operation("ADC A,", opcode, r8, 10, 2, 13, "~S ~Z ~N ~C ~P",
+            inFlags: "C"),
+        r8Operation("ADC A,", opcode, r8, 127, 2, 129, "S ~Z ~N ~C P",
+            inFlags: "~C"),
+        r8Operation("ADC A,", opcode, r8, 127, 2, 130, "S ~Z ~N ~C P",
+            inFlags: "C"),
+        r8Operation("ADC A,", opcode, r8, 128, 127, 0, "~S Z ~N C P",
+            inFlags: "C"),
+        r8Operation("ADC A,", opcode, r8, 255, 255, 255, "S ~Z ~N C ~P",
+            inFlags: "C"),
+        r8Operation("ADC A,", opcode, r8, 254, 2, 0, "~S Z ~N C ~P",
+            inFlags: "~C"),
+        r8Operation("ADC A,", opcode, r8, 254, 1, 0, "~S Z ~N C ~P",
+            inFlags: "C"),
       ];

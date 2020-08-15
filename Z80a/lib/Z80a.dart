@@ -292,6 +292,10 @@ class Z80a {
     this.addSubtractFlag = false;
   }
 
+  void adcA(int value) {
+    addA(value + (this.carryFlag ? 1 : 0));
+  }
+
   bool step() {
     var processed = true;
 
@@ -351,8 +355,23 @@ class Z80a {
         addA(getReg(r8));
         break;
 
-      case 0x86: // ADD A, (HL)
+      case 0x86: // ADC A, (HL)
         addA(this.memory.peek(this.HL));
+        break;
+
+      case 0x88: // ADC A, B
+      case 0x89: // ADC A, C
+      case 0x8A: // ADC A, D
+      case 0x8B: // ADC A, E
+      case 0x8C: // ADC A, H
+      case 0x8D: // ADC A, L
+      case 0x8F: // ADC A, A
+        int r8 = r8Table[opcode & 0x07];
+        adcA(getReg(r8));
+        break;
+
+      case 0x8E: // ADC A, (HL)
+        adcA(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL
