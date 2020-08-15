@@ -75,6 +75,8 @@ class Z80a {
 
   static const R_COUNT = 22;
 
+  static const R_MHL = 100;
+
   static const R_AF = R_A;
   static const R_BC = R_B;
   static const R_DE = R_D;
@@ -279,6 +281,17 @@ class Z80a {
     return flag;
   }
 
+  void addA(int value) {
+    int sum = this.A + value;
+    this.carryFlag = sum > 255;
+    int result = byte(sum);
+    this.parityOverflowFlag = (((this.A & 0x80) ^ (value & 0x80)) == 0) &&
+        (value & 0x80 != (result & 0x80));
+    this.A = result;
+    setFlagsOnResult(result);
+    this.addSubtractFlag = false;
+  }
+
   bool step() {
     var processed = true;
 
@@ -325,6 +338,21 @@ class Z80a {
       case 0x77: // LD (HL), A
         int r8 = r8Table[opcode & 0x07];
         this.memory.poke(this.HL, getReg(r8));
+        break;
+
+      case 0x80: // ADD A, B
+      case 0x81: // ADD A, C
+      case 0x82: // ADD A, D
+      case 0x83: // ADD A, E
+      case 0x84: // ADD A, H
+      case 0x85: // ADD A, L
+      case 0x87: // ADD A, A
+        int r8 = r8Table[opcode & 0x07];
+        addA(getReg(r8));
+        break;
+
+      case 0x86: // ADD A, (HL)
+        addA(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL

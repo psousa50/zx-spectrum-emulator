@@ -702,3 +702,68 @@ List<Scenario> ccf(int opcode) => [
 List<Scenario> scf(int opcode) => [
       flagsTest(opcode, "", "C ~N"),
     ];
+
+Scenario r8r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
+        int result, String flags,
+        {String inFlags = ""}) =>
+    Scenario(
+      '$name ${Z80a.r8Names[r8]} -> ($aValue)',
+      [opcode],
+      initialState: State(
+        register8Values: {
+          Z80a.R_A: aValue,
+          r8: r8Value,
+        },
+        flags: inFlags,
+      ),
+      expectedState: State(
+        register8Values: {
+          Z80a.R_A: result,
+        },
+        flags: flags,
+        pc: 1,
+      ),
+    );
+
+Scenario r8HLOperation(String name, int opcode, int aValue, int mhlValue,
+        int result, String flags,
+        {String inFlags = ""}) =>
+    Scenario(
+      '$name (HL) -> ($aValue)',
+      [opcode],
+      initialState: State(
+        register8Values: {
+          Z80a.R_A: aValue,
+        },
+        register16Values: {Z80a.R_HL: Scenario.RAM_START + 50002},
+        ram: [0, 0, mhlValue],
+        flags: inFlags,
+        pc: 50000,
+      ),
+      expectedState: State(
+        register8Values: {
+          Z80a.R_A: result,
+        },
+        ram: [0, 0, mhlValue],
+        flags: flags,
+        pc: 50001,
+      ),
+      baseAddress: 50000,
+    );
+
+Scenario r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
+        int result, String flags, {String inFlags = ""}) =>
+    r8 == Z80a.R_MHL
+        ? r8HLOperation(name, opcode, aValue, r8Value, result, flags)
+        : r8r8Operation(name, opcode, r8, aValue, r8Value, result, flags);
+
+List<Scenario> addAR8(int opcode, int r8) => r8 == Z80a.R_A
+    ? [
+        r8Operation("ADD A,", opcode, r8, 10, 10, 20, "~S ~Z ~N ~C ~P"),
+        r8Operation("ADD A,", opcode, r8, 128, 128, 0, "~S Z ~N C P"),
+      ]
+    : [
+        r8Operation("ADD A,", opcode, r8, 10, 2, 12, "~S ~Z ~N ~C ~P"),
+        r8Operation("ADD A,", opcode, r8, 127, 2, 129, "S ~Z ~N ~C P"),
+        r8Operation("ADD A,", opcode, r8, 254, 2, 0, "~S Z ~N C ~P"),
+      ];
