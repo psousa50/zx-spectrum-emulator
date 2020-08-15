@@ -444,6 +444,14 @@ class Z80a {
         this.A = this.A ^ 255;
         break;
 
+      case 0x37: // CCF
+        this.F = this.F & ~F_ADD_SUB | F_CARRY;
+        break;
+
+      case 0x3F: // CCF
+        this.F = this.F & ~F_ADD_SUB ^ F_CARRY;
+        break;
+
       case 0x40: // LD B, B
       case 0x41: // LD B, C
       case 0x42: // LD B, D

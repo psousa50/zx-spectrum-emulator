@@ -571,3 +571,22 @@ List<Scenario> cpl(int opcode) => [
       cplN(opcode, binary("11111111"), binary("00000000")),
       cplN(opcode, binary("10110100"), binary("01001011")),
     ];
+
+Scenario flagsTest(int opcode, String flags, String expectedFlags) =>
+    Scenario("CCF", [opcode],
+        initialState: State(
+          flags: flags,
+        ),
+        expectedState: State(
+          flags: expectedFlags,
+          pc: 1,
+        ));
+
+List<Scenario> ccf(int opcode) => [
+      flagsTest(opcode, "C N", "~C ~N"),
+      flagsTest(opcode, "~C N", "C ~N"),
+    ];
+
+List<Scenario> scf(int opcode) => [
+      flagsTest(opcode, "", "C ~N"),
+    ];

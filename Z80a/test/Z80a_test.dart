@@ -56,6 +56,8 @@ var allScenarios = [
   ...rra(0x17),
   ...rla(0x1F),
   ...cpl(0x2F),
+  ...scf(0x37),
+  ...ccf(0x3F),
   ...ldR8R8(0x40, Z80a.R_B, Z80a.R_B),
   ...ldR8R8(0x41, Z80a.R_B, Z80a.R_C),
   ...ldR8R8(0x42, Z80a.R_B, Z80a.R_D),
