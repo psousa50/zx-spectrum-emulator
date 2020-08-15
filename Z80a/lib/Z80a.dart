@@ -294,13 +294,13 @@ class Z80a {
         AFt = af;
         break;
 
-      case 0x06: // LD B, nn
-      case 0x0E: // LD C, nn
-      case 0x16: // LD D, nn
-      case 0x1E: // LD E, nn
-      case 0x26: // LD H, nn
-      case 0x2E: // LD L, nn
-      case 0x3E: // LD A, nn
+      case 0x06: // LD B, n
+      case 0x0E: // LD C, n
+      case 0x16: // LD D, n
+      case 0x1E: // LD E, n
+      case 0x26: // LD H, n
+      case 0x2E: // LD L, n
+      case 0x3E: // LD A, n
         int r8 = r8Table[(opcode & 0x38) >> 3];
         setReg(r8, fetch());
         break;
@@ -438,6 +438,10 @@ class Z80a {
         this.A = byte(this.A >> 1) | (this.carryFlag ? 0x80 : 0x00);
         this.carryFlag = b0 == 1;
         this.addSubtractFlag = false;
+        break;
+
+      case 0x2F: // CPL
+        this.A = this.A ^ 255;
         break;
 
       case 0x40: // LD B, B

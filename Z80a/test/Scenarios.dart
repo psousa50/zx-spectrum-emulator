@@ -556,3 +556,18 @@ List<Scenario> jrCCNN(int opcode, String flag, bool jumpIfSet) => [
       jrCCNJump(opcode, jumpIfSet ? flag : '~$flag'),
       jrCCNNotJump(opcode, jumpIfSet ? '~$flag' : flag),
     ];
+
+Scenario cplN(int opcode, int value, int result) => Scenario("CPL", [opcode],
+    initialState: State(
+      register8Values: {Z80a.R_A: value},
+    ),
+    expectedState: State(
+      register8Values: {Z80a.R_A: result},
+      pc: 1,
+    ));
+
+List<Scenario> cpl(int opcode) => [
+      cplN(opcode, binary("00000000"), binary("11111111")),
+      cplN(opcode, binary("11111111"), binary("00000000")),
+      cplN(opcode, binary("10110100"), binary("01001011")),
+    ];

@@ -55,6 +55,7 @@ var allScenarios = [
   ...rrca(0x0F),
   ...rra(0x17),
   ...rla(0x1F),
+  ...cpl(0x2F),
   ...ldR8R8(0x40, Z80a.R_B, Z80a.R_B),
   ...ldR8R8(0x41, Z80a.R_B, Z80a.R_C),
   ...ldR8R8(0x42, Z80a.R_B, Z80a.R_D),
@@ -181,7 +182,8 @@ void main() {
         z80a.memory.poke(2, 0);
         z80a.memory.poke(3, 0);
         z80a.PC = 0;
-        expect(z80a.step(), true, reason: 'Opcode $opcode not processed');
+        expect(z80a.step(), true,
+            reason: 'Opcode ${opcode.toRadixString(16)} not processed');
       }
     }
   }, skip: true);
