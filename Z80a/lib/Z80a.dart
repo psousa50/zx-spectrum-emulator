@@ -228,12 +228,6 @@ class Z80a {
     registers[r + 1] = lo(w);
   }
 
-  int add(int b1, int b2) {
-    int r = b1 + b2;
-    carryFlag = r > 255;
-    return word(r);
-  }
-
   int addW(int w1, int w2) {
     int r = w1 + w2;
     carryFlag = r > 65535;
@@ -304,7 +298,7 @@ class Z80a {
 
   int adcA(int value) => addA(value + (this.carryFlag ? 1 : 0));
 
-  int sub(int value) {
+  int subA(int value) {
     int diff = this.A - value;
     this.carryFlag = diff < 0;
     int result = byte(diff);
@@ -316,9 +310,9 @@ class Z80a {
     return result;
   }
 
-  int sbcA(int value) => sub(value + (this.carryFlag ? 1 : 0));
+  int sbcA(int value) => subA(value + (this.carryFlag ? 1 : 0));
 
-  int and(int value) {
+  int andA(int value) {
     int result = this.A & value;
     setFlagsOnResult(result);
     this.carryFlag = false;
@@ -328,7 +322,7 @@ class Z80a {
     return result;
   }
 
-  int xor(int value) {
+  int xorA(int value) {
     int result = this.A ^ value;
     setFlagsOnResult(result);
     this.carryFlag = false;
@@ -338,7 +332,7 @@ class Z80a {
     return result;
   }
 
-  int or(int value) {
+  int orA(int value) {
     int result = this.A | value;
     setFlagsOnResult(result);
     this.carryFlag = false;
@@ -434,11 +428,11 @@ class Z80a {
       case 0x95: // SUB L
       case 0x97: // SUB A
         int r8 = r8Table[opcode & 0x07];
-        this.A = sub(getReg(r8));
+        this.A = subA(getReg(r8));
         break;
 
       case 0x96: // SUB (HL)
-        this.A = sub(this.memory.peek(this.HL));
+        this.A = subA(this.memory.peek(this.HL));
         break;
 
       case 0x98: // SBC A, B
@@ -464,11 +458,11 @@ class Z80a {
       case 0xA5: // AND L
       case 0xA7: // AND A
         int r8 = r8Table[opcode & 0x07];
-        this.A = and(getReg(r8));
+        this.A = andA(getReg(r8));
         break;
 
       case 0xA6: // AND (HL)
-        this.A = and(this.memory.peek(this.HL));
+        this.A = andA(this.memory.peek(this.HL));
         break;
 
       case 0xA8: // XOR B
@@ -479,11 +473,11 @@ class Z80a {
       case 0xAD: // XOR L
       case 0xAF: // XOR A
         int r8 = r8Table[opcode & 0x07];
-        this.A = xor(getReg(r8));
+        this.A = xorA(getReg(r8));
         break;
 
       case 0xAE: // XOR (HL)
-        this.A = xor(this.memory.peek(this.HL));
+        this.A = xorA(this.memory.peek(this.HL));
         break;
 
       case 0xB0: // OR B
@@ -494,11 +488,11 @@ class Z80a {
       case 0xB5: // OR L
       case 0xB7: // OR A
         int r8 = r8Table[opcode & 0x07];
-        this.A = or(getReg(r8));
+        this.A = orA(getReg(r8));
         break;
 
       case 0xB6: // OR (HL)
-        this.A = or(this.memory.peek(this.HL));
+        this.A = orA(this.memory.peek(this.HL));
         break;
 
       case 0xB8: // CP B
@@ -509,11 +503,43 @@ class Z80a {
       case 0xBD: // CP L
       case 0xBF: // CP A
         int r8 = r8Table[opcode & 0x07];
-        sub(getReg(r8));
+        subA(getReg(r8));
+        break;
+
+      case 0xC6: // ADD A, N
+        this.A = addA(fetch());
+        break;
+
+      case 0xCE: // ADC A, N
+        this.A = adcA(fetch());
+        break;
+
+      case 0xD6: // SUB N
+        this.A = subA(fetch());
+        break;
+
+      case 0xDE: // SBC A, N
+        this.A = sbcA(fetch());
+        break;
+
+      case 0xE6: // AND A, N
+        this.A = andA(fetch());
+        break;
+
+      case 0xEE: // XOR N
+        this.A = xorA(fetch());
+        break;
+
+      case 0xF6: // OR N
+        this.A = orA(fetch());
+        break;
+
+      case 0xFE: // CP N
+        subA(fetch());
         break;
 
       case 0xBE: // CP (HL)
-        sub(this.memory.peek(this.HL));
+        subA(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL

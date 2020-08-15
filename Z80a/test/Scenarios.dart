@@ -885,3 +885,75 @@ List<Scenario> cpR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("CP", opcode, r8, 255, 254, 255, "~S ~Z N ~C P"),
         r8Operation("CP", opcode, r8, 3, 5, 3, "S ~Z N C P"),
       ];
+
+Scenario nOperation(String name, int opcode, int aValue, int nValue, int result,
+        String flags,
+        {String inFlags = ""}) =>
+    Scenario(
+      '$name -> ($aValue)',
+      [opcode, nValue],
+      initialState: State(
+        register8Values: {
+          Z80a.R_A: aValue,
+        },
+        flags: inFlags,
+      ),
+      expectedState: State(
+        register8Values: {
+          Z80a.R_A: result,
+        },
+        flags: flags,
+        pc: 2,
+      ),
+    );
+
+List<Scenario> addAN(int opcode) => [
+      nOperation("ADD A, N", opcode, 10, 2, 12, "~S ~Z ~N ~C ~P"),
+      nOperation("ADD A, N", opcode, 127, 2, 129, "S ~Z ~N ~C P"),
+      nOperation("ADD A, N", opcode, 254, 2, 0, "~S Z ~N C ~P"),
+    ];
+
+List<Scenario> adcAN(int opcode) => [
+      nOperation("ADC A, N", opcode, 10, 10, 20, "~S ~Z ~N ~C ~P",
+          inFlags: "~C"),
+      nOperation("ADC A, N", opcode, 10, 10, 21, "~S ~Z ~N ~C ~P",
+          inFlags: "C"),
+      nOperation("ADC A, N", opcode, 128, 128, 0, "~S Z ~N C P", inFlags: "~C"),
+      nOperation("ADC A, N", opcode, 128, 128, 1, "~S ~Z ~N C P", inFlags: "C"),
+    ];
+
+List<Scenario> subAN(int opcode) => [
+      nOperation("SUB N", opcode, 10, 2, 8, "~S ~Z N ~C ~P"),
+      nOperation("SUB N", opcode, 129, 2, 127, "~S ~Z N ~C ~P"),
+      nOperation("SUB N", opcode, 255, 254, 1, "~S ~Z N ~C P"),
+      nOperation("SUB N", opcode, 3, 5, 254, "S ~Z N C P"),
+    ];
+
+List<Scenario> sbcAN(int opcode) => [
+      nOperation("SBC N", opcode, 10, 10, 0, "~S Z N ~C ~P", inFlags: "~C"),
+      nOperation("SBC N", opcode, 10, 10, 255, "S ~Z N C P", inFlags: "C"),
+      nOperation("SBC N", opcode, 128, 128, 0, "~S Z N ~C P", inFlags: "~C"),
+      nOperation("SBC N", opcode, 128, 128, 255, "S ~Z N C ~P", inFlags: "C"),
+    ];
+
+List<Scenario> andAN(int opcode) => [
+      nOperation("AND A, N", opcode, 0x03, 0x01, 0x01, "~S ~Z ~N ~C P"),
+      nOperation("AND A, N", opcode, 0x03, 0x04, 0x00, "~S Z ~N ~C ~P"),
+    ];
+
+List<Scenario> xorN(int opcode) => [
+      nOperation("XOR N", opcode, 0x03, 0x01, 0x02, "~S ~Z ~N ~C P"),
+      nOperation("XOR N", opcode, 0x03, 0x81, 0x82, "S ~Z ~N ~C ~P"),
+    ];
+
+List<Scenario> orN(int opcode) => [
+      nOperation("OR N", opcode, 0x02, 0x01, 0x03, "~S ~Z ~N ~C ~P"),
+      nOperation("OR N", opcode, 0x02, 0x81, 0x83, "S ~Z ~N ~C P"),
+    ];
+
+List<Scenario> cpN(int opcode) => [
+      nOperation("CP N", opcode, 10, 2, 10, "~S ~Z N ~C ~P"),
+      nOperation("CP N", opcode, 129, 2, 129, "~S ~Z N ~C ~P"),
+      nOperation("CP N", opcode, 255, 254, 255, "~S ~Z N ~C P"),
+      nOperation("CP N", opcode, 3, 5, 3, "S ~Z N C P"),
+    ];
