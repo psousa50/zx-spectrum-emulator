@@ -852,3 +852,13 @@ List<Scenario> andR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("AND", opcode, r8, 0x03, 0x01, 0x01, "~S ~Z ~N ~C P"),
         r8Operation("AND", opcode, r8, 0x03, 0x04, 0x00, "~S Z ~N ~C ~P"),
       ];
+
+List<Scenario> xorR8(int opcode, int r8) => r8 == Z80a.R_A
+    ? [
+        r8Operation("XOR", opcode, r8, 0x07, 0x07, 0x00, "~S Z ~N ~C ~P"),
+        r8Operation("XOR", opcode, r8, 0x90, 0x90, 0x00, "~S Z ~N ~C ~P"),
+      ]
+    : [
+        r8Operation("XOR", opcode, r8, 0x03, 0x01, 0x02, "~S ~Z ~N ~C P"),
+        r8Operation("XOR", opcode, r8, 0x03, 0x81, 0x82, "S ~Z ~N ~C ~P"),
+      ];

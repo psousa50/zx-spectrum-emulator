@@ -329,6 +329,15 @@ class Z80a {
     this.parityOverflowFlag = parity(result);
   }
 
+  void xor(int value) {
+    int result = this.A ^ value;
+    this.A = result;
+    setFlagsOnResult(result);
+    this.carryFlag = false;
+    this.addSubtractFlag = false;
+    this.parityOverflowFlag = parity(result);
+  }
+
   bool step() {
     var processed = true;
 
@@ -450,6 +459,21 @@ class Z80a {
 
       case 0xA6: // AND (HL)
         and(this.memory.peek(this.HL));
+        break;
+
+      case 0xA8: // XOR B
+      case 0xA9: // XOR C
+      case 0xAA: // XOR D
+      case 0xAB: // XOR E
+      case 0xAC: // XOR H
+      case 0xAD: // XOR L
+      case 0xAF: // XOR A
+        int r8 = r8Table[opcode & 0x07];
+        xor(getReg(r8));
+        break;
+
+      case 0xAE: // XOR (HL)
+        xor(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL
