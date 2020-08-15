@@ -290,52 +290,52 @@ class Z80a {
     return count & 0x01 == 0x01;
   }
 
-  void addA(int value) {
+  int addA(int value) {
     int sum = this.A + value;
     this.carryFlag = sum > 255;
     int result = byte(sum);
     this.parityOverflowFlag = (((this.A & 0x80) ^ (value & 0x80)) == 0) &&
         (value & 0x80 != (result & 0x80));
-    this.A = result;
     setFlagsOnResult(result);
     this.addSubtractFlag = false;
+
+    return result;
   }
 
-  void adcA(int value) {
-    addA(value + (this.carryFlag ? 1 : 0));
-  }
+  int adcA(int value) => addA(value + (this.carryFlag ? 1 : 0));
 
-  void sub(int value) {
+  int sub(int value) {
     int diff = this.A - value;
     this.carryFlag = diff < 0;
     int result = byte(diff);
     this.parityOverflowFlag = (((this.A & 0x80) ^ (value & 0x80)) == 0) &&
         (value & 0x80 != (result & 0x80));
-    this.A = result;
     setFlagsOnResult(result);
     this.addSubtractFlag = true;
+
+    return result;
   }
 
-  void sbcA(int value) {
-    sub(value + (this.carryFlag ? 1 : 0));
-  }
+  int sbcA(int value) => sub(value + (this.carryFlag ? 1 : 0));
 
-  void and(int value) {
+  int and(int value) {
     int result = this.A & value;
-    this.A = result;
     setFlagsOnResult(result);
     this.carryFlag = false;
     this.addSubtractFlag = false;
     this.parityOverflowFlag = parity(result);
+
+    return result;
   }
 
-  void xor(int value) {
+  int xor(int value) {
     int result = this.A ^ value;
-    this.A = result;
     setFlagsOnResult(result);
     this.carryFlag = false;
     this.addSubtractFlag = false;
     this.parityOverflowFlag = parity(result);
+
+    return result;
   }
 
   bool step() {
@@ -394,11 +394,11 @@ class Z80a {
       case 0x85: // ADD A, L
       case 0x87: // ADD A, A
         int r8 = r8Table[opcode & 0x07];
-        addA(getReg(r8));
+        this.A = addA(getReg(r8));
         break;
 
       case 0x86: // ADC A, (HL)
-        addA(this.memory.peek(this.HL));
+        this.A = addA(this.memory.peek(this.HL));
         break;
 
       case 0x88: // ADC A, B
@@ -409,11 +409,11 @@ class Z80a {
       case 0x8D: // ADC A, L
       case 0x8F: // ADC A, A
         int r8 = r8Table[opcode & 0x07];
-        adcA(getReg(r8));
+        this.A = adcA(getReg(r8));
         break;
 
       case 0x8E: // ADC A, (HL)
-        adcA(this.memory.peek(this.HL));
+        this.A = adcA(this.memory.peek(this.HL));
         break;
 
       case 0x90: // SUB B
@@ -424,11 +424,11 @@ class Z80a {
       case 0x95: // SUB L
       case 0x97: // SUB A
         int r8 = r8Table[opcode & 0x07];
-        sub(getReg(r8));
+        this.A = sub(getReg(r8));
         break;
 
       case 0x96: // SUB (HL)
-        sub(this.memory.peek(this.HL));
+        this.A = sub(this.memory.peek(this.HL));
         break;
 
       case 0x98: // SBC A, B
@@ -439,11 +439,11 @@ class Z80a {
       case 0x9D: // SBC A, L
       case 0x9F: // SBC A, A
         int r8 = r8Table[opcode & 0x07];
-        sbcA(getReg(r8));
+        this.A = sbcA(getReg(r8));
         break;
 
       case 0x9E: // SBC A, (HL)
-        sbcA(this.memory.peek(this.HL));
+        this.A = sbcA(this.memory.peek(this.HL));
         break;
 
       case 0xA0: // AND B
@@ -454,11 +454,11 @@ class Z80a {
       case 0xA5: // AND L
       case 0xA7: // AND A
         int r8 = r8Table[opcode & 0x07];
-        and(getReg(r8));
+        this.A = and(getReg(r8));
         break;
 
       case 0xA6: // AND (HL)
-        and(this.memory.peek(this.HL));
+        this.A = and(this.memory.peek(this.HL));
         break;
 
       case 0xA8: // XOR B
@@ -469,11 +469,11 @@ class Z80a {
       case 0xAD: // XOR L
       case 0xAF: // XOR A
         int r8 = r8Table[opcode & 0x07];
-        xor(getReg(r8));
+        this.A = xor(getReg(r8));
         break;
 
       case 0xAE: // XOR (HL)
-        xor(this.memory.peek(this.HL));
+        this.A = xor(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL
