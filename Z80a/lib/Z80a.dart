@@ -314,8 +314,16 @@ class Z80a {
         this.HL = this.memory.peek2(a);
         break;
 
+      case 0x32: // LD (NN), A
+        this.memory.poke(fetch2(), this.A);
+        break;
+
       case 0x36: // LD (HL), nn
         this.memory.poke(this.HL, fetch());
+        break;
+
+      case 0x3A: // LD A, (NN)
+        this.A = this.memory.peek(fetch2());
         break;
 
       case 0x01: // LD BC, nn
