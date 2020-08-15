@@ -338,6 +338,16 @@ class Z80a {
     return result;
   }
 
+  int or(int value) {
+    int result = this.A | value;
+    setFlagsOnResult(result);
+    this.carryFlag = false;
+    this.addSubtractFlag = false;
+    this.parityOverflowFlag = parity(result);
+
+    return result;
+  }
+
   bool step() {
     var processed = true;
 
@@ -474,6 +484,21 @@ class Z80a {
 
       case 0xAE: // XOR (HL)
         this.A = xor(this.memory.peek(this.HL));
+        break;
+
+      case 0xB0: // OR B
+      case 0xB1: // OR C
+      case 0xB2: // OR D
+      case 0xB3: // OR E
+      case 0xB4: // OR H
+      case 0xB5: // OR L
+      case 0xB7: // OR A
+        int r8 = r8Table[opcode & 0x07];
+        this.A = or(getReg(r8));
+        break;
+
+      case 0xB6: // OR (HL)
+        this.A = or(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL
