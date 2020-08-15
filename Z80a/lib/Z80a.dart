@@ -307,6 +307,10 @@ class Z80a {
     this.addSubtractFlag = true;
   }
 
+  void sbcA(int value) {
+    sub(value + (this.carryFlag ? 1 : 0));
+  }
+
   bool step() {
     var processed = true;
 
@@ -398,6 +402,21 @@ class Z80a {
 
       case 0x96: // SUB (HL)
         sub(this.memory.peek(this.HL));
+        break;
+
+      case 0x98: // SBC A, B
+      case 0x99: // SBC A, C
+      case 0x9A: // SBC A, D
+      case 0x9B: // SBC A, E
+      case 0x9C: // SBC A, H
+      case 0x9D: // SBC A, L
+      case 0x9F: // SBC A, A
+        int r8 = r8Table[opcode & 0x07];
+        sbcA(getReg(r8));
+        break;
+
+      case 0x9E: // SBC A, (HL)
+        sbcA(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL

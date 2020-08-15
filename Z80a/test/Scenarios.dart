@@ -778,6 +778,8 @@ List<Scenario> adcAR8(int opcode, int r8) => r8 == Z80a.R_A
             inFlags: "C"),
         r8Operation("ADC A,", opcode, r8, 128, 128, 0, "~S Z ~N C P",
             inFlags: "~C"),
+        r8Operation("ADC A,", opcode, r8, 128, 128, 1, "~S ~Z ~N C P",
+            inFlags: "C"),
       ]
     : [
         r8Operation("ADC A,", opcode, r8, 10, 2, 12, "~S ~Z ~N ~C ~P",
@@ -806,5 +808,36 @@ List<Scenario> subAR8(int opcode, int r8) => r8 == Z80a.R_A
     : [
         r8Operation("SUB", opcode, r8, 10, 2, 8, "~S ~Z N ~C ~P"),
         r8Operation("SUB", opcode, r8, 129, 2, 127, "~S ~Z N ~C ~P"),
+        r8Operation("SUB", opcode, r8, 255, 254, 1, "~S ~Z N ~C P"),
         r8Operation("SUB", opcode, r8, 3, 5, 254, "S ~Z N C P"),
+      ];
+
+List<Scenario> sbcAR8(int opcode, int r8) => r8 == Z80a.R_A
+    ? [
+        r8Operation("SBC A,", opcode, r8, 10, 10, 0, "~S Z N ~C ~P",
+            inFlags: "~C"),
+        r8Operation("SBC A,", opcode, r8, 10, 10, 255, "S ~Z N C P",
+            inFlags: "C"),
+        r8Operation("SBC A,", opcode, r8, 128, 128, 0, "~S Z N ~C P",
+            inFlags: "~C"),
+        r8Operation("SBC A,", opcode, r8, 128, 128, 255, "S ~Z N C ~P",
+            inFlags: "C"),
+      ]
+    : [
+        r8Operation("SBC A,", opcode, r8, 10, 2, 8, "~S ~Z N ~C ~P",
+            inFlags: "~C"),
+        r8Operation("SBC A,", opcode, r8, 10, 2, 7, "~S ~Z N ~C ~P",
+            inFlags: "C"),
+        r8Operation("SBC A,", opcode, r8, 255, 1, 254, "S ~Z N ~C ~P",
+            inFlags: "~C"),
+        r8Operation("SBC A,", opcode, r8, 255, 1, 253, "S ~Z N ~C ~P",
+            inFlags: "C"),
+        r8Operation("SBC A,", opcode, r8, 255, 254, 1, "~S ~Z N ~C P",
+            inFlags: "~C"),
+        r8Operation("SBC A,", opcode, r8, 255, 254, 0, "~S Z N ~C P",
+            inFlags: "C"),
+        r8Operation("SBC A,", opcode, r8, 3, 5, 254, "S ~Z N C P",
+            inFlags: "~C"),
+        r8Operation("SBC A,", opcode, r8, 3, 5, 253, "S ~Z N C P",
+            inFlags: "C"),
       ];
