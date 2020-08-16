@@ -59,6 +59,7 @@ var allScenarios = [
   ...incR8(0x1C, Z80a.R_E),
   ...incR8(0x24, Z80a.R_H),
   ...incR8(0x2C, Z80a.R_L),
+  ...incR8(0x34, Z80a.R_MHL),
   ...incR8(0x3C, Z80a.R_A),
   ...decR8(0x05, Z80a.R_B),
   ...decR8(0x0D, Z80a.R_C),
@@ -66,6 +67,7 @@ var allScenarios = [
   ...decR8(0x1D, Z80a.R_E),
   ...decR8(0x25, Z80a.R_H),
   ...decR8(0x2D, Z80a.R_L),
+  ...decR8(0x35, Z80a.R_MHL),
   ...decR8(0x3D, Z80a.R_A),
   ...rlca(0x07),
   ...rrca(0x0F),
@@ -261,7 +263,7 @@ void main() {
   }, skip: !runAll);
 
   test('One Scenario', () {
-    var scenarios = ldHLMNN(0x2A);
+    var scenarios = incR8(0x34, Z80a.R_MHL);
     scenarios.forEach((scenario) {
       scenario.run();
     });

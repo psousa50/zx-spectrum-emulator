@@ -296,6 +296,24 @@ class Z80a {
     return result;
   }
 
+  int incR8(int value) {
+    this.parityOverflowFlag = value == 0x7F;
+    int newValue = byte(value + 1);
+    setFlagsOnResult(newValue);
+    this.addSubtractFlag = false;
+
+    return newValue;
+  }
+
+  int decR8(int value) {
+    this.parityOverflowFlag = value == 0x80;
+    int newValue = byte(value - 1);
+    setFlagsOnResult(newValue);
+    this.addSubtractFlag = true;
+
+    return newValue;
+  }
+
   int adcA(int value) => addA(value + (this.carryFlag ? 1 : 0));
 
   int subA(int value) {
@@ -603,19 +621,11 @@ class Z80a {
       case 0x2C: // INC L
       case 0x3C: // INC A
         int r8 = r8Table[(opcode & 0x38) >> 3];
-        int value = this.getReg(r8);
-        this.parityOverflowFlag = value == 0x7F;
-        int newValue = byte(value + 1);
-        setReg(r8, newValue);
-        setFlagsOnResult(newValue);
-        this.addSubtractFlag = false;
+        setReg(r8, incR8(this.getReg(r8)));
         break;
 
       case 0x34: // INC (HL)
-        this.parityOverflowFlag = this.memory.peek(this.HL) == 0x7F;
-        this.memory.poke(this.HL, byte(this.memory.peek(this.HL) + 1));
-        setFlagsOnResult(this.memory.peek(this.HL));
-        this.addSubtractFlag = false;
+        this.memory.poke(this.HL, incR8(this.memory.peek(this.HL)));
         break;
 
       case 0x05: // DEC B
@@ -626,19 +636,11 @@ class Z80a {
       case 0x2D: // DEC L
       case 0x3D: // DEC A
         int r8 = r8Table[(opcode & 0x38) >> 3];
-        int value = this.getReg(r8);
-        this.parityOverflowFlag = value == 0x80;
-        int newValue = byte(value - 1);
-        setReg(r8, newValue);
-        setFlagsOnResult(newValue);
-        this.addSubtractFlag = true;
+        setReg(r8, decR8(this.getReg(r8)));
         break;
 
       case 0x35: // DEC (HL)
-        this.parityOverflowFlag = this.memory.peek(this.HL) == 0x80;
-        this.memory.poke(this.HL, byte(this.memory.peek(this.HL) - 1));
-        setFlagsOnResult(this.memory.peek(this.HL));
-        this.addSubtractFlag = true;
+        this.memory.poke(this.HL, decR8(this.memory.peek(this.HL)));
         break;
 
       case 0x02: // LD (BC), A
