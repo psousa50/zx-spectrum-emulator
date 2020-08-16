@@ -221,12 +221,38 @@ Scenario changeR8HL(
       ),
     );
 
+Scenario changeR8IXYd(String name, int prefix, int opcode, int r16xy, int value,
+        int result, String flags,
+        {String inFlags = ""}) =>
+    Scenario(
+      '$name (IX+d)',
+      [prefix, opcode, 2],
+      initialState: State(
+        register16Values: {r16xy: Scenario.RAM_START},
+        ram: [0, 0, value],
+        flags: inFlags,
+      ),
+      expectedState: State(
+        ram: [0, 0, result],
+        flags: flags,
+        pc: 3,
+      ),
+    );
+
 Scenario changeR8(
         String name, int opcode, int r8, int value, int result, String flags,
         {String inFlags = ""}) =>
-    r8 == Z80a.R_MHL
-        ? changeR8HL(name, opcode, value, result, flags, inFlags: inFlags)
-        : changeR8R8(name, opcode, r8, value, result, flags, inFlags: inFlags);
+    r8 == Z80a.R_MIXd
+        ? changeR8IXYd(name, 0xDD, opcode, Z80a.R_IX, value, result, flags,
+            inFlags: inFlags)
+        : r8 == Z80a.R_MIYd
+            ? changeR8IXYd(name, 0xFD, opcode, Z80a.R_IY, value, result, flags,
+                inFlags: inFlags)
+            : r8 == Z80a.R_MHL
+                ? changeR8HL(name, opcode, value, result, flags,
+                    inFlags: inFlags)
+                : changeR8R8(name, opcode, r8, value, result, flags,
+                    inFlags: inFlags);
 
 List<Scenario> incR8(int opcode, int r8) => [
       changeR8("INC", opcode, r8, 10, 11, "~Z ~S ~P ~N"),

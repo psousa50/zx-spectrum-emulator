@@ -76,6 +76,11 @@ class Z80a {
   static const R_COUNT = 22;
 
   static const R_MHL = 100;
+  static const R_MIXd = 101;
+  static const R_MIYd = 102;
+
+  static const IX_PREFIX = 0xDD;
+  static const IY_PREFIX = 0xFD;
 
   static const R_AF = R_A;
   static const R_BC = R_B;
@@ -175,6 +180,8 @@ class Z80a {
   int get DEt => gw(R_Dt);
   int get HLt => gw(R_Ht);
 
+  int getIXY(int prefix) => prefix == IX_PREFIX ? gw(R_IX_H) : gw(R_IY_H);
+
   set AF(int w) => sw(R_A, w);
   set BC(int w) => sw(R_B, w);
   set DE(int w) => sw(R_D, w);
@@ -186,6 +193,9 @@ class Z80a {
   set BCt(int w) => sw(R_Bt, w);
   set DEt(int w) => sw(R_Dt, w);
   set HLt(int w) => sw(R_Ht, w);
+
+  void setIXY(int w, int prefix) =>
+      prefix == IX_PREFIX ? sw(R_IX_H, w) : sw(R_IY_H, w);
 
   bool get carryFlag => F & F_CARRY != 0;
   bool get addSubtractFlag => F & F_ADD_SUB != 0;
@@ -364,6 +374,23 @@ class Z80a {
     var processed = true;
 
     final opcode = fetch();
+
+    switch (opcode) {
+      case IX_PREFIX:
+      case IY_PREFIX:
+        processDDopcodes(opcode);
+        break;
+
+      default:
+        processed = processUnprefixedOpCodes(opcode);
+        break;
+    }
+
+    return processed;
+  }
+
+  bool processUnprefixedOpCodes(int opcode) {
+    var processed = true;
 
     switch (opcode) {
       case 0x00: // NOP
@@ -914,6 +941,31 @@ class Z80a {
 
       default:
         processed = false;
+        break;
+    }
+
+    return processed;
+  }
+
+  bool processDDopcodes(int prefix) {
+    var processed = true;
+
+    final opcode = fetch();
+
+    switch (opcode) {
+      case 0x34: // INC (IXY+d)
+        var d = fetch();
+        this.memory.poke(
+            getIXY(prefix) + d, incR8(this.memory.peek(getIXY(prefix) + d)));
+        break;
+
+      case 0x35: // DEC (IXY+d)
+        var d = fetch();
+        this.memory.poke(
+            getIXY(prefix) + d, decR8(this.memory.peek(getIXY(prefix) + d)));
+        break;
+
+      default:
         break;
     }
 

@@ -251,6 +251,10 @@ var allScenarios = [
   ...jpMHL(0xE9),
   ...exDEHL(0xEB),
   ...ldSPHL(0xF9),
+  ...incR8(0x34, Z80a.R_MIXd),
+  ...incR8(0x34, Z80a.R_MIYd),
+  ...decR8(0x35, Z80a.R_MIXd),
+  ...decR8(0x35, Z80a.R_MIYd),
 ];
 
 void main() {
@@ -263,7 +267,7 @@ void main() {
   }, skip: !runAll);
 
   test('One Scenario', () {
-    var scenarios = incR8(0x34, Z80a.R_MHL);
+    var scenarios = incR8(0x34, Z80a.R_MIYd);
     scenarios.forEach((scenario) {
       scenario.run();
     });
