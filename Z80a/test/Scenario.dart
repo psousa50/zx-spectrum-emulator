@@ -34,10 +34,8 @@ class Scenario {
   final List<int> opcodes;
   State initialState;
   State expectedState;
-  int baseAddress;
 
-  Scenario(this.name, this.opcodes,
-      {this.initialState, this.expectedState, this.baseAddress = 0});
+  Scenario(this.name, this.opcodes, {this.initialState, this.expectedState});
 
   String scenarioName(List<int> opcodes) =>
       '${this.name} <=> ${opcodes.map((e) => e.toRadixString(16))}';
@@ -77,7 +75,7 @@ class Scenario {
     Map<int, int> expectedRegisterValues =
         setupExpectedRegisterValues(initialRegisterValues);
 
-    var z80a = Z80a(Memory.fromBytes(memory, baseAddress: this.baseAddress));
+    var z80a = Z80a(Memory.fromBytes(memory));
 
     setZ80Registers(z80a, initialRegisterValues);
 
@@ -136,10 +134,10 @@ class Scenario {
 
   List<int> setupMemory() {
     var memory = [
-      ...opcodes,
-      ...List<int>(RAM_START - opcodes.length),
+      ...List<int>(RAM_START),
       ...initialState.ram,
     ];
+    memory.setRange(initialState.pc, initialState.pc + opcodes.length, opcodes);
     return memory;
   }
 
