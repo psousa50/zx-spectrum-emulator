@@ -245,6 +245,7 @@ var allScenarios = [
   ...jrCCNN(0x28, "Z", true),
   ...jrCCNN(0x30, "C", false),
   ...jrCCNN(0x38, "C", true),
+  ...exMSPHL(0xE3),
 ];
 
 void main() {

@@ -890,6 +890,12 @@ class Z80a {
         }
         break;
 
+      case 0xE3: // EX (SP), HL
+        var msp = this.memory.peek2(this.SP);
+        this.memory.poke2(this.SP, this.HL);
+        this.HL = msp;
+        break;
+
       default:
         processed = false;
         break;

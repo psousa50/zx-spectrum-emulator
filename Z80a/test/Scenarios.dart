@@ -957,3 +957,26 @@ List<Scenario> cpN(int opcode) => [
       nOperation("CP N", opcode, 255, 254, 255, "~S ~Z N ~C P"),
       nOperation("CP N", opcode, 3, 5, 3, "S ~Z N C P"),
     ];
+
+List<Scenario> exMSPHL(int opcode) => [
+      Scenario(
+        "EX (SP), HL",
+        [opcode],
+        initialState: State(
+          register16Values: {
+            Z80a.R_SP: Scenario.RAM_START + 50002,
+            Z80a.R_HL: 10000
+          },
+          ram: [0, 0, 12, 34],
+          pc: 50000,
+        ),
+        expectedState: State(
+          register16Values: {
+            Z80a.R_HL: w(12, 34),
+          },
+          ram: [0, 0, lo(10000), hi(10000)],
+          pc: 50001,
+        ),
+        baseAddress: 50000,
+      )
+    ];
