@@ -900,6 +900,12 @@ class Z80a {
         this.PC = this.memory.peek2(this.HL);
         break;
 
+      case 0xEB: // EX DE, HL
+        var de = this.DE;
+        this.DE = this.HL;
+        this.HL = de;
+        break;
+
       default:
         processed = false;
         break;
