@@ -896,6 +896,10 @@ class Z80a {
         this.HL = msp;
         break;
 
+      case 0xE9: // JP (HL)
+        this.PC = this.memory.peek2(this.HL);
+        break;
+
       default:
         processed = false;
         break;

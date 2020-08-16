@@ -980,3 +980,22 @@ List<Scenario> exMSPHL(int opcode) => [
         baseAddress: 50000,
       )
     ];
+
+List<Scenario> jpMHL(int opcode) => [
+      Scenario(
+        "JP (HL)",
+        [opcode],
+        initialState: State(
+          register16Values: {
+            Z80a.R_HL: Scenario.RAM_START + 50002,
+          },
+          ram: [0, 0, 12, 34],
+          pc: 50000,
+        ),
+        expectedState: State(
+          ram: [0, 0, 12, 34],
+          pc: w(12, 34),
+        ),
+        baseAddress: 50000,
+      )
+    ];
