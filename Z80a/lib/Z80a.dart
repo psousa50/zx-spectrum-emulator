@@ -17,6 +17,10 @@ class Z80a {
     R_L: "L",
     R_S: "S",
     R_P: "P",
+    R_IX_L: "IX_l",
+    R_IX_H: "IX_h",
+    R_IY_L: "IY_l",
+    R_IY_H: "IY_h",
     R_At: "A'",
     R_Ft: "F'",
     R_Bt: "B'",
@@ -194,7 +198,7 @@ class Z80a {
   set DEt(int w) => sw(R_Dt, w);
   set HLt(int w) => sw(R_Ht, w);
 
-  void setIXY(int w, int prefix) =>
+  void setIXY(int prefix, int w) =>
       prefix == IX_PREFIX ? sw(R_IX_H, w) : sw(R_IY_H, w);
 
   bool get carryFlag => F & F_CARRY != 0;
@@ -963,6 +967,17 @@ class Z80a {
         var d = fetch();
         this.memory.poke(
             getIXY(prefix) + d, decR8(this.memory.peek(getIXY(prefix) + d)));
+        break;
+
+      case 0x09: // ADD IX, BC
+      case 0x19: // ADD IX, DE
+      case 0x39: // ADD IX, SP
+        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        setIXY(prefix, addW(getIXY(prefix), getReg2(r16)));
+        break;
+
+      case 0x29: // ADD IX, IX
+        setIXY(prefix, addW(getIXY(prefix), getIXY(prefix)));
         break;
 
       default:

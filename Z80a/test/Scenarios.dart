@@ -2,6 +2,12 @@ import 'package:Z80a/Util.dart';
 import 'package:Z80a/Z80a.dart';
 import 'Scenario.dart';
 
+log(String m, value) {
+  print(m);
+  print(value);
+  return value;
+}
+
 List<Scenario> nop(int opcode) => [
       Scenario(
         "NOP",
@@ -126,40 +132,50 @@ List<Scenario> ldR16NN(int opcode, int r16) => [
       )
     ];
 
-Scenario addHLR16Spec(int opcode, int r16, int hlValue, int r16Value,
-        int result, String flags) =>
-    Scenario(
-      "ADD HL, ${Z80a.r16Names[r16]}",
-      [opcode],
-      initialState:
-          State(register16Values: {Z80a.R_HL: hlValue, r16: r16Value}),
-      expectedState: State(
-        register16Values: {Z80a.R_HL: result, r16: r16Value},
-        flags: flags,
-        pc: 1,
-      ),
-    );
-
-List<Scenario> addHLR16(int opcode, int r16) => [
-      addHLR16Spec(opcode, r16, 10000, 2345, 12345, "~C"),
-      addHLR16Spec(opcode, r16, 65535, 2, 1, "C"),
+bool isHL(int rhxy) => rhxy == Z80a.R_HL;
+List<int> ixyPrefix(int rhxy) => [
+      if (rhxy == Z80a.R_IX) Z80a.IX_PREFIX,
+      if (rhxy == Z80a.R_IY) Z80a.IY_PREFIX
     ];
 
-Scenario addHLHLSpec(int opcode, int hlValue, int result, String flags) =>
+Scenario addHLR16Spec(int opcode, int rhxy, int r16, int hxyValue, int r16Value,
+        int result, String flags) =>
     Scenario(
-      "ADD HL, HL",
-      [opcode],
-      initialState: State(register16Values: {Z80a.R_HL: hlValue}),
+      "ADD ${Z80a.r16Names[rhxy]}, ${Z80a.r16Names[r16]}",
+      [...ixyPrefix(rhxy), opcode],
+      initialState: State(
+        register16Values: {rhxy: hxyValue, r16: r16Value},
+      ),
       expectedState: State(
-        register16Values: {Z80a.R_HL: result},
+        register16Values: {
+          rhxy: result,
+        },
         flags: flags,
-        pc: 1,
+        pc: isHL(rhxy) ? 1 : 2,
       ),
     );
 
-List<Scenario> addHLHL(int opcode) => [
-      addHLHLSpec(opcode, 10000, 20000, "~C"),
-      addHLHLSpec(opcode, 65535, 65534, "C"),
+List<Scenario> addHLR16(int opcode, int rhxy, int r16) => [
+      addHLR16Spec(opcode, rhxy, r16, 10000, 2345, 12345, "~C"),
+      addHLR16Spec(opcode, rhxy, r16, 65535, 2, 1, "C"),
+    ];
+
+Scenario addHLHLSpec(
+        int opcode, int rhxy, int hxyValue, int result, String flags) =>
+    Scenario(
+      "ADD ${Z80a.r16Names[rhxy]}, ${Z80a.r16Names[rhxy]}",
+      [...ixyPrefix(rhxy), opcode],
+      initialState: State(register16Values: {rhxy: hxyValue}),
+      expectedState: State(
+        register16Values: {rhxy: result},
+        flags: flags,
+        pc: isHL(rhxy) ? 1 : 2,
+      ),
+    );
+
+List<Scenario> addHLHL(int opcode, int rhxy) => [
+      addHLHLSpec(opcode, rhxy, 10000, 20000, "~C"),
+      addHLHLSpec(opcode, rhxy, 65535, 65534, "C"),
     ];
 
 List<Scenario> incR16(int opcode, int r16) => [
