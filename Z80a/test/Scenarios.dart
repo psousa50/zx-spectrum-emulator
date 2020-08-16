@@ -1000,7 +1000,7 @@ List<Scenario> jpMHL(int opcode) => [
       )
     ];
 
-List<Scenario> exDELHL(int opcode) => [
+List<Scenario> exDEHL(int opcode) => [
       Scenario(
         "EX DE, HL",
         [opcode],
@@ -1014,6 +1014,24 @@ List<Scenario> exDELHL(int opcode) => [
           register16Values: {
             Z80a.R_DE: 20000,
             Z80a.R_HL: 10000,
+          },
+          pc: 1,
+        ),
+      )
+    ];
+
+List<Scenario> ldSPHL(int opcode) => [
+      Scenario(
+        "LD SP, HL",
+        [opcode],
+        initialState: State(
+          register16Values: {
+            Z80a.R_HL: 10000,
+          },
+        ),
+        expectedState: State(
+          register16Values: {
+            Z80a.R_SP: 10000,
           },
           pc: 1,
         ),

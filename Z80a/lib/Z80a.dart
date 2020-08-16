@@ -906,6 +906,10 @@ class Z80a {
         this.HL = de;
         break;
 
+      case 0xF9: // LD SP, HL
+        this.SP = this.HL;
+        break;
+
       default:
         processed = false;
         break;
