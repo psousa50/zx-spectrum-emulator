@@ -988,6 +988,14 @@ class Z80a {
         this.memory.poke2(fetch2(), getIXY(prefix));
         break;
 
+      case 0x23: // INC IXY
+        setIXY(prefix, word(getIXY(prefix) + 1));
+        break;
+
+      case 0x2B: // DEC IXY
+        setIXY(prefix, word(getIXY(prefix) - 1));
+        break;
+
       default:
         break;
     }

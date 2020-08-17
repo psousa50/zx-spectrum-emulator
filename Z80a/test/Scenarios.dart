@@ -132,7 +132,7 @@ List<Scenario> ldR16NN(int opcode, int r16) => [
       )
     ];
 
-bool isHL(int rhxy) => rhxy == Z80a.R_HL;
+bool isIXIY(int rhxy) => rhxy == Z80a.R_IX || rhxy == Z80a.R_IY;
 List<int> ixyPrefix(int rhxy) => [
       if (rhxy == Z80a.R_IX) Z80a.IX_PREFIX,
       if (rhxy == Z80a.R_IY) Z80a.IY_PREFIX
@@ -151,7 +151,7 @@ Scenario addHLR16Spec(int opcode, int rhxy, int r16, int hxyValue, int r16Value,
           rhxy: result,
         },
         flags: flags,
-        pc: isHL(rhxy) ? 1 : 2,
+        pc: isIXIY(rhxy) ? 2 : 1,
       ),
     );
 
@@ -169,7 +169,7 @@ Scenario addHLHLSpec(
       expectedState: State(
         register16Values: {rhxy: result},
         flags: flags,
-        pc: isHL(rhxy) ? 1 : 2,
+        pc: isIXIY(rhxy) ? 2 : 1,
       ),
     );
 
@@ -178,28 +178,27 @@ List<Scenario> addHLHL(int opcode, int rhxy) => [
       addHLHLSpec(opcode, rhxy, 65535, 65534, "C"),
     ];
 
-List<Scenario> incR16(int opcode, int r16) => [
-      Scenario(
-        'INC ${Z80a.r16Names[r16]}',
-        [opcode],
-        initialState: State(register16Values: {r16: 10000}),
-        expectedState: State(
-          register16Values: {r16: 10001},
-          pc: 1,
-        ),
-      )
+Scenario changeR16(String name, int opcode, int rhxy, int value, int result) =>
+    Scenario(
+      '$name ${Z80a.r16Names[rhxy]}',
+      [...ixyPrefix(rhxy), opcode],
+      initialState: State(
+        register16Values: {rhxy: value},
+      ),
+      expectedState: State(
+        register16Values: {rhxy: result},
+        pc: isIXIY(rhxy) ? 2 : 1,
+      ),
+    );
+
+List<Scenario> incR16(int opcode, int rhxy) => [
+      changeR16("INC", opcode, rhxy, 10000, 10001),
+      changeR16("INC", opcode, rhxy, 65535, 0),
     ];
 
-List<Scenario> decR16(int opcode, int r16) => [
-      Scenario(
-        'DEC ${Z80a.r16Names[r16]}',
-        [opcode],
-        initialState: State(register16Values: {r16: 10000}),
-        expectedState: State(
-          register16Values: {r16: 9999},
-          pc: 1,
-        ),
-      )
+List<Scenario> decR16(int opcode, int rhxy) => [
+      changeR16("DEC", opcode, rhxy, 10000, 9999),
+      changeR16("DEC", opcode, rhxy, 0, 65535),
     ];
 
 Scenario changeR8R8(
@@ -1104,7 +1103,7 @@ List<Scenario> ldIXYNN(int opcode, int rxy) => [
 
 List<Scenario> ldMNNIXY(int opcode, int rxy) => [
       Scenario(
-        "LD (NN), IXY",
+        "LD (NN), ${Z80a.r16Names[rxy]}",
         [
           ...ixyPrefix(rxy),
           opcode,
