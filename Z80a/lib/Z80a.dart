@@ -1017,6 +1017,18 @@ class Z80a {
         setReg(r8, this.memory.peek(getIXY(prefix) + d));
         break;
 
+      case 0x70: // LD B, (IXY + d)
+      case 0x71: // LD C, (IXY + d)
+      case 0x72: // LD D, (IXY + d)
+      case 0x73: // LD E, (IXY + d)
+      case 0x74: // LD H, (IXY + d)
+      case 0x75: // LD L, (IXY + d)
+      case 0x77: // LD A, (IXY + d)
+        int r8 = r8Table[opcode & 0x07];
+        int d = fetch();
+        this.memory.poke(getIXY(prefix) + d, getReg(r8));
+        break;
+
       default:
         break;
     }

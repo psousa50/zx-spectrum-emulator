@@ -1158,9 +1158,9 @@ List<Scenario> ldMIXYdN(int opcode, rxy) => [
       )
     ];
 
-List<Scenario> ldR8MIXY(int opcode, int r8, int rxy) => [
+List<Scenario> ldR8MIXYd(int opcode, int r8, int rxy) => [
       Scenario(
-        'LD ${Z80a.r8Names[r8]}, (${Z80a.r16Names[rxy]})',
+        'LD ${Z80a.r8Names[r8]}, (${Z80a.r16Names[rxy]} + d)',
         [...ixyPrefix(rxy), opcode, 1],
         initialState: State(
           register16Values: {rxy: Scenario.RAM_START},
@@ -1169,6 +1169,22 @@ List<Scenario> ldR8MIXY(int opcode, int r8, int rxy) => [
         expectedState: State(
           ram: [0, 12],
           register8Values: {r8: 12},
+          pc: 3,
+        ),
+      )
+    ];
+
+List<Scenario> ldMIXYdR8(int opcode, int r8, int rxy) => [
+      Scenario(
+        'LD (${Z80a.r16Names[rxy]} + d), ${Z80a.r8Names[r8]}',
+        [...ixyPrefix(rxy), opcode, 1],
+        initialState: State(
+          register16Values: {rxy: Scenario.RAM_START},
+          register8Values: {r8: 12},
+          ram: [0, 0],
+        ),
+        expectedState: State(
+          ram: [0, 12],
           pc: 3,
         ),
       )
