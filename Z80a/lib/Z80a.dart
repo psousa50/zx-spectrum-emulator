@@ -1000,6 +1000,12 @@ class Z80a {
         setIXY(prefix, word(getIXY(prefix) - 1));
         break;
 
+      case 0x36: // LD (IXY + D), N
+        var d = fetch();
+        var value = fetch();
+        this.memory.poke(getIXY(prefix) + d, value);
+        break;
+
       default:
         break;
     }

@@ -1142,3 +1142,18 @@ List<Scenario> ldIXYMN(int opcode, rxy) => [
         ),
       )
     ];
+
+List<Scenario> ldMIXYdN(int opcode, rxy) => [
+      Scenario(
+        'LD ${Z80a.r16Names[rxy]}, (NN)',
+        [...ixyPrefix(rxy), opcode, 1, 12],
+        initialState: State(
+          register16Values: {rxy: Scenario.RAM_START},
+          ram: [0, 0],
+        ),
+        expectedState: State(
+          ram: [0, 12],
+          pc: 4,
+        ),
+      )
+    ];
