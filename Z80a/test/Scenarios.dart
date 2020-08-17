@@ -8,6 +8,17 @@ log(String m, value) {
   return value;
 }
 
+bool isIXIY(int rhxy) => rhxy == Z80a.R_IX || rhxy == Z80a.R_IY;
+
+bool isMIXIY(int rhxy) => rhxy == Z80a.R_MIXd || rhxy == Z80a.R_MIYd;
+
+int rMIXY(int rxy) => rxy == Z80a.R_MIXd ? Z80a.R_IX : Z80a.R_IY;
+
+List<int> ixyPrefix(int rhxy) => [
+      if (rhxy == Z80a.R_IX) Z80a.IX_PREFIX,
+      if (rhxy == Z80a.R_IY) Z80a.IY_PREFIX
+    ];
+
 List<Scenario> nop(int opcode) => [
       Scenario(
         "NOP",
@@ -132,12 +143,6 @@ List<Scenario> ldR16NN(int opcode, int r16) => [
       )
     ];
 
-bool isIXIY(int rhxy) => rhxy == Z80a.R_IX || rhxy == Z80a.R_IY;
-List<int> ixyPrefix(int rhxy) => [
-      if (rhxy == Z80a.R_IX) Z80a.IX_PREFIX,
-      if (rhxy == Z80a.R_IY) Z80a.IY_PREFIX
-    ];
-
 Scenario addHLR16Spec(int opcode, int rhxy, int r16, int hxyValue, int r16Value,
         int result, String flags) =>
     Scenario(
@@ -236,14 +241,14 @@ Scenario changeR8HL(
       ),
     );
 
-Scenario changeR8IXYd(String name, int prefix, int opcode, int r16xy, int value,
-        int result, String flags,
+Scenario changeR8IXYd(
+        String name, int opcode, int rxy, int value, int result, String flags,
         {String inFlags = ""}) =>
     Scenario(
       '$name (IX+d)',
-      [prefix, opcode, 2],
+      [...ixyPrefix(rxy), opcode, 2],
       initialState: State(
-        register16Values: {r16xy: Scenario.RAM_START},
+        register16Values: {rxy: Scenario.RAM_START},
         ram: [0, 0, value],
         flags: inFlags,
       ),
@@ -257,17 +262,13 @@ Scenario changeR8IXYd(String name, int prefix, int opcode, int r16xy, int value,
 Scenario changeR8(
         String name, int opcode, int r8, int value, int result, String flags,
         {String inFlags = ""}) =>
-    r8 == Z80a.R_MIXd
-        ? changeR8IXYd(name, 0xDD, opcode, Z80a.R_IX, value, result, flags,
+    isMIXIY(r8)
+        ? changeR8IXYd(name, opcode, rMIXY(r8), value, result, flags,
             inFlags: inFlags)
-        : r8 == Z80a.R_MIYd
-            ? changeR8IXYd(name, 0xFD, opcode, Z80a.R_IY, value, result, flags,
-                inFlags: inFlags)
-            : r8 == Z80a.R_MHL
-                ? changeR8HL(name, opcode, value, result, flags,
-                    inFlags: inFlags)
-                : changeR8R8(name, opcode, r8, value, result, flags,
-                    inFlags: inFlags);
+        : r8 == Z80a.R_MHL
+            ? changeR8HL(name, opcode, value, result, flags, inFlags: inFlags)
+            : changeR8R8(name, opcode, r8, value, result, flags,
+                inFlags: inFlags);
 
 List<Scenario> incR8(int opcode, int r8) => [
       changeR8("INC", opcode, r8, 10, 11, "~Z ~S ~P ~N"),
@@ -807,13 +808,41 @@ Scenario r8HLOperation(String name, int opcode, int aValue, int mhlValue,
       ),
     );
 
+Scenario r8IXYOperation(String name, int opcode, int rxy, int aValue,
+        int mxyValue, int result, String flags,
+        {String inFlags = ""}) =>
+    Scenario(
+      '$name (${Z80a.r16Names[rxy]} + d) -> ($aValue)',
+      [...ixyPrefix(rxy), opcode, 1],
+      initialState: State(
+        register8Values: {
+          Z80a.R_A: aValue,
+        },
+        register16Values: {rxy: Scenario.RAM_START},
+        ram: [0, mxyValue],
+        flags: inFlags,
+      ),
+      expectedState: State(
+        register8Values: {
+          Z80a.R_A: result,
+        },
+        ram: [0, mxyValue],
+        flags: flags,
+        pc: 3,
+      ),
+    );
+
 Scenario r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
         int result, String flags, {String inFlags = ""}) =>
-    r8 == Z80a.R_MHL
-        ? r8HLOperation(name, opcode, aValue, r8Value, result, flags,
+    isMIXIY(r8)
+        ? r8IXYOperation(
+            name, opcode, rMIXY(r8), aValue, r8Value, result, flags,
             inFlags: inFlags)
-        : r8r8Operation(name, opcode, r8, aValue, r8Value, result, flags,
-            inFlags: inFlags);
+        : r8 == Z80a.R_MHL
+            ? r8HLOperation(name, opcode, aValue, r8Value, result, flags,
+                inFlags: inFlags)
+            : r8r8Operation(name, opcode, r8, aValue, r8Value, result, flags,
+                inFlags: inFlags);
 
 List<Scenario> addAR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [

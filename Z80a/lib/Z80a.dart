@@ -374,6 +374,8 @@ class Z80a {
     return result;
   }
 
+  int cpA(int value) => subA(value);
+
   bool step() {
     var processed = true;
 
@@ -584,11 +586,11 @@ class Z80a {
         break;
 
       case 0xFE: // CP N
-        subA(fetch());
+        cpA(fetch());
         break;
 
       case 0xBE: // CP (HL)
-        subA(this.memory.peek(this.HL));
+        cpA(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL
@@ -1027,6 +1029,46 @@ class Z80a {
         int r8 = r8Table[opcode & 0x07];
         int d = fetch();
         this.memory.poke(getIXY(prefix) + d, getReg(r8));
+        break;
+
+      case 0x86: // ADD A, (IXY + d)
+        var d = fetch();
+        this.A = addA(this.memory.peek(getIXY(prefix) + d));
+        break;
+
+      case 0x8E: // ADC A, (IXY + d)
+        var d = fetch();
+        this.A = adcA(this.memory.peek(getIXY(prefix) + d));
+        break;
+
+      case 0x96: // SUB (IXY + d)
+        var d = fetch();
+        this.A = subA(this.memory.peek(getIXY(prefix) + d));
+        break;
+
+      case 0x9E: // SBC A, (IXY + d)
+        var d = fetch();
+        this.A = sbcA(this.memory.peek(getIXY(prefix) + d));
+        break;
+
+      case 0xA6: // AND (IXY + d)
+        var d = fetch();
+        this.A = andA(this.memory.peek(getIXY(prefix) + d));
+        break;
+
+      case 0xAE: // XOR (IXY + d)
+        var d = fetch();
+        this.A = xorA(this.memory.peek(getIXY(prefix) + d));
+        break;
+
+      case 0xB6: // OR (IXY + d)
+        var d = fetch();
+        this.A = orA(this.memory.peek(getIXY(prefix) + d));
+        break;
+
+      case 0xBE: // CP (IXY + d)
+        var d = fetch();
+        cpA(this.memory.peek(getIXY(prefix) + d));
         break;
 
       default:
