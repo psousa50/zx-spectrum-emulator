@@ -1101,3 +1101,25 @@ List<Scenario> ldIXYNN(int opcode, int rxy) => [
         ),
       )
     ];
+
+List<Scenario> ldMNNIXY(int opcode, int rxy) => [
+      Scenario(
+        "LD (NN), IXY",
+        [
+          ...ixyPrefix(rxy),
+          opcode,
+          lo(Scenario.RAM_START),
+          hi(Scenario.RAM_START),
+        ],
+        initialState: State(
+          register16Values: {
+            rxy: 10000,
+          },
+          ram: [0, 0],
+        ),
+        expectedState: State(
+          ram: [lo(10000), hi(10000)],
+          pc: 4,
+        ),
+      )
+    ];

@@ -984,6 +984,10 @@ class Z80a {
         setIXY(prefix, fetch2());
         break;
 
+      case 0x22: // LD (NN), IXY
+        this.memory.poke2(fetch2(), getIXY(prefix));
+        break;
+
       default:
         break;
     }
