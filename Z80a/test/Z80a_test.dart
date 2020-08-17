@@ -247,10 +247,10 @@ var allScenarios = [
   ...jrCCNN(0x28, "Z", true),
   ...jrCCNN(0x30, "C", false),
   ...jrCCNN(0x38, "C", true),
-  ...exMSPHL(0xE3),
-  ...jpMHL(0xE9),
+  ...exMSPHL(0xE3, Z80a.R_HL),
+  ...jpMHL(0xE9, Z80a.R_HL),
   ...exDEHL(0xEB),
-  ...ldSPHL(0xF9),
+  ...ldSPHL(0xF9, Z80a.R_HL),
 
 // IX IY
   ...incR8(0x34, Z80a.R_MIXd),
@@ -319,6 +319,16 @@ var allScenarios = [
   ...orR8(0xB6, Z80a.R_MIYd),
   ...cpR8(0xBE, Z80a.R_MIXd),
   ...cpR8(0xBE, Z80a.R_MIYd),
+  ...popR16(0xE1, Z80a.R_IX),
+  ...popR16(0xE1, Z80a.R_IY),
+  ...pushR16(0xE5, Z80a.R_IX),
+  ...pushR16(0xE5, Z80a.R_IY),
+  ...jpMHL(0xE9, Z80a.R_IX),
+  ...jpMHL(0xE9, Z80a.R_IY),
+  ...exMSPHL(0xE3, Z80a.R_IX),
+  ...exMSPHL(0xE3, Z80a.R_IY),
+  ...ldSPHL(0xF9, Z80a.R_IX),
+  ...ldSPHL(0xF9, Z80a.R_IY),
 ];
 
 void main() {

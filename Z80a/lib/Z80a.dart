@@ -1071,6 +1071,28 @@ class Z80a {
         cpA(this.memory.peek(getIXY(prefix) + d));
         break;
 
+      case 0xE1: // POP IXY
+        setIXY(prefix, pop2());
+        break;
+
+      case 0xE5: // PUSH IXY
+        push2(getIXY(prefix));
+        break;
+
+      case 0xE9: // JP (IXY)
+        this.PC = this.memory.peek2(getIXY(prefix));
+        break;
+
+      case 0xE3: // EX (SP), IXY
+        var msp = this.memory.peek2(this.SP);
+        this.memory.poke2(this.SP, getIXY(prefix));
+        setIXY(prefix, msp);
+        break;
+
+      case 0xF9: // LD SP, IXY
+        this.SP = getIXY(prefix);
+        break;
+
       default:
         break;
     }

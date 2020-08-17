@@ -576,10 +576,10 @@ List<Scenario> jpNN(int opcode) => [
       )
     ];
 
-List<Scenario> popR16(int opcode, int r16) => [
+List<Scenario> popR16(int opcode, int rhxy) => [
       Scenario(
-        'POP ${Z80a.r16Names[r16]}',
-        [opcode],
+        'POP ${Z80a.r16Names[rhxy]}',
+        [...ixyPrefix(rhxy), opcode],
         initialState: State(
           register16Values: {Z80a.R_SP: Scenario.RAM_START + 0},
           ram: [lo(12345), hi(12345), 0],
@@ -587,14 +587,10 @@ List<Scenario> popR16(int opcode, int r16) => [
         expectedState: State(
           register16Values: {
             Z80a.R_SP: Scenario.RAM_START + 2,
-            r16: 12345,
+            rhxy: 12345,
           },
-          ram: [
-            lo(12345),
-            hi(12345),
-            0,
-          ],
-          pc: 1,
+          ram: [lo(12345), hi(12345), 0],
+          pc: isIXIY(rhxy) ? 2 : 1,
         ),
       )
     ];
@@ -627,13 +623,13 @@ List<Scenario> exx(int opcode) => [
       ),
     ];
 
-List<Scenario> pushR16(int opcode, int r16) => [
+List<Scenario> pushR16(int opcode, int rhxy) => [
       Scenario(
-        'PUSH ${Z80a.r16Names[r16]}',
-        [opcode],
+        'PUSH ${Z80a.r16Names[rhxy]}',
+        [...ixyPrefix(rhxy), opcode],
         initialState: State(
           register16Values: {
-            r16: 10000,
+            rhxy: 10000,
             Z80a.R_SP: Scenario.RAM_START + 2,
           },
           ram: [0, 0, 0],
@@ -643,7 +639,7 @@ List<Scenario> pushR16(int opcode, int r16) => [
             Z80a.R_SP: Scenario.RAM_START + 0,
           },
           ram: [lo(10000), hi(10000), 0],
-          pc: 1,
+          pc: isIXIY(rhxy) ? 2 : 1,
         ),
       )
     ];
@@ -1043,31 +1039,31 @@ List<Scenario> cpN(int opcode) => [
       nOperation("CP N", opcode, 3, 5, 3, "S ~Z N C P"),
     ];
 
-List<Scenario> exMSPHL(int opcode) => [
+List<Scenario> exMSPHL(int opcode, int rhxy) => [
       Scenario(
-        "EX (SP), HL",
-        [opcode],
+        "EX (SP), ${Z80a.r16Names[rhxy]}",
+        [...ixyPrefix(rhxy), opcode],
         initialState: State(
-          register16Values: {Z80a.R_SP: Scenario.RAM_START, Z80a.R_HL: 10000},
+          register16Values: {Z80a.R_SP: Scenario.RAM_START, rhxy: 10000},
           ram: [12, 34],
         ),
         expectedState: State(
           register16Values: {
-            Z80a.R_HL: w(12, 34),
+            rhxy: w(12, 34),
           },
           ram: [lo(10000), hi(10000)],
-          pc: 1,
+          pc: isIXIY(rhxy) ? 2 : 1,
         ),
       )
     ];
 
-List<Scenario> jpMHL(int opcode) => [
+List<Scenario> jpMHL(int opcode, int rhxy) => [
       Scenario(
-        "JP (HL)",
-        [opcode],
+        "JP (${Z80a.r16Names[rhxy]})",
+        [...ixyPrefix(rhxy), opcode],
         initialState: State(
           register16Values: {
-            Z80a.R_HL: Scenario.RAM_START,
+            rhxy: Scenario.RAM_START,
           },
           ram: [12, 34],
         ),
@@ -1098,20 +1094,20 @@ List<Scenario> exDEHL(int opcode) => [
       )
     ];
 
-List<Scenario> ldSPHL(int opcode) => [
+List<Scenario> ldSPHL(int opcode, int rhxy) => [
       Scenario(
-        "LD SP, HL",
-        [opcode],
+        "LD SP, ${Z80a.r16Names[rhxy]}",
+        [...ixyPrefix(rhxy), opcode],
         initialState: State(
           register16Values: {
-            Z80a.R_HL: 10000,
+            rhxy: 10000,
           },
         ),
         expectedState: State(
           register16Values: {
             Z80a.R_SP: 10000,
           },
-          pc: 1,
+          pc: isIXIY(rhxy) ? 2 : 1,
         ),
       )
     ];
