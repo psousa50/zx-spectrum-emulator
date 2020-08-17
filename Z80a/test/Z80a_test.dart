@@ -277,6 +277,18 @@ var allScenarios = [
   ...ldIXYMN(0x2A, Z80a.R_IY),
   ...ldMIXYdN(0x36, Z80a.R_IX),
   ...ldMIXYdN(0x36, Z80a.R_IY),
+  ...ldR8MIXY(0x46, Z80a.R_B, Z80a.R_IX),
+  ...ldR8MIXY(0x4E, Z80a.R_C, Z80a.R_IX),
+  ...ldR8MIXY(0x56, Z80a.R_D, Z80a.R_IX),
+  ...ldR8MIXY(0x5E, Z80a.R_E, Z80a.R_IX),
+  ...ldR8MIXY(0x66, Z80a.R_H, Z80a.R_IX),
+  ...ldR8MIXY(0x6E, Z80a.R_L, Z80a.R_IX),
+  ...ldR8MIXY(0x46, Z80a.R_B, Z80a.R_IY),
+  ...ldR8MIXY(0x4E, Z80a.R_C, Z80a.R_IY),
+  ...ldR8MIXY(0x56, Z80a.R_D, Z80a.R_IY),
+  ...ldR8MIXY(0x5E, Z80a.R_E, Z80a.R_IY),
+  ...ldR8MIXY(0x66, Z80a.R_H, Z80a.R_IY),
+  ...ldR8MIXY(0x6E, Z80a.R_L, Z80a.R_IY),
 ];
 
 void main() {

@@ -1000,10 +1000,21 @@ class Z80a {
         setIXY(prefix, word(getIXY(prefix) - 1));
         break;
 
-      case 0x36: // LD (IXY + D), N
+      case 0x36: // LD (IXY + d), N
         var d = fetch();
         var value = fetch();
         this.memory.poke(getIXY(prefix) + d, value);
+        break;
+
+      case 0x46: // LD B, (IXY + d)
+      case 0x4E: // LD C, (IXY + d)
+      case 0x56: // LD D, (IXY + d)
+      case 0x5E: // LD E, (IXY + d)
+      case 0x66: // LD H, (IXY + d)
+      case 0x6E: // LD L, (IXY + d)
+        int r8 = r8Table[(opcode & 0x38) >> 3];
+        int d = fetch();
+        setReg(r8, this.memory.peek(getIXY(prefix) + d));
         break;
 
       default:
