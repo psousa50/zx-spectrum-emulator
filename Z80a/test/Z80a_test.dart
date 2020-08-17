@@ -273,6 +273,8 @@ var allScenarios = [
   ...incR16(0x23, Z80a.R_IY),
   ...decR16(0x2B, Z80a.R_IX),
   ...decR16(0x2B, Z80a.R_IY),
+  ...ldIXYMN(0x2A, Z80a.R_IX),
+  ...ldIXYMN(0x2A, Z80a.R_IY),
 ];
 
 void main() {
