@@ -969,15 +969,19 @@ class Z80a {
             getIXY(prefix) + d, decR8(this.memory.peek(getIXY(prefix) + d)));
         break;
 
-      case 0x09: // ADD IX, BC
-      case 0x19: // ADD IX, DE
-      case 0x39: // ADD IX, SP
+      case 0x09: // ADD IXY, BC
+      case 0x19: // ADD IXY, DE
+      case 0x39: // ADD IXY, SP
         int r16 = r16SPTable[(opcode & 0x30) >> 4];
         setIXY(prefix, addW(getIXY(prefix), getReg2(r16)));
         break;
 
-      case 0x29: // ADD IX, IX
+      case 0x29: // ADD IXY, IX
         setIXY(prefix, addW(getIXY(prefix), getIXY(prefix)));
+        break;
+
+      case 0x21: // LD IXY, NN
+        setIXY(prefix, fetch2());
         break;
 
       default:

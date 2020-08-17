@@ -265,6 +265,8 @@ var allScenarios = [
   ...addHLR16(0x19, Z80a.R_IY, Z80a.R_DE),
   ...addHLHL(0x29, Z80a.R_IY),
   ...addHLR16(0x39, Z80a.R_IY, Z80a.R_SP),
+  ...ldIXYNN(0x21, Z80a.R_IX),
+  ...ldIXYNN(0x21, Z80a.R_IY),
 ];
 
 void main() {

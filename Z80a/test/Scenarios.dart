@@ -1087,3 +1087,17 @@ List<Scenario> ldSPHL(int opcode) => [
         ),
       )
     ];
+
+List<Scenario> ldIXYNN(int opcode, int rxy) => [
+      Scenario(
+        "LD IXY, NN",
+        [...ixyPrefix(rxy), opcode, lo(10000), hi(10000)],
+        initialState: State(),
+        expectedState: State(
+          register16Values: {
+            rxy: 10000,
+          },
+          pc: 4,
+        ),
+      )
+    ];
