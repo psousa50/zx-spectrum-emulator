@@ -108,6 +108,11 @@ class Scenario {
     expect(z80a.memory.range(10), expectedState.ram,
         reason: '${scenarioName(opcodes)}\nReason: RAM is wrong');
 
+    expectedState.ports.forEach((port, value) {
+      expect(z80a.ports.inPort(port), value,
+          reason: '${scenarioName(opcodes)}\nReason: Port $port is wrong');
+    });
+
     expect(
         z80a.SP,
         256 * expectedRegisterValues[Z80a.R_SP] +

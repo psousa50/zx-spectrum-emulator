@@ -339,6 +339,13 @@ var allScenarios = [
   ...inR8C(0x60, Z80a.R_H),
   ...inR8C(0x68, Z80a.R_L),
   ...inR8C(0x78, Z80a.R_A),
+  ...outCR8(0x41, Z80a.R_B),
+  ...outCR8(0x49, Z80a.R_C),
+  ...outCR8(0x51, Z80a.R_D),
+  ...outCR8(0x59, Z80a.R_E),
+  ...outCR8(0x61, Z80a.R_H),
+  ...outCR8(0x69, Z80a.R_L),
+  ...outCR8(0x79, Z80a.R_A),
 ];
 
 void main() {

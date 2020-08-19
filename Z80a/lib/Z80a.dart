@@ -1115,7 +1115,7 @@ class Z80a {
 
     switch (opcode) {
       case 0x40: // IN B, (C)
-      case 0x48: // IN E, (C)
+      case 0x48: // IN C, (C)
       case 0x50: // IN D, (C)
       case 0x58: // IN E, (C)
       case 0x60: // IN H, (C)
@@ -1128,6 +1128,17 @@ class Z80a {
         this.parityOverflowFlag = parity(result);
         this.addSubtractFlag = false;
         this.halfCarryFlag = false;
+        break;
+
+      case 0x41: // OUT B, (C)
+      case 0x49: // OUT C, (C)
+      case 0x51: // OUT D, (C)
+      case 0x59: // OUT E, (C)
+      case 0x61: // OUT H, (C)
+      case 0x69: // OUT L, (C)
+      case 0x79: // OUT A, (C)
+        int r8 = r8Table[(opcode & 0x38) >> 3];
+        this.ports.outPort(this.C, getReg(r8));
         break;
 
       default:

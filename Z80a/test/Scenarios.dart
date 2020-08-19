@@ -1234,3 +1234,17 @@ List<Scenario> inR8C(int opcode, int r8) => [
       inR8CSpec(opcode, r8, 0x00, "~S Z ~H ~P ~N"),
       inR8CSpec(opcode, r8, 0x80, "S ~Z ~H P ~N"),
     ];
+
+List<Scenario> outCR8(int opcode, int r8) => [
+      Scenario(
+        'OUT (C) ${Z80a.r8Names[r8]}',
+        [0xED, opcode],
+        initialState: State(
+          register8Values: {Z80a.R_C: 254, r8: r8 == Z80a.R_C ? 254 : 12},
+        ),
+        expectedState: State(
+          ports: {254: r8 == Z80a.R_C ? 254 : 12},
+          pc: 2,
+        ),
+      )
+    ];
