@@ -329,6 +329,16 @@ var allScenarios = [
   ...exMSPHL(0xE3, Z80a.R_IY),
   ...ldSPHL(0xF9, Z80a.R_IX),
   ...ldSPHL(0xF9, Z80a.R_IY),
+
+  // Extended
+
+  ...inR8C(0x40, Z80a.R_B),
+  ...inR8C(0x48, Z80a.R_C),
+  ...inR8C(0x50, Z80a.R_D),
+  ...inR8C(0x58, Z80a.R_E),
+  ...inR8C(0x60, Z80a.R_H),
+  ...inR8C(0x68, Z80a.R_L),
+  ...inR8C(0x78, Z80a.R_A),
 ];
 
 void main() {

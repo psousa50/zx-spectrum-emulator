@@ -87,6 +87,8 @@ class Z80a {
   static const IX_PREFIX = 0xDD;
   static const IY_PREFIX = 0xFD;
 
+  static const EXTENDED_OPCODES = 0xED;
+
   static const R_AF = R_A;
   static const R_BC = R_B;
   static const R_DE = R_D;
@@ -386,7 +388,11 @@ class Z80a {
     switch (opcode) {
       case IX_PREFIX:
       case IY_PREFIX:
-        processDDopcodes(opcode);
+        processIXYOpcodes(opcode);
+        break;
+
+      case EXTENDED_OPCODES:
+        processExtendedOpcodes();
         break;
 
       default:
@@ -955,7 +961,7 @@ class Z80a {
     return processed;
   }
 
-  bool processDDopcodes(int prefix) {
+  bool processIXYOpcodes(int prefix) {
     var processed = true;
 
     final opcode = fetch();
@@ -1096,6 +1102,36 @@ class Z80a {
         break;
 
       default:
+        break;
+    }
+
+    return processed;
+  }
+
+  bool processExtendedOpcodes() {
+    var processed = true;
+
+    final opcode = fetch();
+
+    switch (opcode) {
+      case 0x40: // IN B, (C)
+      case 0x48: // IN E, (C)
+      case 0x50: // IN D, (C)
+      case 0x58: // IN E, (C)
+      case 0x60: // IN H, (C)
+      case 0x68: // IN L, (C)
+      case 0x78: // IN A, (C)
+        int r8 = r8Table[(opcode & 0x38) >> 3];
+        var result = this.ports.inPort(this.C);
+        setReg(r8, result);
+        setFlagsOnResult(result);
+        this.parityOverflowFlag = parity(result);
+        this.addSubtractFlag = false;
+        this.halfCarryFlag = false;
+        break;
+
+      default:
+        processed = false;
         break;
     }
 

@@ -1,3 +1,4 @@
+import 'package:Z80a/Ports.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Z80a/Memory.dart';
@@ -10,6 +11,7 @@ import 'PortsTest.dart';
 class State {
   Map<int, int> registerValues = {};
   List<int> ram = [];
+  Map<int, int> ports;
   int pc = 0;
   String flags = "";
 
@@ -28,6 +30,7 @@ class State {
       this.registerValues[r] = hi(value);
       this.registerValues[r + 1] = lo(value);
     });
+    this.ports = ports;
   }
 }
 
@@ -71,15 +74,14 @@ class Scenario {
   }
 
   void runWithFlagsSetTo(bool flagsValue) {
-    var memory = setupMemory();
-
     Map<int, int> initialRegisterValues =
         setupInitialRegisterValues(flagsValue);
 
     Map<int, int> expectedRegisterValues =
         setupExpectedRegisterValues(initialRegisterValues);
 
-    var ports = PortsTest();
+    var memory = setupMemory();
+    var ports = setupPorts();
     var z80a = Z80a(memory, ports);
 
     setZ80Registers(z80a, initialRegisterValues);
@@ -145,6 +147,14 @@ class Scenario {
     memory.setRange(initialState.pc, initialState.pc + opcodes.length, opcodes);
 
     return MemoryTest.fromBytes(memory);
+  }
+
+  Ports setupPorts() {
+    var ports = PortsTest();
+    initialState.ports.forEach((port, value) {
+      ports.outPort(port, value);
+    });
+    return ports;
   }
 
   Map<int, int> setupInitialRegisterValues(bool flagsValue) {

@@ -1216,20 +1216,21 @@ List<Scenario> ldMIXYdR8(int opcode, int r8, int rxy) => [
     ];
 
 Scenario inR8CSpec(int opcode, int r8, int value, String flags) => Scenario(
-      'IN ${Z80a.r8Names[r8]}, (C)',
-      [opcode],
+      'IN ${Z80a.r8Names[r8]}, (C) => ($value)',
+      [0xED, opcode],
       initialState: State(
-        ports: {254: 12},
+        register8Values: {Z80a.R_C: 254},
+        ports: {254: value},
       ),
       expectedState: State(
-        register8Values: {r8: 12},
-        pc: 1,
+        register8Values: {r8: value},
+        pc: 2,
         flags: flags,
       ),
     );
 
 List<Scenario> inR8C(int opcode, int r8) => [
-      inR8CSpec(opcode, r8, 0x03, "~S ~Z ~H P ~N"),
+      inR8CSpec(opcode, r8, 0x07, "~S ~Z ~H P ~N"),
       inR8CSpec(opcode, r8, 0x00, "~S Z ~H ~P ~N"),
-      inR8CSpec(opcode, r8, 0x80, "S ~Z ~H ~P ~N"),
+      inR8CSpec(opcode, r8, 0x80, "S ~Z ~H P ~N"),
     ];
