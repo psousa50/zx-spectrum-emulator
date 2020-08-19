@@ -1,7 +1,8 @@
 library z80a;
 
-import './Memory.dart';
-import './Util.dart';
+import 'package:Z80a/Memory.dart';
+import 'package:Z80a/Ports.dart';
+import 'package:Z80a/Util.dart';
 
 // ignore_for_file: non_constant_identifier_names
 
@@ -130,8 +131,9 @@ class Z80a {
   };
 
   final Memory memory;
+  final Ports ports;
 
-  Z80a(this.memory);
+  Z80a(this.memory, this.ports);
 
   var registers = List<int>.filled(R_COUNT, 0);
   var PC = 0;

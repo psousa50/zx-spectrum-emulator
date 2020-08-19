@@ -1,12 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Z80a/Memory.dart';
 import 'package:Z80a/Z80a.dart';
+import 'MemoryTest.dart';
+import 'PortsTest.dart';
 
 void main() {
   test('All opcodes should be processed', () {
     for (var opcode = 0; opcode < 256; opcode++) {
-      var z80a = Z80a(Memory(size: 20));
+      var z80a = Z80a(MemoryTest(size: 20), PortsTest());
       if (![0x27, 0x76, 0xD3, 0xDB, 0xF3, 0xFB].contains(opcode)) {
         z80a.memory.poke(0, opcode);
         z80a.memory.poke(1, 0);

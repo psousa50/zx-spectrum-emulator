@@ -1,27 +1,11 @@
-import './Util.dart';
+import 'dart:typed_data';
 
-class Memory {
-  List<int> bytes;
+abstract class Memory {
+  int peek(int address);
+  int peek2(int address);
 
-  Memory.fromBytes(this.bytes);
+  void poke(int address, int b);
+  void poke2(int address, int w);
 
-  Memory({size = 10}) {
-    this.bytes = List<int>.filled(size, 0);
-  }
-
-  int normalize(int address) => address % 65536;
-
-  peek(int address) => bytes[normalize(address)];
-
-  peek2(int address) =>
-      bytes[normalize(address)] + 256 * bytes[normalize(address + 1)];
-
-  poke(int address, int b) {
-    this.bytes[normalize(address)] = b;
-  }
-
-  poke2(int address, int b) {
-    this.bytes[normalize(address)] = lo(b);
-    this.bytes[normalize(address + 1)] = hi(b);
-  }
+  Uint8List range(int start, {int end});
 }

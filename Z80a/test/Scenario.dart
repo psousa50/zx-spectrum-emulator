@@ -4,6 +4,9 @@ import 'package:Z80a/Memory.dart';
 import 'package:Z80a/Util.dart';
 import 'package:Z80a/Z80a.dart';
 
+import 'MemoryTest.dart';
+import 'PortsTest.dart';
+
 class State {
   Map<int, int> registerValues = {};
   List<int> ram = [];
@@ -13,6 +16,7 @@ class State {
   State({
     Map<int, int> register8Values = const {},
     Map<int, int> register16Values = const {},
+    Map<int, int> ports = const {},
     this.ram = const [],
     this.pc = 0,
     this.flags = "",
@@ -67,7 +71,7 @@ class Scenario {
   }
 
   void runWithFlagsSetTo(bool flagsValue) {
-    List<int> memory = setupMemory();
+    var memory = setupMemory();
 
     Map<int, int> initialRegisterValues =
         setupInitialRegisterValues(flagsValue);
@@ -75,7 +79,8 @@ class Scenario {
     Map<int, int> expectedRegisterValues =
         setupExpectedRegisterValues(initialRegisterValues);
 
-    var z80a = Z80a(Memory.fromBytes(memory));
+    var ports = PortsTest();
+    var z80a = Z80a(memory, ports);
 
     setZ80Registers(z80a, initialRegisterValues);
 
@@ -98,7 +103,7 @@ class Scenario {
     checkFlag(z80a.zeroFlag, Z80a.F_ZERO, expectedRegisterValues);
     checkFlag(z80a.signFlag, Z80a.F_SIGN, expectedRegisterValues);
 
-    expect(z80a.memory.bytes.sublist(10), expectedState.ram,
+    expect(z80a.memory.range(10), expectedState.ram,
         reason: '${scenarioName(opcodes)}\nReason: RAM is wrong');
 
     expect(
@@ -132,13 +137,14 @@ class Scenario {
     runWithFlagsSetTo(true);
   }
 
-  List<int> setupMemory() {
+  Memory setupMemory() {
     var memory = [
       ...List<int>(RAM_START),
       ...initialState.ram,
     ];
     memory.setRange(initialState.pc, initialState.pc + opcodes.length, opcodes);
-    return memory;
+
+    return MemoryTest.fromBytes(memory);
   }
 
   Map<int, int> setupInitialRegisterValues(bool flagsValue) {
