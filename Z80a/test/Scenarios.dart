@@ -332,49 +332,46 @@ List<Scenario> ldAR16(int opcode, int r16) => [
       )
     ];
 
-List<Scenario> rlca(int opcode) => [
-      changeR8("RLCA", 0x07, Z80a.R_A, binary("00010011"), binary("00100110"),
-          "~C ~N"),
-      changeR8("RLCA", 0x07, Z80a.R_A, binary("10010011"), binary("00100111"),
-          "C ~N"),
-    ];
-
-List<Scenario> rrca(int opcode) => [
-      changeR8("RRCA", 0x0F, Z80a.R_A, binary("10100010"), binary("01010001"),
-          "~C ~N"),
-      changeR8("RRCA", 0x0F, Z80a.R_A, binary("10100011"), binary("11010001"),
-          "C ~N"),
-    ];
-
-List<Scenario> rla(int opcode) => [
-      changeR8("RLA", 0x17, Z80a.R_A, binary("00100010"), binary("01000100"),
-          "~C ~N",
-          inFlags: "~C"),
+List<Scenario> rlcR8(int opcode, int r8) => [
       changeR8(
-          "RLA", 0x17, Z80a.R_A, binary("10100010"), binary("01000100"), "C ~N",
+          "RLCA", 0x07, r8, binary("00010011"), binary("00100110"), "~C ~N"),
+      changeR8(
+          "RLCA", 0x07, r8, binary("10010011"), binary("00100111"), "C ~N"),
+    ];
+
+List<Scenario> rrcR8(int opcode, int r8) => [
+      changeR8(
+          "RRCA", 0x0F, r8, binary("10100010"), binary("01010001"), "~C ~N"),
+      changeR8(
+          "RRCA", 0x0F, r8, binary("10100011"), binary("11010001"), "C ~N"),
+    ];
+
+List<Scenario> rlR8(int opcode, int r8) => [
+      changeR8("RLA", 0x17, r8, binary("00100010"), binary("01000100"), "~C ~N",
           inFlags: "~C"),
-      changeR8("RLA", 0x17, Z80a.R_A, binary("00100010"), binary("01000101"),
-          "~C ~N",
+      changeR8("RLA", 0x17, r8, binary("10100010"), binary("01000100"), "C ~N",
+          inFlags: "~C"),
+      changeR8("RLA", 0x17, r8, binary("00100010"), binary("01000101"), "~C ~N",
           inFlags: "C"),
-      changeR8(
-          "RLA", 0x17, Z80a.R_A, binary("10100010"), binary("01000101"), "C ~N",
+      changeR8("RLA", 0x17, r8, binary("10100010"), binary("01000101"), "C ~N",
           inFlags: "C"),
     ];
 
-List<Scenario> rra(int opcode) => [
-      changeR8("RRA", 0x1F, Z80a.R_A, binary("00100010"), binary("00010001"),
-          "~C ~N",
+List<Scenario> rrR8(int opcode, int r8) => [
+      changeR8("RRA", 0x1F, r8, binary("00100010"), binary("00010001"), "~C ~N",
           inFlags: "~C"),
-      changeR8(
-          "RRA", 0x1F, Z80a.R_A, binary("00100011"), binary("00010001"), "C ~N",
+      changeR8("RRA", 0x1F, r8, binary("00100011"), binary("00010001"), "C ~N",
           inFlags: "~C"),
-      changeR8("RRA", 0x1F, Z80a.R_A, binary("00100010"), binary("10010001"),
-          "~C ~N",
+      changeR8("RRA", 0x1F, r8, binary("00100010"), binary("10010001"), "~C ~N",
           inFlags: "C"),
-      changeR8(
-          "RRA", 0x1F, Z80a.R_A, binary("00100011"), binary("10010001"), "C ~N",
+      changeR8("RRA", 0x1F, r8, binary("00100011"), binary("10010001"), "C ~N",
           inFlags: "C"),
     ];
+
+List<Scenario> rlca(int opcode) => rlcR8(opcode, Z80a.R_A);
+List<Scenario> rrca(int opcode) => rrcR8(opcode, Z80a.R_A);
+List<Scenario> rla(int opcode) => rlR8(opcode, Z80a.R_A);
+List<Scenario> rra(int opcode) => rrR8(opcode, Z80a.R_A);
 
 List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
       Scenario(
