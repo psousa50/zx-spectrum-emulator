@@ -346,6 +346,10 @@ var allScenarios = [
   ...outCR8(0x61, Z80a.R_H),
   ...outCR8(0x69, Z80a.R_L),
   ...outCR8(0x79, Z80a.R_A),
+  ...sbcHLR16(0x42, Z80a.R_BC),
+  ...sbcHLR16(0x52, Z80a.R_DE),
+  ...sbcHLR16(0x62, Z80a.R_HL),
+  ...sbcHLR16(0x72, Z80a.R_SP),
 ];
 
 void main() {

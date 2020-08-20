@@ -143,26 +143,28 @@ List<Scenario> ldR16NN(int opcode, int r16) => [
       )
     ];
 
-Scenario addHLR16Spec(int opcode, int rhxy, int r16, int hxyValue, int r16Value,
-        int result, String flags) =>
+Scenario changeR16R16Spec(String name, int opcode, int rhxy, int r16,
+        int hxyValue, int r16Value, int result, String flags,
+        {String inFlags = "", int prefix}) =>
     Scenario(
-      "ADD ${Z80a.r16Names[rhxy]}, ${Z80a.r16Names[r16]}",
-      [...ixyPrefix(rhxy), opcode],
+      "$name ${Z80a.r16Names[rhxy]}, ${Z80a.r16Names[r16]} => ($hxyValue $r16Value)",
+      [if (prefix != null) prefix, ...ixyPrefix(rhxy), opcode],
       initialState: State(
         register16Values: {rhxy: hxyValue, r16: r16Value},
+        flags: inFlags,
       ),
       expectedState: State(
         register16Values: {
           rhxy: result,
         },
         flags: flags,
-        pc: isIXIY(rhxy) ? 2 : 1,
+        pc: (prefix == null ? 0 : 1) + (isIXIY(rhxy) ? 2 : 1),
       ),
     );
 
 List<Scenario> addHLR16(int opcode, int rhxy, int r16) => [
-      addHLR16Spec(opcode, rhxy, r16, 10000, 2345, 12345, "~C"),
-      addHLR16Spec(opcode, rhxy, r16, 65535, 2, 1, "C"),
+      changeR16R16Spec("ADD", opcode, rhxy, r16, 10000, 2345, 12345, "~C"),
+      changeR16R16Spec("ADD", opcode, rhxy, r16, 65535, 2, 1, "C"),
     ];
 
 Scenario addHLHLSpec(
@@ -884,22 +886,22 @@ List<Scenario> adcAR8(int opcode, int r8) => r8 == Z80a.R_A
 List<Scenario> subAR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [
         r8Operation("SUB", opcode, r8, 20, 20, 0, "~S Z N ~C ~P"),
-        r8Operation("SUB", opcode, r8, 128, 128, 0, "~S Z N ~C P"),
+        r8Operation("SUB", opcode, r8, 128, 128, 0, "~S Z N ~C ~P"),
       ]
     : [
         r8Operation("SUB", opcode, r8, 10, 2, 8, "~S ~Z N ~C ~P"),
-        r8Operation("SUB", opcode, r8, 129, 2, 127, "~S ~Z N ~C ~P"),
-        r8Operation("SUB", opcode, r8, 255, 254, 1, "~S ~Z N ~C P"),
-        r8Operation("SUB", opcode, r8, 3, 5, 254, "S ~Z N C P"),
+        r8Operation("SUB", opcode, r8, 129, 2, 127, "~S ~Z N ~C P"),
+        r8Operation("SUB", opcode, r8, 255, 254, 1, "~S ~Z N ~C ~P"),
+        r8Operation("SUB", opcode, r8, 3, 5, 254, "S ~Z N C ~P"),
       ];
 
 List<Scenario> sbcAR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [
         r8Operation("SBC A,", opcode, r8, 10, 10, 0, "~S Z N ~C ~P",
             inFlags: "~C"),
-        r8Operation("SBC A,", opcode, r8, 10, 10, 255, "S ~Z N C P",
+        r8Operation("SBC A,", opcode, r8, 10, 10, 255, "S ~Z N C ~P",
             inFlags: "C"),
-        r8Operation("SBC A,", opcode, r8, 128, 128, 0, "~S Z N ~C P",
+        r8Operation("SBC A,", opcode, r8, 128, 128, 0, "~S Z N ~C ~P",
             inFlags: "~C"),
         r8Operation("SBC A,", opcode, r8, 128, 128, 255, "S ~Z N C ~P",
             inFlags: "C"),
@@ -913,13 +915,15 @@ List<Scenario> sbcAR8(int opcode, int r8) => r8 == Z80a.R_A
             inFlags: "~C"),
         r8Operation("SBC A,", opcode, r8, 255, 1, 253, "S ~Z N ~C ~P",
             inFlags: "C"),
-        r8Operation("SBC A,", opcode, r8, 255, 254, 1, "~S ~Z N ~C P",
+        r8Operation("SBC A,", opcode, r8, 255, 254, 1, "~S ~Z N ~C ~P",
             inFlags: "~C"),
-        r8Operation("SBC A,", opcode, r8, 255, 254, 0, "~S Z N ~C P",
+        r8Operation("SBC A,", opcode, r8, 255, 254, 0, "~S Z N ~C ~P",
             inFlags: "C"),
-        r8Operation("SBC A,", opcode, r8, 3, 5, 254, "S ~Z N C P",
+        r8Operation("SBC A,", opcode, r8, 3, 5, 254, "S ~Z N C ~P",
             inFlags: "~C"),
-        r8Operation("SBC A,", opcode, r8, 3, 5, 253, "S ~Z N C P",
+        r8Operation("SBC A,", opcode, r8, 3, 5, 253, "S ~Z N C ~P",
+            inFlags: "C"),
+        r8Operation("SBC A,", opcode, r8, 129, 2, 126, "~S ~Z N ~C P",
             inFlags: "C"),
       ];
 
@@ -958,13 +962,13 @@ List<Scenario> orR8(int opcode, int r8) => r8 == Z80a.R_A
 List<Scenario> cpR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [
         r8Operation("CP", opcode, r8, 20, 20, 20, "~S Z N ~C ~P"),
-        r8Operation("CP", opcode, r8, 128, 128, 128, "~S Z N ~C P"),
+        r8Operation("CP", opcode, r8, 128, 128, 128, "~S Z N ~C ~P"),
       ]
     : [
         r8Operation("CP", opcode, r8, 10, 2, 10, "~S ~Z N ~C ~P"),
-        r8Operation("CP", opcode, r8, 129, 2, 129, "~S ~Z N ~C ~P"),
-        r8Operation("CP", opcode, r8, 255, 254, 255, "~S ~Z N ~C P"),
-        r8Operation("CP", opcode, r8, 3, 5, 3, "S ~Z N C P"),
+        r8Operation("CP", opcode, r8, 129, 2, 129, "~S ~Z N ~C P"),
+        r8Operation("CP", opcode, r8, 255, 254, 255, "~S ~Z N ~C ~P"),
+        r8Operation("CP", opcode, r8, 3, 5, 3, "S ~Z N C ~P"),
       ];
 
 Scenario nOperation(String name, int opcode, int aValue, int nValue, int result,
@@ -1005,15 +1009,15 @@ List<Scenario> adcAN(int opcode) => [
 
 List<Scenario> subAN(int opcode) => [
       nOperation("SUB N", opcode, 10, 2, 8, "~S ~Z N ~C ~P"),
-      nOperation("SUB N", opcode, 129, 2, 127, "~S ~Z N ~C ~P"),
-      nOperation("SUB N", opcode, 255, 254, 1, "~S ~Z N ~C P"),
-      nOperation("SUB N", opcode, 3, 5, 254, "S ~Z N C P"),
+      nOperation("SUB N", opcode, 129, 2, 127, "~S ~Z N ~C P"),
+      nOperation("SUB N", opcode, 255, 254, 1, "~S ~Z N ~C ~P"),
+      nOperation("SUB N", opcode, 3, 5, 254, "S ~Z N C ~P"),
     ];
 
 List<Scenario> sbcAN(int opcode) => [
       nOperation("SBC N", opcode, 10, 10, 0, "~S Z N ~C ~P", inFlags: "~C"),
-      nOperation("SBC N", opcode, 10, 10, 255, "S ~Z N C P", inFlags: "C"),
-      nOperation("SBC N", opcode, 128, 128, 0, "~S Z N ~C P", inFlags: "~C"),
+      nOperation("SBC N", opcode, 10, 10, 255, "S ~Z N C ~P", inFlags: "C"),
+      nOperation("SBC N", opcode, 128, 128, 0, "~S Z N ~C ~P", inFlags: "~C"),
       nOperation("SBC N", opcode, 128, 128, 255, "S ~Z N C ~P", inFlags: "C"),
     ];
 
@@ -1034,9 +1038,9 @@ List<Scenario> orN(int opcode) => [
 
 List<Scenario> cpN(int opcode) => [
       nOperation("CP N", opcode, 10, 2, 10, "~S ~Z N ~C ~P"),
-      nOperation("CP N", opcode, 129, 2, 129, "~S ~Z N ~C ~P"),
-      nOperation("CP N", opcode, 255, 254, 255, "~S ~Z N ~C P"),
-      nOperation("CP N", opcode, 3, 5, 3, "S ~Z N C P"),
+      nOperation("CP N", opcode, 129, 2, 129, "~S ~Z N ~C P"),
+      nOperation("CP N", opcode, 255, 254, 255, "~S ~Z N ~C ~P"),
+      nOperation("CP N", opcode, 3, 5, 3, "S ~Z N C ~P"),
     ];
 
 List<Scenario> exMSPHL(int opcode, int rhxy) => [
@@ -1248,3 +1252,30 @@ List<Scenario> outCR8(int opcode, int r8) => [
         ),
       )
     ];
+
+List<Scenario> sbcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
+    ? [
+        changeR16R16Spec(
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 0, "~S Z ~P ~C",
+            inFlags: "~C", prefix: 0xED),
+        changeR16R16Spec(
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 65535, "S ~Z P C",
+            inFlags: "C", prefix: 0xED),
+      ]
+    : [
+        changeR16R16Spec(
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 12000, 18000, "~S ~Z ~P ~C",
+            inFlags: "~C", prefix: 0xED),
+        changeR16R16Spec(
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 0, "~S Z ~P ~C",
+            inFlags: "~C", prefix: 0xED),
+        changeR16R16Spec(
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 40000, 55536, "S ~Z ~P C",
+            inFlags: "~C", prefix: 0xED),
+        changeR16R16Spec(
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 12000, 17999, "~S ~Z ~P ~C",
+            inFlags: "C", prefix: 0xED),
+        changeR16R16Spec(
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 65535, "S ~Z P C",
+            inFlags: "C", prefix: 0xED),
+      ];

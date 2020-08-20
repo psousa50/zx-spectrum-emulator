@@ -252,9 +252,14 @@ class Z80a {
     return word(r);
   }
 
-  void setFlagsOnResult(int b) {
+  void setZeroAndSignFlagsOn8BitResult(int b) {
     zeroFlag = b == 0;
     signFlag = b > 127;
+  }
+
+  void setZeroAndSignFlagsOn16BitResult(int b) {
+    zeroFlag = b == 0;
+    signFlag = b > 32767;
   }
 
   void push2(int w) {
@@ -267,6 +272,8 @@ class Z80a {
     this.SP = this.SP + 2;
     return w(this.memory.peek(this.SP - 2), this.memory.peek(this.SP - 1));
   }
+
+  bool sameSign8(int b1, int b2) => (b1 & 0x80) ^ (b2 & 0x80) == 0;
 
   bool getFlagCondition(int b) {
     bool flag;
@@ -308,7 +315,7 @@ class Z80a {
     int result = byte(sum);
     this.parityOverflowFlag = (((this.A & 0x80) ^ (value & 0x80)) == 0) &&
         (value & 0x80 != (result & 0x80));
-    setFlagsOnResult(result);
+    setZeroAndSignFlagsOn8BitResult(result);
     this.addSubtractFlag = false;
 
     return result;
@@ -317,7 +324,7 @@ class Z80a {
   int incR8(int value) {
     this.parityOverflowFlag = value == 0x7F;
     int newValue = byte(value + 1);
-    setFlagsOnResult(newValue);
+    setZeroAndSignFlagsOn8BitResult(newValue);
     this.addSubtractFlag = false;
 
     return newValue;
@@ -326,7 +333,7 @@ class Z80a {
   int decR8(int value) {
     this.parityOverflowFlag = value == 0x80;
     int newValue = byte(value - 1);
-    setFlagsOnResult(newValue);
+    setZeroAndSignFlagsOn8BitResult(newValue);
     this.addSubtractFlag = true;
 
     return newValue;
@@ -338,9 +345,9 @@ class Z80a {
     int diff = this.A - value;
     this.carryFlag = diff < 0;
     int result = byte(diff);
-    this.parityOverflowFlag = (((this.A & 0x80) ^ (value & 0x80)) == 0) &&
-        (value & 0x80 != (result & 0x80));
-    setFlagsOnResult(result);
+    this.parityOverflowFlag =
+        !sameSign8(this.A, value) && sameSign8(value, result);
+    setZeroAndSignFlagsOn8BitResult(result);
     this.addSubtractFlag = true;
 
     return result;
@@ -350,7 +357,7 @@ class Z80a {
 
   int andA(int value) {
     int result = this.A & value;
-    setFlagsOnResult(result);
+    setZeroAndSignFlagsOn8BitResult(result);
     this.carryFlag = false;
     this.addSubtractFlag = false;
     this.parityOverflowFlag = parity(result);
@@ -360,7 +367,7 @@ class Z80a {
 
   int xorA(int value) {
     int result = this.A ^ value;
-    setFlagsOnResult(result);
+    setZeroAndSignFlagsOn8BitResult(result);
     this.carryFlag = false;
     this.addSubtractFlag = false;
     this.parityOverflowFlag = parity(result);
@@ -370,7 +377,7 @@ class Z80a {
 
   int orA(int value) {
     int result = this.A | value;
-    setFlagsOnResult(result);
+    setZeroAndSignFlagsOn8BitResult(result);
     this.carryFlag = false;
     this.addSubtractFlag = false;
     this.parityOverflowFlag = parity(result);
@@ -1124,7 +1131,7 @@ class Z80a {
         int r8 = r8Table[(opcode & 0x38) >> 3];
         var result = this.ports.inPort(this.C);
         setReg(r8, result);
-        setFlagsOnResult(result);
+        setZeroAndSignFlagsOn8BitResult(result);
         this.parityOverflowFlag = parity(result);
         this.addSubtractFlag = false;
         this.halfCarryFlag = false;
@@ -1139,6 +1146,21 @@ class Z80a {
       case 0x79: // OUT A, (C)
         int r8 = r8Table[(opcode & 0x38) >> 3];
         this.ports.outPort(this.C, getReg(r8));
+        break;
+
+      case 0x42: // SBC HL, BC
+      case 0x52: // SBC HL, DE
+      case 0x62: // SBC HL, HL
+      case 0x72: // SBC HL, SP
+        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        int value = getReg2(r16);
+        var result = this.HL - value - (this.carryFlag ? 1 : 0);
+        this.parityOverflowFlag =
+            (((this.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
+                (value & 0x8000 != (result & 0x8000));
+        this.carryFlag = result < 0;
+        this.HL = word(result);
+        setZeroAndSignFlagsOn16BitResult(this.HL);
         break;
 
       default:
