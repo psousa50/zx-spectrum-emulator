@@ -71,8 +71,8 @@ var allScenarios = [
   ...decR8(0x3D, Z80a.R_A),
   ...rlca(0x07),
   ...rrca(0x0F),
-  ...rra(0x17),
-  ...rla(0x1F),
+  ...rla(0x17),
+  ...rra(0x1F),
   ...cpl(0x2F),
   ...scf(0x37),
   ...ccf(0x3F),
@@ -350,6 +350,44 @@ var allScenarios = [
   ...sbcHLR16(0x52, Z80a.R_DE),
   ...sbcHLR16(0x62, Z80a.R_HL),
   ...sbcHLR16(0x72, Z80a.R_SP),
+
+  // CB
+
+  ...rlcR8(0x00, Z80a.R_B),
+  ...rlcR8(0x01, Z80a.R_C),
+  ...rlcR8(0x02, Z80a.R_D),
+  ...rlcR8(0x03, Z80a.R_E),
+  ...rlcR8(0x04, Z80a.R_H),
+  ...rlcR8(0x05, Z80a.R_L),
+  ...rlcR8(0x06, Z80a.R_MHL),
+  ...rlcR8(0x07, Z80a.R_A),
+
+  ...rrcR8(0x08, Z80a.R_B),
+  ...rrcR8(0x09, Z80a.R_C),
+  ...rrcR8(0x0A, Z80a.R_D),
+  ...rrcR8(0x0B, Z80a.R_E),
+  ...rrcR8(0x0C, Z80a.R_H),
+  ...rrcR8(0x0D, Z80a.R_L),
+  ...rrcR8(0x0E, Z80a.R_MHL),
+  ...rrcR8(0x0F, Z80a.R_A),
+
+  ...rlR8(0x10, Z80a.R_B),
+  ...rlR8(0x11, Z80a.R_C),
+  ...rlR8(0x12, Z80a.R_D),
+  ...rlR8(0x13, Z80a.R_E),
+  ...rlR8(0x14, Z80a.R_H),
+  ...rlR8(0x15, Z80a.R_L),
+  ...rlR8(0x16, Z80a.R_MHL),
+  ...rlR8(0x17, Z80a.R_A),
+
+  ...rrR8(0x18, Z80a.R_B),
+  ...rrR8(0x19, Z80a.R_C),
+  ...rrR8(0x1A, Z80a.R_D),
+  ...rrR8(0x1B, Z80a.R_E),
+  ...rrR8(0x1C, Z80a.R_H),
+  ...rrR8(0x1D, Z80a.R_L),
+  ...rrR8(0x1E, Z80a.R_MHL),
+  ...rrR8(0x1F, Z80a.R_A),
 ];
 
 void main() {
@@ -362,7 +400,7 @@ void main() {
   }, skip: !runAll);
 
   test('One Scenario', () {
-    var scenarios = addHLR16(0x09, Z80a.R_IX, Z80a.R_BC);
+    var scenarios = rlcR8(0x00, Z80a.R_B);
     scenarios.forEach((scenario) {
       scenario.run();
     });

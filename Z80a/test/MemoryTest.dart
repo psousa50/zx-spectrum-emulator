@@ -20,7 +20,7 @@ class MemoryTest extends Memory {
       bytes[normalize(address)] + 256 * bytes[normalize(address + 1)];
 
   poke(int address, int b) {
-    this.bytes[normalize(address)] = b;
+    this.bytes[normalize(address)] = b % 256;
   }
 
   poke2(int address, int b) {

@@ -20,7 +20,7 @@ class State {
     Map<int, int> register16Values = const {},
     Map<int, int> ports = const {},
     this.ram = const [],
-    this.pc = 0,
+    this.pc,
     this.flags = "",
   }) {
     register8Values.forEach((r, value) {
@@ -119,7 +119,9 @@ class Scenario {
             expectedRegisterValues[Z80a.R_SP + 1],
         reason: '${scenarioName(opcodes)}\nReason: SP is wrong');
 
-    expect(z80a.PC, expectedState.pc,
+    var expectedPC =
+        expectedState.pc == null ? opcodes.length : expectedState.pc;
+    expect(z80a.PC, expectedPC,
         reason: '${scenarioName(opcodes)}\nReason: PC is wrong');
   }
 
@@ -140,6 +142,7 @@ class Scenario {
   }
 
   void run() {
+    if (initialState.pc == null) initialState.pc = 0;
     runWithFlagsSetTo(false);
     runWithFlagsSetTo(true);
   }

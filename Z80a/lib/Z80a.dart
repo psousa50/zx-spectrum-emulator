@@ -87,6 +87,7 @@ class Z80a {
   static const IX_PREFIX = 0xDD;
   static const IY_PREFIX = 0xFD;
 
+  static const BIT_OPCODES = 0xCB;
   static const EXTENDED_OPCODES = 0xED;
 
   static const R_AF = R_A;
@@ -115,6 +116,7 @@ class Z80a {
     3: R_E,
     4: R_H,
     5: R_L,
+    6: R_MHL,
     7: R_A,
   };
 
@@ -235,11 +237,12 @@ class Z80a {
 
   int word(int v) => v % 65536;
 
-  int getReg(int r) => registers[r];
+  int getReg(int r) => r == R_MHL ? this.memory.peek(this.HL) : registers[r];
 
   int getReg2(int r) => 256 * registers[r] + registers[r + 1];
 
-  void setReg(int r, int b) => registers[r] = byte(b);
+  void setReg(int r, int b) =>
+      r == R_MHL ? this.memory.poke(this.HL, byte(b)) : registers[r] = byte(b);
 
   void setReg2(int r, int w) {
     registers[r] = hi(w);
@@ -387,6 +390,38 @@ class Z80a {
 
   int cpA(int value) => subA(value);
 
+  int rlc(int value) {
+    int b7 = (value & 0x80) >> 7;
+    this.carryFlag = b7 == 1;
+    this.addSubtractFlag = false;
+    var result = byte(value << 1) | b7;
+    return result;
+  }
+
+  int rrc(int value) {
+    int b0 = (value & 0x01);
+    this.carryFlag = b0 == 1;
+    this.addSubtractFlag = false;
+    var result = byte(value >> 1) | (b0 << 7);
+    return result;
+  }
+
+  int rl(int value) {
+    int b7 = (value & 0x80) >> 7;
+    var result = byte(value << 1) | (this.carryFlag ? 0x01 : 0x00);
+    this.carryFlag = b7 == 1;
+    this.addSubtractFlag = false;
+    return result;
+  }
+
+  int rr(int value) {
+    int b0 = (value & 0x01);
+    var result = byte(value >> 1) | (this.carryFlag ? 0x80 : 0x00);
+    this.carryFlag = b0 == 1;
+    this.addSubtractFlag = false;
+    return result;
+  }
+
   bool step() {
     var processed = true;
 
@@ -400,6 +435,10 @@ class Z80a {
 
       case EXTENDED_OPCODES:
         processExtendedOpcodes();
+        break;
+
+      case BIT_OPCODES:
+        processBitOpcodes();
         break;
 
       default:
@@ -462,13 +501,10 @@ class Z80a {
       case 0x83: // ADD A, E
       case 0x84: // ADD A, H
       case 0x85: // ADD A, L
+      case 0x86: // ADC A, (HL)
       case 0x87: // ADD A, A
         int r8 = r8Table[opcode & 0x07];
         this.A = addA(getReg(r8));
-        break;
-
-      case 0x86: // ADC A, (HL)
-        this.A = addA(this.memory.peek(this.HL));
         break;
 
       case 0x88: // ADC A, B
@@ -477,13 +513,10 @@ class Z80a {
       case 0x8B: // ADC A, E
       case 0x8C: // ADC A, H
       case 0x8D: // ADC A, L
+      case 0x8E: // ADC A, (HL)
       case 0x8F: // ADC A, A
         int r8 = r8Table[opcode & 0x07];
         this.A = adcA(getReg(r8));
-        break;
-
-      case 0x8E: // ADC A, (HL)
-        this.A = adcA(this.memory.peek(this.HL));
         break;
 
       case 0x90: // SUB B
@@ -492,13 +525,10 @@ class Z80a {
       case 0x93: // SUB E
       case 0x94: // SUB H
       case 0x95: // SUB L
+      case 0x96: // SUB (HL)
       case 0x97: // SUB A
         int r8 = r8Table[opcode & 0x07];
         this.A = subA(getReg(r8));
-        break;
-
-      case 0x96: // SUB (HL)
-        this.A = subA(this.memory.peek(this.HL));
         break;
 
       case 0x98: // SBC A, B
@@ -507,13 +537,10 @@ class Z80a {
       case 0x9B: // SBC A, E
       case 0x9C: // SBC A, H
       case 0x9D: // SBC A, L
+      case 0x9E: // SBC A, (HL)
       case 0x9F: // SBC A, A
         int r8 = r8Table[opcode & 0x07];
         this.A = sbcA(getReg(r8));
-        break;
-
-      case 0x9E: // SBC A, (HL)
-        this.A = sbcA(this.memory.peek(this.HL));
         break;
 
       case 0xA0: // AND B
@@ -522,13 +549,10 @@ class Z80a {
       case 0xA3: // AND E
       case 0xA4: // AND H
       case 0xA5: // AND L
+      case 0xA6: // AND (HL)
       case 0xA7: // AND A
         int r8 = r8Table[opcode & 0x07];
         this.A = andA(getReg(r8));
-        break;
-
-      case 0xA6: // AND (HL)
-        this.A = andA(this.memory.peek(this.HL));
         break;
 
       case 0xA8: // XOR B
@@ -537,13 +561,10 @@ class Z80a {
       case 0xAB: // XOR E
       case 0xAC: // XOR H
       case 0xAD: // XOR L
+      case 0xAE: // XOR (HL)
       case 0xAF: // XOR A
         int r8 = r8Table[opcode & 0x07];
         this.A = xorA(getReg(r8));
-        break;
-
-      case 0xAE: // XOR (HL)
-        this.A = xorA(this.memory.peek(this.HL));
         break;
 
       case 0xB0: // OR B
@@ -552,13 +573,10 @@ class Z80a {
       case 0xB3: // OR E
       case 0xB4: // OR H
       case 0xB5: // OR L
+      case 0xB6: // OR (HL)
       case 0xB7: // OR A
         int r8 = r8Table[opcode & 0x07];
         this.A = orA(getReg(r8));
-        break;
-
-      case 0xB6: // OR (HL)
-        this.A = orA(this.memory.peek(this.HL));
         break;
 
       case 0xB8: // CP B
@@ -567,6 +585,7 @@ class Z80a {
       case 0xBB: // CP E
       case 0xBC: // CP H
       case 0xBD: // CP L
+      case 0xBE: // CP (HL)
       case 0xBF: // CP A
         int r8 = r8Table[opcode & 0x07];
         subA(getReg(r8));
@@ -602,10 +621,6 @@ class Z80a {
 
       case 0xFE: // CP N
         cpA(fetch());
-        break;
-
-      case 0xBE: // CP (HL)
-        cpA(this.memory.peek(this.HL));
         break;
 
       case 0x22: // LD (nn), HL
@@ -667,13 +682,10 @@ class Z80a {
       case 0x1C: // INC E
       case 0x24: // INC H
       case 0x2C: // INC L
+      case 0x34: // INC (HL)
       case 0x3C: // INC A
         int r8 = r8Table[(opcode & 0x38) >> 3];
         setReg(r8, incR8(this.getReg(r8)));
-        break;
-
-      case 0x34: // INC (HL)
-        this.memory.poke(this.HL, incR8(this.memory.peek(this.HL)));
         break;
 
       case 0x05: // DEC B
@@ -682,13 +694,10 @@ class Z80a {
       case 0x1D: // DEC E
       case 0x25: // DEC H
       case 0x2D: // DEC L
+      case 0x35: // DEC (HL)
       case 0x3D: // DEC A
         int r8 = r8Table[(opcode & 0x38) >> 3];
         setReg(r8, decR8(this.getReg(r8)));
-        break;
-
-      case 0x35: // DEC (HL)
-        this.memory.poke(this.HL, decR8(this.memory.peek(this.HL)));
         break;
 
       case 0x02: // LD (BC), A
@@ -708,31 +717,19 @@ class Z80a {
         break;
 
       case 0x07: // RLCA
-        int b7 = (this.A & 0x80) >> 7;
-        this.A = byte(this.A << 1) | b7;
-        this.carryFlag = b7 == 1;
-        this.addSubtractFlag = false;
+        this.A = rlc(this.A);
         break;
 
       case 0x0F: // RRCA
-        int b0 = (this.A & 0x01);
-        this.A = byte(this.A >> 1) | (b0 << 7);
-        this.carryFlag = b0 == 1;
-        this.addSubtractFlag = false;
+        this.A = rrc(this.A);
         break;
 
       case 0x17: // RLA
-        int b7 = (this.A & 0x80) >> 7;
-        this.A = byte(this.A << 1) | (this.carryFlag ? 0x01 : 0x00);
-        this.carryFlag = b7 == 1;
-        this.addSubtractFlag = false;
+        this.A = rl(this.A);
         break;
 
       case 0x1F: // RRA
-        int b0 = (this.A & 0x01);
-        this.A = byte(this.A >> 1) | (this.carryFlag ? 0x80 : 0x00);
-        this.carryFlag = b0 == 1;
-        this.addSubtractFlag = false;
+        this.A = rr(this.A);
         break;
 
       case 0x2F: // CPL
@@ -1161,6 +1158,68 @@ class Z80a {
         this.carryFlag = result < 0;
         this.HL = word(result);
         setZeroAndSignFlagsOn16BitResult(this.HL);
+        break;
+
+      default:
+        processed = false;
+        break;
+    }
+
+    return processed;
+  }
+
+  bool processBitOpcodes() {
+    var processed = true;
+
+    final opcode = fetch();
+
+    switch (opcode) {
+      case 0x00: // RLC B
+      case 0x01: // RLC C
+      case 0x02: // RLC D
+      case 0x03: // RLC E
+      case 0x04: // RLC H
+      case 0x05: // RLC L
+      case 0x06: // RLC (HL)
+      case 0x07: // RLC A
+        int r8 = r8Table[opcode & 0x07];
+        setReg(r8, rlc(getReg(r8)));
+        break;
+
+      case 0x08: // RRC B
+      case 0x09: // RRC C
+      case 0x0A: // RRC D
+      case 0x0B: // RRC E
+      case 0x0C: // RRC H
+      case 0x0D: // RRC L
+      case 0x0E: // RRC (HL)
+      case 0x0F: // RRC A
+        int r8 = r8Table[opcode & 0x07];
+        setReg(r8, rrc(getReg(r8)));
+        break;
+
+      case 0x10: // RL B
+      case 0x11: // RL C
+      case 0x12: // RL D
+      case 0x13: // RL E
+      case 0x14: // RL H
+      case 0x15: // RL L
+      case 0x16: // RL (HL)
+      case 0x17: // RL A
+        int r8 = r8Table[opcode & 0x07];
+        setReg(r8, rl(getReg(r8)));
+        break;
+
+      case 0x18: // RR B
+      case 0x19: // RR C
+      case 0x1A: // RR D
+      case 0x1B: // RR E
+      case 0x1C: // RR H
+      case 0x1D: // RR L
+      case 0x1E: // RR (HL)
+      case 0x1F: // RR A
+        int r8 = r8Table[opcode & 0x07];
+        setReg(r8, rr(getReg(r8)));
         break;
 
       default:

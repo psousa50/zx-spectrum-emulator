@@ -210,10 +210,10 @@ List<Scenario> decR16(int opcode, int rhxy) => [
 
 Scenario changeR8R8(
         String name, int opcode, int r8, int value, int result, String flags,
-        {String inFlags = ""}) =>
+        {String inFlags = "", int prefix}) =>
     Scenario(
       '$name ${Z80a.r8Names[r8]}',
-      [opcode],
+      [if (prefix != null) prefix, opcode],
       initialState: State(
         register8Values: {r8: value},
         flags: inFlags,
@@ -221,16 +221,15 @@ Scenario changeR8R8(
       expectedState: State(
         register8Values: {r8: result},
         flags: flags,
-        pc: 1,
       ),
     );
 
 Scenario changeR8HL(
         String name, int opcode, int value, int result, String flags,
-        {String inFlags = ""}) =>
+        {String inFlags = "", int prefix}) =>
     Scenario(
       '$name (HL)',
-      [opcode],
+      [if (prefix != null) prefix, opcode],
       initialState: State(
         register16Values: {Z80a.R_HL: Scenario.RAM_START},
         ram: [value],
@@ -239,16 +238,15 @@ Scenario changeR8HL(
       expectedState: State(
         ram: [result],
         flags: flags,
-        pc: 1,
       ),
     );
 
 Scenario changeR8IXYd(
         String name, int opcode, int rxy, int value, int result, String flags,
-        {String inFlags = ""}) =>
+        {String inFlags = "", int prefix}) =>
     Scenario(
       '$name (IX+d)',
-      [...ixyPrefix(rxy), opcode, 2],
+      [if (prefix != null) prefix, ...ixyPrefix(rxy), opcode, 2],
       initialState: State(
         register16Values: {rxy: Scenario.RAM_START},
         ram: [0, 0, value],
@@ -257,20 +255,20 @@ Scenario changeR8IXYd(
       expectedState: State(
         ram: [0, 0, result],
         flags: flags,
-        pc: 3,
       ),
     );
 
 Scenario changeR8(
         String name, int opcode, int r8, int value, int result, String flags,
-        {String inFlags = ""}) =>
+        {String inFlags = "", int prefix}) =>
     isMIXIY(r8)
         ? changeR8IXYd(name, opcode, rMIXY(r8), value, result, flags,
-            inFlags: inFlags)
+            inFlags: inFlags, prefix: prefix)
         : r8 == Z80a.R_MHL
-            ? changeR8HL(name, opcode, value, result, flags, inFlags: inFlags)
+            ? changeR8HL(name, opcode, value, result, flags,
+                inFlags: inFlags, prefix: prefix)
             : changeR8R8(name, opcode, r8, value, result, flags,
-                inFlags: inFlags);
+                inFlags: inFlags, prefix: prefix);
 
 List<Scenario> incR8(int opcode, int r8) => [
       changeR8("INC", opcode, r8, 10, 11, "~Z ~S ~P ~N"),
@@ -332,46 +330,64 @@ List<Scenario> ldAR16(int opcode, int r16) => [
       )
     ];
 
-List<Scenario> rlcR8(int opcode, int r8) => [
+List<Scenario> rlcR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(
-          "RLCA", 0x07, r8, binary("00010011"), binary("00100110"), "~C ~N"),
-      changeR8(
-          "RLCA", 0x07, r8, binary("10010011"), binary("00100111"), "C ~N"),
+          name, opcode, r8, binary("00010011"), binary("00100110"), "~C ~N",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("10010011"), binary("00100111"), "C ~N",
+          prefix: prefix),
     ];
 
-List<Scenario> rrcR8(int opcode, int r8) => [
+List<Scenario> rrcR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(
-          "RRCA", 0x0F, r8, binary("10100010"), binary("01010001"), "~C ~N"),
+          name, opcode, r8, binary("10100010"), binary("01010001"), "~C ~N",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("10100011"), binary("11010001"), "C ~N",
+          prefix: prefix),
+    ];
+
+List<Scenario> rlR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(
-          "RRCA", 0x0F, r8, binary("10100011"), binary("11010001"), "C ~N"),
+          name, opcode, r8, binary("00100010"), binary("01000100"), "~C ~N",
+          inFlags: "~C", prefix: prefix),
+      changeR8(name, opcode, r8, binary("10100010"), binary("01000100"), "C ~N",
+          inFlags: "~C", prefix: prefix),
+      changeR8(
+          name, opcode, r8, binary("00100010"), binary("01000101"), "~C ~N",
+          inFlags: "C", prefix: prefix),
+      changeR8(name, opcode, r8, binary("10100010"), binary("01000101"), "C ~N",
+          inFlags: "C", prefix: prefix),
     ];
 
-List<Scenario> rlR8(int opcode, int r8) => [
-      changeR8("RLA", 0x17, r8, binary("00100010"), binary("01000100"), "~C ~N",
-          inFlags: "~C"),
-      changeR8("RLA", 0x17, r8, binary("10100010"), binary("01000100"), "C ~N",
-          inFlags: "~C"),
-      changeR8("RLA", 0x17, r8, binary("00100010"), binary("01000101"), "~C ~N",
-          inFlags: "C"),
-      changeR8("RLA", 0x17, r8, binary("10100010"), binary("01000101"), "C ~N",
-          inFlags: "C"),
+List<Scenario> rrR8Spec(String name, int opcode, int r8, {int prefix}) => [
+      changeR8(
+          name, opcode, r8, binary("00100010"), binary("00010001"), "~C ~N",
+          inFlags: "~C", prefix: prefix),
+      changeR8(name, opcode, r8, binary("00100011"), binary("00010001"), "C ~N",
+          inFlags: "~C", prefix: prefix),
+      changeR8(
+          name, opcode, r8, binary("00100010"), binary("10010001"), "~C ~N",
+          inFlags: "C", prefix: prefix),
+      changeR8(name, opcode, r8, binary("00100011"), binary("10010001"), "C ~N",
+          inFlags: "C", prefix: prefix),
     ];
 
-List<Scenario> rrR8(int opcode, int r8) => [
-      changeR8("RRA", 0x1F, r8, binary("00100010"), binary("00010001"), "~C ~N",
-          inFlags: "~C"),
-      changeR8("RRA", 0x1F, r8, binary("00100011"), binary("00010001"), "C ~N",
-          inFlags: "~C"),
-      changeR8("RRA", 0x1F, r8, binary("00100010"), binary("10010001"), "~C ~N",
-          inFlags: "C"),
-      changeR8("RRA", 0x1F, r8, binary("00100011"), binary("10010001"), "C ~N",
-          inFlags: "C"),
-    ];
+List<Scenario> rlca(int opcode) => rlcR8Spec("RLC", opcode, Z80a.R_A);
+List<Scenario> rrca(int opcode) => rrcR8Spec("RRC", opcode, Z80a.R_A);
+List<Scenario> rla(int opcode) => rlR8Spec("RL", opcode, Z80a.R_A);
+List<Scenario> rra(int opcode) => rrR8Spec("RL", opcode, Z80a.R_A);
 
-List<Scenario> rlca(int opcode) => rlcR8(opcode, Z80a.R_A);
-List<Scenario> rrca(int opcode) => rrcR8(opcode, Z80a.R_A);
-List<Scenario> rla(int opcode) => rlR8(opcode, Z80a.R_A);
-List<Scenario> rra(int opcode) => rrR8(opcode, Z80a.R_A);
+List<Scenario> rlcR8(int opcode, int r8) =>
+    rlcR8Spec("RLC", opcode, r8, prefix: Z80a.BIT_OPCODES);
+
+List<Scenario> rrcR8(int opcode, int r8) =>
+    rrcR8Spec("RRC", opcode, r8, prefix: Z80a.BIT_OPCODES);
+
+List<Scenario> rlR8(int opcode, int r8) =>
+    rlR8Spec("RL", opcode, r8, prefix: Z80a.BIT_OPCODES);
+
+List<Scenario> rrR8(int opcode, int r8) =>
+    rrR8Spec("RR", opcode, r8, prefix: Z80a.BIT_OPCODES);
 
 List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
       Scenario(
