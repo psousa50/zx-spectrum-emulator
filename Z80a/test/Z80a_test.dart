@@ -390,6 +390,33 @@ var allScenarios = [
   ...rrR8(0x1D, Z80a.R_L),
   ...rrR8(0x1E, Z80a.R_MHL),
   ...rrR8(0x1F, Z80a.R_A),
+
+  ...slaR8(0x20, Z80a.R_B),
+  ...slaR8(0x21, Z80a.R_C),
+  ...slaR8(0x22, Z80a.R_D),
+  ...slaR8(0x23, Z80a.R_E),
+  ...slaR8(0x24, Z80a.R_H),
+  ...slaR8(0x25, Z80a.R_L),
+  ...slaR8(0x26, Z80a.R_MHL),
+  ...slaR8(0x27, Z80a.R_A),
+
+  ...sraR8(0x28, Z80a.R_B),
+  ...sraR8(0x29, Z80a.R_C),
+  ...sraR8(0x2A, Z80a.R_D),
+  ...sraR8(0x2B, Z80a.R_E),
+  ...sraR8(0x2C, Z80a.R_H),
+  ...sraR8(0x2D, Z80a.R_L),
+  ...sraR8(0x2E, Z80a.R_MHL),
+  ...sraR8(0x2F, Z80a.R_A),
+
+  ...srlR8(0x38, Z80a.R_B),
+  ...srlR8(0x39, Z80a.R_C),
+  ...srlR8(0x3A, Z80a.R_D),
+  ...srlR8(0x3B, Z80a.R_E),
+  ...srlR8(0x3C, Z80a.R_H),
+  ...srlR8(0x3D, Z80a.R_L),
+  ...srlR8(0x3E, Z80a.R_MHL),
+  ...srlR8(0x3F, Z80a.R_A),
 ];
 
 void main() {

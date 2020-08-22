@@ -455,9 +455,35 @@ class Z80a {
   }
 
   int sla(int value) {
-    var result = byte(value << 1);
     this.carryFlag = value & 0x80 == 0x80;
     this.addSubtractFlag = false;
+    this.halfCarryFlag = false;
+    var result = byte(value << 1);
+    setZeroAndSignFlagsOn8BitResult(result);
+    this.parityOverflowFlag = parity(result);
+    return result;
+  }
+
+  int sra(int value) {
+    int b0 = (value & 0x01);
+    var b7 = (value & 0x80);
+    var result = byte(value >> 1) | b7;
+    this.carryFlag = b0 == 1;
+    this.addSubtractFlag = false;
+    this.halfCarryFlag = false;
+    setZeroAndSignFlagsOn8BitResult(result);
+    this.parityOverflowFlag = parity(result);
+    return result;
+  }
+
+  int srl(int value) {
+    int b0 = (value & 0x01);
+    var result = byte(value >> 1);
+    this.carryFlag = b0 == 1;
+    this.addSubtractFlag = false;
+    this.halfCarryFlag = false;
+    setZeroAndSignFlagsOn8BitResult(result);
+    this.parityOverflowFlag = parity(result);
     return result;
   }
 
@@ -1262,8 +1288,39 @@ class Z80a {
         break;
 
       case 0x20: // SLA B
+      case 0x21: // SLA C
+      case 0x22: // SLA D
+      case 0x23: // SLA E
+      case 0x24: // SLA H
+      case 0x25: // SLA L
+      case 0x26: // SLA (HL)
+      case 0x27: // SLA A
         int r8 = r8Table[opcode & 0x07];
         setReg(r8, sla(getReg(r8)));
+        break;
+
+      case 0x28: // SRA B
+      case 0x29: // SRA C
+      case 0x2A: // SRA D
+      case 0x2B: // SRA E
+      case 0x2C: // SRA H
+      case 0x2D: // SRA L
+      case 0x2E: // SRA (HL)
+      case 0x2F: // SRA A
+        int r8 = r8Table[opcode & 0x07];
+        setReg(r8, sra(getReg(r8)));
+        break;
+
+      case 0x38: // SRL B
+      case 0x39: // SRL C
+      case 0x3A: // SRL D
+      case 0x3B: // SRL E
+      case 0x3C: // SRL H
+      case 0x3D: // SRL L
+      case 0x3E: // SRA (HL)
+      case 0x3F: // SRA A
+        int r8 = r8Table[opcode & 0x07];
+        setReg(r8, srl(getReg(r8)));
         break;
 
       default:

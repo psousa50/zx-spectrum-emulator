@@ -438,11 +438,47 @@ List<Scenario> slaR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(name, opcode, r8, binary("00100110"), binary("01001100"),
           "~S ~Z ~C ~N ~H P",
           prefix: prefix),
-      changeR8(name, opcode, r8, binary("10100011"), binary("10100011"),
+      changeR8(name, opcode, r8, binary("11100011"), binary("11000110"),
           "S ~Z C ~N ~H ~P",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("10000000"), binary("00000000"),
           "~S Z C ~N ~H ~P",
+          prefix: prefix),
+    ];
+
+List<Scenario> sraR8Spec(String name, int opcode, int r8, {int prefix}) => [
+      changeR8(name, opcode, r8, binary("00100110"), binary("00010011"),
+          "~S ~Z ~C ~N ~H P",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("00100111"), binary("00010011"),
+          "~S ~Z C ~N ~H P",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("10100110"), binary("11010011"),
+          "S ~Z ~C ~N ~H P",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("10100111"), binary("11010011"),
+          "S ~Z C ~N ~H P",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("00000000"), binary("00000000"),
+          "~S Z ~C ~N ~H ~P",
+          prefix: prefix),
+    ];
+
+List<Scenario> srlR8Spec(String name, int opcode, int r8, {int prefix}) => [
+      changeR8(name, opcode, r8, binary("00100110"), binary("00010011"),
+          "~S ~Z ~C ~N ~H P",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("00100111"), binary("00010011"),
+          "~S ~Z C ~N ~H P",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("10100110"), binary("01010011"),
+          "~S ~Z ~C ~N ~H ~P",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("10100111"), binary("01010011"),
+          "~S ~Z C ~N ~H ~P",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("00000000"), binary("00000000"),
+          "~S Z ~C ~N ~H ~P",
           prefix: prefix),
     ];
 
@@ -460,6 +496,12 @@ List<Scenario> rrR8(int opcode, int r8) =>
 
 List<Scenario> slaR8(int opcode, int r8) =>
     slaR8Spec("SLA", opcode, r8, prefix: Z80a.BIT_OPCODES);
+
+List<Scenario> sraR8(int opcode, int r8) =>
+    sraR8Spec("SRA", opcode, r8, prefix: Z80a.BIT_OPCODES);
+
+List<Scenario> srlR8(int opcode, int r8) =>
+    srlR8Spec("SRL", opcode, r8, prefix: Z80a.BIT_OPCODES);
 
 List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
       Scenario(
