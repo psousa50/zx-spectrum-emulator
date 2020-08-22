@@ -393,7 +393,7 @@ var allScenarios = [
 ];
 
 void main() {
-  const runAll = false;
+  const runAll = true;
 
   test('All Scenarios', () {
     allScenarios.forEach((scenario) {
@@ -402,6 +402,7 @@ void main() {
   }, skip: !runAll);
 
   test('One Scenario', () {
+    print("RUNNING ONLY ONE SCENARIO");
     var scenarios = rlR8(0x10, Z80a.R_B);
     scenarios.forEach((scenario) {
       scenario.run();

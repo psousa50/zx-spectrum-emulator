@@ -393,19 +393,19 @@ List<Scenario> rlR8Spec(String name, int opcode, int r8, {int prefix}) => [
     ];
 
 List<Scenario> rrR8Spec(String name, int opcode, int r8, {int prefix}) => [
-      changeR8(name, opcode, r8, binary("10100010"), binary("01010001"),
+      changeR8("$name 1", opcode, r8, binary("10100010"), binary("01010001"),
           "~S ~Z ~C ~N P ~H",
-          prefix: prefix),
-      changeR8(name, opcode, r8, binary("10100011"), binary("01010001"),
-          "S ~Z `~C ~N ~P ~H",
-          prefix: prefix),
-      changeR8(name, opcode, r8, binary("00000001"), binary("00000000"),
-          "S Z ~C ~N ~P ~H",
-          prefix: prefix),
-      changeR8(name, opcode, r8, binary("10100010"), binary("11010001"),
-          "S ~Z C ~N P ~H",
+          inFlags: "~C", prefix: prefix),
+      changeR8("$name 2", opcode, r8, binary("10100011"), binary("01010001"),
+          "~S ~Z C ~N P ~H",
+          inFlags: "~C", prefix: prefix),
+      changeR8("$name 3", opcode, r8, binary("00000001"), binary("00000000"),
+          "~S Z C ~N ~P ~H",
+          inFlags: "~C", prefix: prefix),
+      changeR8("$name 4", opcode, r8, binary("10100010"), binary("11010001"),
+          "S ~Z ~C ~N ~P ~H",
           inFlags: "C", prefix: prefix),
-      changeR8(name, opcode, r8, binary("10100011"), binary("11010001"),
+      changeR8("$name 5", opcode, r8, binary("10100011"), binary("11010001"),
           "S ~Z C ~N ~P ~H",
           inFlags: "C", prefix: prefix),
     ];
@@ -435,10 +435,14 @@ List<Scenario> rrcR8Spec(String name, int opcode, int r8, {int prefix}) => [
     ];
 
 List<Scenario> slaR8Spec(String name, int opcode, int r8, {int prefix}) => [
-      changeR8(
-          name, opcode, r8, binary("00100010"), binary("01000100"), "~C ~N",
+      changeR8(name, opcode, r8, binary("00100110"), binary("01001100"),
+          "~S ~Z ~C ~N ~H P",
           prefix: prefix),
-      changeR8(name, opcode, r8, binary("10100011"), binary("10100011"), "C ~N",
+      changeR8(name, opcode, r8, binary("10100011"), binary("10100011"),
+          "S ~Z C ~N ~H ~P",
+          prefix: prefix),
+      changeR8(name, opcode, r8, binary("10000000"), binary("00000000"),
+          "~S Z C ~N ~H ~P",
           prefix: prefix),
     ];
 

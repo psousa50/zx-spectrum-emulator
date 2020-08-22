@@ -1249,6 +1249,18 @@ class Z80a {
         setReg(r8, rl(getReg(r8)));
         break;
 
+      case 0x18: // RR B
+      case 0x19: // RR C
+      case 0x1A: // RR D
+      case 0x1B: // RR E
+      case 0x1C: // RR H
+      case 0x1D: // RR L
+      case 0x1E: // RR (HL)
+      case 0x1F: // RR A
+        int r8 = r8Table[opcode & 0x07];
+        setReg(r8, rr(getReg(r8)));
+        break;
+
       case 0x20: // SLA B
         int r8 = r8Table[opcode & 0x07];
         setReg(r8, sla(getReg(r8)));
