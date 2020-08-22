@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Z80a/Z80a.dart';
-import 'MemoryTest.dart';
-import 'PortsTest.dart';
 import 'Scenarios.dart';
 
 var allScenarios = [
@@ -417,6 +415,78 @@ var allScenarios = [
   ...srlR8(0x3D, Z80a.R_L),
   ...srlR8(0x3E, Z80a.R_MHL),
   ...srlR8(0x3F, Z80a.R_A),
+
+  ...bit0R8(0x40, Z80a.R_B),
+  ...bit0R8(0x41, Z80a.R_C),
+  ...bit0R8(0x42, Z80a.R_D),
+  ...bit0R8(0x43, Z80a.R_E),
+  ...bit0R8(0x44, Z80a.R_H),
+  ...bit0R8(0x45, Z80a.R_L),
+  ...bit0R8(0x46, Z80a.R_MHL),
+  ...bit0R8(0x47, Z80a.R_A),
+
+  ...bit1R8(0x48, Z80a.R_B),
+  ...bit1R8(0x49, Z80a.R_C),
+  ...bit1R8(0x4A, Z80a.R_D),
+  ...bit1R8(0x4B, Z80a.R_E),
+  ...bit1R8(0x4C, Z80a.R_H),
+  ...bit1R8(0x4D, Z80a.R_L),
+  ...bit1R8(0x4E, Z80a.R_MHL),
+  ...bit1R8(0x4F, Z80a.R_A),
+
+  ...bit2R8(0x50, Z80a.R_B),
+  ...bit2R8(0x51, Z80a.R_C),
+  ...bit2R8(0x52, Z80a.R_D),
+  ...bit2R8(0x53, Z80a.R_E),
+  ...bit2R8(0x54, Z80a.R_H),
+  ...bit2R8(0x55, Z80a.R_L),
+  ...bit2R8(0x56, Z80a.R_MHL),
+  ...bit2R8(0x57, Z80a.R_A),
+
+  ...bit3R8(0x58, Z80a.R_B),
+  ...bit3R8(0x59, Z80a.R_C),
+  ...bit3R8(0x5A, Z80a.R_D),
+  ...bit3R8(0x5B, Z80a.R_E),
+  ...bit3R8(0x5C, Z80a.R_H),
+  ...bit3R8(0x5D, Z80a.R_L),
+  ...bit3R8(0x5E, Z80a.R_MHL),
+  ...bit3R8(0x5F, Z80a.R_A),
+
+  ...bit4R8(0x60, Z80a.R_B),
+  ...bit4R8(0x61, Z80a.R_C),
+  ...bit4R8(0x62, Z80a.R_D),
+  ...bit4R8(0x63, Z80a.R_E),
+  ...bit4R8(0x64, Z80a.R_H),
+  ...bit4R8(0x65, Z80a.R_L),
+  ...bit4R8(0x66, Z80a.R_MHL),
+  ...bit4R8(0x67, Z80a.R_A),
+
+  ...bit5R8(0x68, Z80a.R_B),
+  ...bit5R8(0x69, Z80a.R_C),
+  ...bit5R8(0x6A, Z80a.R_D),
+  ...bit5R8(0x6B, Z80a.R_E),
+  ...bit5R8(0x6C, Z80a.R_H),
+  ...bit5R8(0x6D, Z80a.R_L),
+  ...bit5R8(0x6E, Z80a.R_MHL),
+  ...bit5R8(0x6F, Z80a.R_A),
+
+  ...bit6R8(0x70, Z80a.R_B),
+  ...bit6R8(0x71, Z80a.R_C),
+  ...bit6R8(0x72, Z80a.R_D),
+  ...bit6R8(0x73, Z80a.R_E),
+  ...bit6R8(0x74, Z80a.R_H),
+  ...bit6R8(0x75, Z80a.R_L),
+  ...bit6R8(0x76, Z80a.R_MHL),
+  ...bit6R8(0x77, Z80a.R_A),
+
+  ...bit7R8(0x78, Z80a.R_B),
+  ...bit7R8(0x79, Z80a.R_C),
+  ...bit7R8(0x7A, Z80a.R_D),
+  ...bit7R8(0x7B, Z80a.R_E),
+  ...bit7R8(0x7C, Z80a.R_H),
+  ...bit7R8(0x7D, Z80a.R_L),
+  ...bit7R8(0x7E, Z80a.R_MHL),
+  ...bit7R8(0x7F, Z80a.R_A),
 ];
 
 void main() {

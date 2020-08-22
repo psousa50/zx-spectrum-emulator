@@ -1406,3 +1406,46 @@ List<Scenario> sbcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
             "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 65535, "S ~Z P C",
             inFlags: "C", prefix: 0xED),
       ];
+
+Scenario bitNR8R8Spec(int opcode, int bit, int r8, int value, String flags) =>
+    Scenario(
+      "BIT $bit, ${Z80a.r8Names[r8]} (${toBinary8(value)})",
+      [Z80a.BIT_OPCODES, opcode],
+      initialState: State(
+        register8Values: {r8: value},
+      ),
+      expectedState: State(flags: flags),
+    );
+
+Scenario bitNR8HLSpec(int opcode, int bit, int value, String flags) => Scenario(
+      "BIT $bit, (HL) (${toBinary8(value)})",
+      [Z80a.BIT_OPCODES, opcode],
+      initialState: State(
+        register16Values: {Z80a.R_HL: Scenario.RAM_START + 1},
+        ram: [0, value],
+      ),
+      expectedState: State(
+        ram: [0, value],
+        flags: flags,
+      ),
+    );
+
+Scenario bitNR8Spec(int opcode, int bit, int r8, int value, String flags) =>
+    r8 == Z80a.R_MHL
+        ? bitNR8HLSpec(opcode, bit, value, flags)
+        : bitNR8R8Spec(opcode, bit, r8, value, flags);
+
+List<Scenario> bitNR8(int opcode, int bit, int r8) => [
+      bitNR8Spec(opcode, bit, r8, 0xFF ^ Z80a.bitMask[bit], "Z H ~N"),
+      bitNR8Spec(opcode, bit, r8, Z80a.bitMask[bit], "~Z H ~N")
+    ];
+
+List<Scenario> bit0R8(int opcode, int r8) => bitNR8(opcode, 0, r8);
+List<Scenario> bit1R8(int opcode, int r8) => bitNR8(opcode, 1, r8);
+List<Scenario> bit2R8(int opcode, int r8) => bitNR8(opcode, 2, r8);
+List<Scenario> bit3R8(int opcode, int r8) => bitNR8(opcode, 3, r8);
+List<Scenario> bit4R8(int opcode, int r8) => bitNR8(opcode, 4, r8);
+List<Scenario> bit5R8(int opcode, int r8) => bitNR8(opcode, 5, r8);
+List<Scenario> bit6R8(int opcode, int r8) => bitNR8(opcode, 6, r8);
+List<Scenario> bit7R8(int opcode, int r8) => bitNR8(opcode, 7, r8);
+
