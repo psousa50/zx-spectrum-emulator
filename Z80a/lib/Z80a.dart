@@ -497,15 +497,15 @@ class Z80a {
     switch (opcode) {
       case IX_PREFIX:
       case IY_PREFIX:
-        processIXYOpcodes(opcode);
+        processed = processIXYOpcodes(opcode);
         break;
 
       case EXTENDED_OPCODES:
-        processExtendedOpcodes();
+        processed = processExtendedOpcodes();
         break;
 
       case BIT_OPCODES:
-        processBitOpcodes();
+        processed = processBitOpcodes();
         break;
 
       default:
@@ -1636,6 +1636,10 @@ class Z80a {
         var bit = (opcode & 0x38) >> 3;
         var address = getIXY(prefix) + d;
         this.memory.poke(address, setNR8(bit, this.memory.peek(address)));
+        break;
+
+      default:
+        processed = false;
         break;
     }
 
