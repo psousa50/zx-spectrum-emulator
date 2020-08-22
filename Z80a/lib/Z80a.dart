@@ -313,9 +313,9 @@ class Z80a {
   }
 
   int addA(int value) {
-    int sum = this.A + value;
+    var sum = this.A + value;
     this.carryFlag = sum > 255;
-    int result = byte(sum);
+    var result = byte(sum);
     this.parityOverflowFlag = (((this.A & 0x80) ^ (value & 0x80)) == 0) &&
         (value & 0x80 != (result & 0x80));
     setZeroAndSignFlagsOn8BitResult(result);
@@ -326,7 +326,7 @@ class Z80a {
 
   int incR8(int value) {
     this.parityOverflowFlag = value == 0x7F;
-    int newValue = byte(value + 1);
+    var newValue = byte(value + 1);
     setZeroAndSignFlagsOn8BitResult(newValue);
     this.addSubtractFlag = false;
 
@@ -335,7 +335,7 @@ class Z80a {
 
   int decR8(int value) {
     this.parityOverflowFlag = value == 0x80;
-    int newValue = byte(value - 1);
+    var newValue = byte(value - 1);
     setZeroAndSignFlagsOn8BitResult(newValue);
     this.addSubtractFlag = true;
 
@@ -345,9 +345,9 @@ class Z80a {
   int adcA(int value) => addA(value + (this.carryFlag ? 1 : 0));
 
   int subA(int value) {
-    int diff = this.A - value;
+    var diff = this.A - value;
     this.carryFlag = diff < 0;
-    int result = byte(diff);
+    var result = byte(diff);
     this.parityOverflowFlag =
         !sameSign8(this.A, value) && sameSign8(value, result);
     setZeroAndSignFlagsOn8BitResult(result);
@@ -359,7 +359,7 @@ class Z80a {
   int sbcA(int value) => subA(value + (this.carryFlag ? 1 : 0));
 
   int andA(int value) {
-    int result = this.A & value;
+    var result = this.A & value;
     setZeroAndSignFlagsOn8BitResult(result);
     this.carryFlag = false;
     this.addSubtractFlag = false;
@@ -369,7 +369,7 @@ class Z80a {
   }
 
   int xorA(int value) {
-    int result = this.A ^ value;
+    var result = this.A ^ value;
     setZeroAndSignFlagsOn8BitResult(result);
     this.carryFlag = false;
     this.addSubtractFlag = false;
@@ -379,7 +379,7 @@ class Z80a {
   }
 
   int orA(int value) {
-    int result = this.A | value;
+    var result = this.A | value;
     setZeroAndSignFlagsOn8BitResult(result);
     this.carryFlag = false;
     this.addSubtractFlag = false;
@@ -390,34 +390,73 @@ class Z80a {
 
   int cpA(int value) => subA(value);
 
-  int rlc(int value) {
-    int b7 = (value & 0x80) >> 7;
+  int rlOp(int value) {
+    var b7 = (value & 0x80) >> 7;
+    var result = byte(value << 1) | (this.carryFlag ? 0x01 : 0x00);
     this.carryFlag = b7 == 1;
     this.addSubtractFlag = false;
-    var result = byte(value << 1) | b7;
-    return result;
-  }
-
-  int rrc(int value) {
-    int b0 = (value & 0x01);
-    this.carryFlag = b0 == 1;
-    this.addSubtractFlag = false;
-    var result = byte(value >> 1) | (b0 << 7);
+    this.halfCarryFlag = false;
     return result;
   }
 
   int rl(int value) {
-    int b7 = (value & 0x80) >> 7;
-    var result = byte(value << 1) | (this.carryFlag ? 0x01 : 0x00);
-    this.carryFlag = b7 == 1;
+    var result = rlOp(value);
+    setZeroAndSignFlagsOn8BitResult(result);
+    this.parityOverflowFlag = parity(result);
+    return result;
+  }
+
+  int rrOp(int value) {
+    var b0 = (value & 0x01);
+    var result = byte(value >> 1) | (this.carryFlag ? 0x80 : 0x00);
+    this.carryFlag = b0 == 1;
     this.addSubtractFlag = false;
+    this.halfCarryFlag = false;
     return result;
   }
 
   int rr(int value) {
+    var result = rrOp(value);
+    setZeroAndSignFlagsOn8BitResult(result);
+    this.parityOverflowFlag = parity(result);
+    return result;
+  }
+
+  int rlcOp(int value) {
+    var b7 = (value & 0x80) >> 7;
+    var result = byte(value << 1) | b7;
+    this.carryFlag = b7 == 1;
+    this.addSubtractFlag = false;
+    this.halfCarryFlag = false;
+    return result;
+  }
+
+  int rlc(int value) {
+    var result = rlcOp(value);
+    setZeroAndSignFlagsOn8BitResult(result);
+    this.parityOverflowFlag = parity(result);
+    return result;
+  }
+
+  int rrcOp(int value) {
     int b0 = (value & 0x01);
-    var result = byte(value >> 1) | (this.carryFlag ? 0x80 : 0x00);
+    var result = byte(value >> 1) | (b0 << 7);
     this.carryFlag = b0 == 1;
+    this.addSubtractFlag = false;
+    this.halfCarryFlag = false;
+    return result;
+  }
+
+  int rrc(int value) {
+    var result = rrcOp(value);
+    setZeroAndSignFlagsOn8BitResult(result);
+    this.parityOverflowFlag = parity(result);
+    return result;
+  }
+
+  int sla(int value) {
+    var result = byte(value << 1);
+    this.carryFlag = value & 0x80 == 0x80;
     this.addSubtractFlag = false;
     return result;
   }
@@ -717,19 +756,19 @@ class Z80a {
         break;
 
       case 0x07: // RLCA
-        this.A = rlc(this.A);
+        this.A = rlcOp(this.A);
         break;
 
       case 0x0F: // RRCA
-        this.A = rrc(this.A);
+        this.A = rrcOp(this.A);
         break;
 
       case 0x17: // RLA
-        this.A = rl(this.A);
+        this.A = rlOp(this.A);
         break;
 
       case 0x1F: // RRA
-        this.A = rr(this.A);
+        this.A = rrOp(this.A);
         break;
 
       case 0x2F: // CPL
@@ -1210,16 +1249,9 @@ class Z80a {
         setReg(r8, rl(getReg(r8)));
         break;
 
-      case 0x18: // RR B
-      case 0x19: // RR C
-      case 0x1A: // RR D
-      case 0x1B: // RR E
-      case 0x1C: // RR H
-      case 0x1D: // RR L
-      case 0x1E: // RR (HL)
-      case 0x1F: // RR A
+      case 0x20: // SLA B
         int r8 = r8Table[opcode & 0x07];
-        setReg(r8, rr(getReg(r8)));
+        setReg(r8, sla(getReg(r8)));
         break;
 
       default:

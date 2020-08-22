@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Z80a/Z80a.dart';
+import 'MemoryTest.dart';
+import 'PortsTest.dart';
 import 'Scenarios.dart';
 
 var allScenarios = [
@@ -391,7 +393,7 @@ var allScenarios = [
 ];
 
 void main() {
-  const runAll = true;
+  const runAll = false;
 
   test('All Scenarios', () {
     allScenarios.forEach((scenario) {
@@ -400,7 +402,7 @@ void main() {
   }, skip: !runAll);
 
   test('One Scenario', () {
-    var scenarios = rlcR8(0x00, Z80a.R_B);
+    var scenarios = rlR8(0x10, Z80a.R_B);
     scenarios.forEach((scenario) {
       scenario.run();
     });
