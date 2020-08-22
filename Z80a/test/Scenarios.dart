@@ -24,7 +24,7 @@ List<Scenario> nop(int opcode) => [
         "NOP",
         [opcode],
         initialState: State(),
-        expectedState: State(pc: 1),
+        expectedState: State(),
       )
     ];
 
@@ -35,7 +35,6 @@ List<Scenario> ldR8NN(int opcode, int r8) => [
         initialState: State(),
         expectedState: State(
           register8Values: {r8: 12},
-          pc: 2,
         ),
       )
     ];
@@ -54,7 +53,6 @@ List<Scenario> ldMNNHL(int opcode) => [
         ),
         expectedState: State(
           ram: [lo(10000), hi(10000)],
-          pc: 3,
         ),
       )
     ];
@@ -73,7 +71,6 @@ List<Scenario> ldMNNA(int opcode) => [
         ),
         expectedState: State(
           ram: [100],
-          pc: 3,
         ),
       )
     ];
@@ -92,7 +89,6 @@ List<Scenario> ldAMNN(int opcode) => [
         expectedState: State(
           register8Values: {Z80a.R_A: 12},
           ram: [12],
-          pc: 3,
         ),
       )
     ];
@@ -107,7 +103,6 @@ List<Scenario> ldMHLN(int opcode) => [
         ),
         expectedState: State(
           ram: [12],
-          pc: 2,
         ),
       )
     ];
@@ -126,7 +121,6 @@ List<Scenario> ldHLMNN(int opcode) => [
         expectedState: State(
           register16Values: {Z80a.R_HL: w(12, 34)},
           ram: [12, 34],
-          pc: 3,
         ),
       )
     ];
@@ -138,7 +132,6 @@ List<Scenario> ldR16NN(int opcode, int r16) => [
         initialState: State(),
         expectedState: State(
           register16Values: {r16: 34 * 256 + 12},
-          pc: 3,
         ),
       )
     ];
@@ -158,7 +151,6 @@ Scenario changeR16R16Spec(String name, int opcode, int rhxy, int r16,
           rhxy: result,
         },
         flags: flags,
-        pc: (prefix == null ? 0 : 1) + (isIXIY(rhxy) ? 2 : 1),
       ),
     );
 
@@ -176,7 +168,6 @@ Scenario addHLHLSpec(
       expectedState: State(
         register16Values: {rhxy: result},
         flags: flags,
-        pc: isIXIY(rhxy) ? 2 : 1,
       ),
     );
 
@@ -194,7 +185,6 @@ Scenario changeR16(String name, int opcode, int rhxy, int value, int result) =>
       ),
       expectedState: State(
         register16Values: {rhxy: result},
-        pc: isIXIY(rhxy) ? 2 : 1,
       ),
     );
 
@@ -295,7 +285,6 @@ List<Scenario> exAFAFt(int opcode) => [
         ),
         expectedState: State(
           register16Values: {Z80a.R_AF: 1500, Z80a.R_AFt: 1000},
-          pc: 1,
         ),
       )
     ];
@@ -311,7 +300,6 @@ List<Scenario> ldR16A(int opcode, int r16) => [
         ),
         expectedState: State(
           ram: [0, 55],
-          pc: 1,
         ),
       )
     ];
@@ -327,7 +315,6 @@ List<Scenario> ldAR16(int opcode, int r16) => [
         expectedState: State(
           register8Values: {Z80a.R_A: 55},
           ram: [0, 55],
-          pc: 1,
         ),
       )
     ];
@@ -514,7 +501,6 @@ List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
         ),
         expectedState: State(
           register8Values: {r8Source: 10, r8Dest: 10},
-          pc: 1,
         ),
       )
     ];
@@ -530,7 +516,6 @@ List<Scenario> ldR8MHL(int opcode, int r8) => [
         expectedState: State(
           ram: [12],
           register8Values: {r8: 12},
-          pc: 1,
         ),
       )
     ];
@@ -546,7 +531,6 @@ List<Scenario> ldMHLR8(int opcode, int r8) => [
         ),
         expectedState: State(
           ram: [12],
-          pc: 1,
         ),
       )
     ];
@@ -561,7 +545,6 @@ List<Scenario> ldMHLH(int opcode) => [
         ),
         expectedState: State(
           ram: [hi(Scenario.RAM_START)],
-          pc: 1,
         ),
       )
     ];
@@ -576,7 +559,6 @@ List<Scenario> ldMHLL(int opcode) => [
         ),
         expectedState: State(
           ram: [lo(Scenario.RAM_START)],
-          pc: 1,
         ),
       )
     ];
@@ -635,7 +617,7 @@ Scenario callCCNNNotJump(int opcode, String flag) => Scenario(
       initialState: State(
         flags: flag,
       ),
-      expectedState: State(pc: 3),
+      expectedState: State(),
     );
 
 List<Scenario> callCCNN(int opcode, String flag, bool jumpIfSet) => [
@@ -663,7 +645,7 @@ Scenario retCCNotJump(int opcode, String flag) => Scenario(
       initialState: State(
         flags: flag,
       ),
-      expectedState: State(pc: 1),
+      expectedState: State(),
     );
 
 List<Scenario> retCC(int opcode, String flag, bool jumpIfSet) => [
@@ -688,7 +670,7 @@ Scenario jpCCNNNotJump(int opcode, String flag) => Scenario(
       initialState: State(
         flags: flag,
       ),
-      expectedState: State(pc: 1),
+      expectedState: State(),
     );
 
 List<Scenario> jpCCNN(int opcode, String flag, bool jumpIfSet) => [
@@ -721,7 +703,6 @@ List<Scenario> popR16(int opcode, int rhxy) => [
             rhxy: 12345,
           },
           ram: [lo(12345), hi(12345), 0],
-          pc: isIXIY(rhxy) ? 2 : 1,
         ),
       )
     ];
@@ -749,7 +730,6 @@ List<Scenario> exx(int opcode) => [
             Z80a.R_DEt: 20000,
             Z80a.R_HLt: 30000,
           },
-          pc: 1,
         ),
       ),
     ];
@@ -770,7 +750,6 @@ List<Scenario> pushR16(int opcode, int rhxy) => [
             Z80a.R_SP: Scenario.RAM_START + 0,
           },
           ram: [lo(10000), hi(10000), 0],
-          pc: isIXIY(rhxy) ? 2 : 1,
         ),
       )
     ];
@@ -816,7 +795,6 @@ Scenario djnzNNotJump(int opcode) => Scenario(
       ),
       expectedState: State(
         register8Values: {Z80a.R_B: 4},
-        pc: 2,
       ),
     );
 
@@ -847,7 +825,7 @@ Scenario jrCCNNotJump(int opcode, String flag) => Scenario(
       "JR $flag, NN",
       [opcode, 10],
       initialState: State(flags: flag),
-      expectedState: State(pc: 2),
+      expectedState: State(),
     );
 
 List<Scenario> jrCCNN(int opcode, String flag, bool jumpIfSet) => [
@@ -861,7 +839,6 @@ Scenario cplN(int opcode, int value, int result) => Scenario("CPL", [opcode],
     ),
     expectedState: State(
       register8Values: {Z80a.R_A: result},
-      pc: 1,
     ));
 
 List<Scenario> cpl(int opcode) => [
@@ -877,7 +854,6 @@ Scenario flagsTest(int opcode, String flags, String expectedFlags) =>
         ),
         expectedState: State(
           flags: expectedFlags,
-          pc: 1,
         ));
 
 List<Scenario> ccf(int opcode) => [
@@ -907,7 +883,6 @@ Scenario r8r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
           Z80a.R_A: result,
         },
         flags: flags,
-        pc: 1,
       ),
     );
 
@@ -931,7 +906,6 @@ Scenario r8HLOperation(String name, int opcode, int aValue, int mhlValue,
         },
         ram: [mhlValue],
         flags: flags,
-        pc: 1,
       ),
     );
 
@@ -955,7 +929,6 @@ Scenario r8IXYOperation(String name, int opcode, int rxy, int aValue,
         },
         ram: [0, mxyValue],
         flags: flags,
-        pc: 3,
       ),
     );
 
@@ -1117,7 +1090,6 @@ Scenario nOperation(String name, int opcode, int aValue, int nValue, int result,
           Z80a.R_A: result,
         },
         flags: flags,
-        pc: 2,
       ),
     );
 
@@ -1185,7 +1157,6 @@ List<Scenario> exMSPHL(int opcode, int rhxy) => [
             rhxy: w(12, 34),
           },
           ram: [lo(10000), hi(10000)],
-          pc: isIXIY(rhxy) ? 2 : 1,
         ),
       )
     ];
@@ -1222,7 +1193,6 @@ List<Scenario> exDEHL(int opcode) => [
             Z80a.R_DE: 20000,
             Z80a.R_HL: 10000,
           },
-          pc: 1,
         ),
       )
     ];
@@ -1240,7 +1210,6 @@ List<Scenario> ldSPHL(int opcode, int rhxy) => [
           register16Values: {
             Z80a.R_SP: 10000,
           },
-          pc: isIXIY(rhxy) ? 2 : 1,
         ),
       )
     ];
@@ -1254,7 +1223,6 @@ List<Scenario> ldIXYNN(int opcode, int rxy) => [
           register16Values: {
             rxy: 10000,
           },
-          pc: 4,
         ),
       )
     ];
@@ -1276,7 +1244,6 @@ List<Scenario> ldMNNIXY(int opcode, int rxy) => [
         ),
         expectedState: State(
           ram: [lo(10000), hi(10000)],
-          pc: 4,
         ),
       )
     ];
@@ -1296,7 +1263,6 @@ List<Scenario> ldIXYMN(int opcode, rxy) => [
         expectedState: State(
           register16Values: {rxy: w(12, 34)},
           ram: [12, 34],
-          pc: 4,
         ),
       )
     ];
@@ -1311,7 +1277,6 @@ List<Scenario> ldMIXYdN(int opcode, rxy) => [
         ),
         expectedState: State(
           ram: [0, 12],
-          pc: 4,
         ),
       )
     ];
@@ -1327,7 +1292,6 @@ List<Scenario> ldR8MIXYd(int opcode, int r8, int rxy) => [
         expectedState: State(
           ram: [0, 12],
           register8Values: {r8: 12},
-          pc: 3,
         ),
       )
     ];
@@ -1343,7 +1307,6 @@ List<Scenario> ldMIXYdR8(int opcode, int r8, int rxy) => [
         ),
         expectedState: State(
           ram: [0, 12],
-          pc: 3,
         ),
       )
     ];
@@ -1357,7 +1320,6 @@ Scenario inR8CSpec(int opcode, int r8, int value, String flags) => Scenario(
       ),
       expectedState: State(
         register8Values: {r8: value},
-        pc: 2,
         flags: flags,
       ),
     );
@@ -1377,7 +1339,6 @@ List<Scenario> outCR8(int opcode, int r8) => [
         ),
         expectedState: State(
           ports: {254: r8 == Z80a.R_C ? 254 : 12},
-          pc: 2,
         ),
       )
     ];
