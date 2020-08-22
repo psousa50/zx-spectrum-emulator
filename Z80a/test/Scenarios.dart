@@ -1343,6 +1343,32 @@ List<Scenario> outCR8(int opcode, int r8) => [
       )
     ];
 
+List<Scenario> outNA(int opcode) => [
+      Scenario(
+        'OUT (N), A',
+        [opcode, 253],
+        initialState: State(
+          register8Values: {Z80a.R_A: 12},
+        ),
+        expectedState: State(
+          ports: {253: 12},
+        ),
+      )
+    ];
+
+List<Scenario> inAN(int opcode) => [
+      Scenario(
+        'IN A, (N)',
+        [opcode, 253],
+        initialState: State(
+          ports: {253: 12},
+        ),
+        expectedState: State(
+          register8Values: {Z80a.R_A: 12},
+        ),
+      )
+    ];
+
 List<Scenario> sbcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
     ? [
         changeR16R16Spec(

@@ -1024,6 +1024,14 @@ class Z80a {
         this.SP = this.HL;
         break;
 
+      case 0xD3: // OUT (N), A
+        this.ports.outPort(fetch(), this.A);
+        break;
+
+      case 0xDB: // IN A, (N)
+        this.A = this.ports.inPort(fetch());
+        break;
+
       default:
         processed = false;
         break;

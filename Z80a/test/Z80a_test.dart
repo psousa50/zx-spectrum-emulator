@@ -251,6 +251,8 @@ var allScenarios = [
   ...jpMHL(0xE9, Z80a.R_HL),
   ...exDEHL(0xEB),
   ...ldSPHL(0xF9, Z80a.R_HL),
+  ...outNA(0xD3),
+  ...inAN(0xDB),
 
 // IX IY
   ...incR8(0x34, Z80a.R_MIXd),
