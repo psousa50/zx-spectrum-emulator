@@ -1405,6 +1405,84 @@ class Z80a {
         this.addSubtractFlag = false;
         break;
 
+      case 0x80: // RES 0, B
+      case 0x81: // RES 0, C
+      case 0x82: // RES 0, D
+      case 0x83: // RES 0, E
+      case 0x84: // RES 0, H
+      case 0x85: // RES 0, L
+      case 0x86: // RES 0, (HL)
+      case 0x87: // RES 0, A
+
+      case 0x88: // RES 1, B
+      case 0x89: // RES 1, C
+      case 0x8A: // RES 1, D
+      case 0x8B: // RES 1, E
+      case 0x8C: // RES 1, H
+      case 0x8D: // RES 1, L
+      case 0x8E: // RES 1, (HL)
+      case 0x8F: // RES 1, A
+
+      case 0x90: // RES 2, B
+      case 0x91: // RES 2, C
+      case 0x92: // RES 2, D
+      case 0x93: // RES 2, E
+      case 0x94: // RES 2, H
+      case 0x95: // RES 2, L
+      case 0x96: // RES 2, (HL)
+      case 0x97: // RES 2, A
+
+      case 0x98: // RES 3, B
+      case 0x99: // RES 3, C
+      case 0x9A: // RES 3, D
+      case 0x9B: // RES 3, E
+      case 0x9C: // RES 3, H
+      case 0x9D: // RES 3, L
+      case 0x9E: // RES 3, (HL)
+      case 0x9F: // RES 3, A
+
+      case 0xA0: // RES 4, B
+      case 0xA1: // RES 4, C
+      case 0xA2: // RES 4, D
+      case 0xA3: // RES 4, E
+      case 0xA4: // RES 4, H
+      case 0xA5: // RES 4, L
+      case 0xA6: // RES 4, (HL)
+      case 0xA7: // RES 4, A
+
+      case 0xA8: // RES 5, B
+      case 0xA9: // RES 5, C
+      case 0xAA: // RES 5, D
+      case 0xAB: // RES 5, E
+      case 0xAC: // RES 5, H
+      case 0xAD: // RES 5, L
+      case 0xAE: // RES 5, (HL)
+      case 0xAF: // RES 5, A
+
+      case 0xB0: // RES 6, B
+      case 0xB1: // RES 6, C
+      case 0xB2: // RES 6, D
+      case 0xB3: // RES 6, E
+      case 0xB4: // RES 6, H
+      case 0xB5: // RES 6, L
+      case 0xB6: // RES 6, (HL)
+      case 0xB7: // RES 6, A
+
+      case 0xB8: // RES 7, B
+      case 0xB9: // RES 7, C
+      case 0xBA: // RES 7, D
+      case 0xBB: // RES 7, E
+      case 0xBC: // RES 7, H
+      case 0xBD: // RES 7, L
+      case 0xBE: // RES 7, (HL)
+      case 0xBF: // RES 7, A
+
+        var bit = (opcode & 0x38) >> 3;
+        int r8 = r8Table[opcode & 0x07];
+        var mask = bitMask[bit];
+        setReg(r8, getReg(r8) & ~mask);
+        break;
+
       default:
         processed = false;
         break;

@@ -1431,9 +1431,8 @@ Scenario bitNR8HLSpec(int opcode, int bit, int value, String flags) => Scenario(
     );
 
 Scenario bitNR8Spec(int opcode, int bit, int r8, int value, String flags) =>
-    r8 == Z80a.R_MHL
-        ? bitNR8HLSpec(opcode, bit, value, flags)
-        : bitNR8R8Spec(opcode, bit, r8, value, flags);
+    changeR8("BIT $bit", opcode, r8, value, value, flags,
+        prefix: Z80a.BIT_OPCODES);
 
 List<Scenario> bitNR8(int opcode, int bit, int r8) => [
       bitNR8Spec(opcode, bit, r8, 0xFF ^ Z80a.bitMask[bit], "Z H ~N"),
@@ -1449,3 +1448,21 @@ List<Scenario> bit5R8(int opcode, int r8) => bitNR8(opcode, 5, r8);
 List<Scenario> bit6R8(int opcode, int r8) => bitNR8(opcode, 6, r8);
 List<Scenario> bit7R8(int opcode, int r8) => bitNR8(opcode, 7, r8);
 
+Scenario resNR8Spec(int opcode, int bit, int r8, int value, int result) =>
+    changeR8("RES $bit", opcode, r8, value, result, "",
+        prefix: Z80a.BIT_OPCODES);
+
+List<Scenario> resNR8(int opcode, int bit, int r8) => [
+      resNR8Spec(
+          opcode, bit, r8, 0xFF ^ Z80a.bitMask[bit], 0xFF ^ Z80a.bitMask[bit]),
+      resNR8Spec(opcode, bit, r8, 0xFF, 0xFF ^ Z80a.bitMask[bit]),
+    ];
+
+List<Scenario> res0R8(int opcode, int r8) => resNR8(opcode, 0, r8);
+List<Scenario> res1R8(int opcode, int r8) => resNR8(opcode, 1, r8);
+List<Scenario> res2R8(int opcode, int r8) => resNR8(opcode, 2, r8);
+List<Scenario> res3R8(int opcode, int r8) => resNR8(opcode, 3, r8);
+List<Scenario> res4R8(int opcode, int r8) => resNR8(opcode, 4, r8);
+List<Scenario> res5R8(int opcode, int r8) => resNR8(opcode, 5, r8);
+List<Scenario> res6R8(int opcode, int r8) => resNR8(opcode, 6, r8);
+List<Scenario> res7R8(int opcode, int r8) => resNR8(opcode, 7, r8);
