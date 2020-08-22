@@ -148,7 +148,7 @@ Scenario changeR16R16Spec(String name, int opcode, int rhxy, int r16,
         {String inFlags = "", int prefix}) =>
     Scenario(
       "$name ${Z80a.r16Names[rhxy]}, ${Z80a.r16Names[r16]} => ($hxyValue $r16Value)",
-      [if (prefix != null) prefix, ...ixyPrefix(rhxy), opcode],
+      [...ixyPrefix(rhxy), if (prefix != null) prefix, opcode],
       initialState: State(
         register16Values: {rhxy: hxyValue, r16: r16Value},
         flags: inFlags,
@@ -246,7 +246,9 @@ Scenario changeR8IXYd(
         {String inFlags = "", int prefix}) =>
     Scenario(
       '$name (IX+d)',
-      [if (prefix != null) prefix, ...ixyPrefix(rxy), opcode, 2],
+      isIXIY(rxy) && prefix != null
+          ? [...ixyPrefix(rxy), prefix, 2, opcode]
+          : [...ixyPrefix(rxy), if (prefix != null) prefix, opcode, 2],
       initialState: State(
         register16Values: {rxy: Scenario.RAM_START},
         ram: [0, 0, value],

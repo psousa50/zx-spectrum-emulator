@@ -424,6 +424,8 @@ var allScenarios = [
   ...bit0R8(0x44, Z80a.R_H),
   ...bit0R8(0x45, Z80a.R_L),
   ...bit0R8(0x46, Z80a.R_MHL),
+  ...bit0R8(0x46, Z80a.R_MIXd),
+  ...bit0R8(0x46, Z80a.R_MIYd),
   ...bit0R8(0x47, Z80a.R_A),
 
   ...bit1R8(0x48, Z80a.R_B),
@@ -433,6 +435,8 @@ var allScenarios = [
   ...bit1R8(0x4C, Z80a.R_H),
   ...bit1R8(0x4D, Z80a.R_L),
   ...bit1R8(0x4E, Z80a.R_MHL),
+  ...bit1R8(0x4E, Z80a.R_MIXd),
+  ...bit1R8(0x4E, Z80a.R_MIYd),
   ...bit1R8(0x4F, Z80a.R_A),
 
   ...bit2R8(0x50, Z80a.R_B),
@@ -442,6 +446,8 @@ var allScenarios = [
   ...bit2R8(0x54, Z80a.R_H),
   ...bit2R8(0x55, Z80a.R_L),
   ...bit2R8(0x56, Z80a.R_MHL),
+  ...bit2R8(0x56, Z80a.R_MIXd),
+  ...bit2R8(0x56, Z80a.R_MIYd),
   ...bit2R8(0x57, Z80a.R_A),
 
   ...bit3R8(0x58, Z80a.R_B),
@@ -451,6 +457,8 @@ var allScenarios = [
   ...bit3R8(0x5C, Z80a.R_H),
   ...bit3R8(0x5D, Z80a.R_L),
   ...bit3R8(0x5E, Z80a.R_MHL),
+  ...bit3R8(0x5E, Z80a.R_MIXd),
+  ...bit3R8(0x5E, Z80a.R_MIYd),
   ...bit3R8(0x5F, Z80a.R_A),
 
   ...bit4R8(0x60, Z80a.R_B),
@@ -460,6 +468,8 @@ var allScenarios = [
   ...bit4R8(0x64, Z80a.R_H),
   ...bit4R8(0x65, Z80a.R_L),
   ...bit4R8(0x66, Z80a.R_MHL),
+  ...bit4R8(0x66, Z80a.R_MIXd),
+  ...bit4R8(0x66, Z80a.R_MIYd),
   ...bit4R8(0x67, Z80a.R_A),
 
   ...bit5R8(0x68, Z80a.R_B),
@@ -469,6 +479,8 @@ var allScenarios = [
   ...bit5R8(0x6C, Z80a.R_H),
   ...bit5R8(0x6D, Z80a.R_L),
   ...bit5R8(0x6E, Z80a.R_MHL),
+  ...bit5R8(0x6E, Z80a.R_MIXd),
+  ...bit5R8(0x6E, Z80a.R_MIYd),
   ...bit5R8(0x6F, Z80a.R_A),
 
   ...bit6R8(0x70, Z80a.R_B),
@@ -478,6 +490,8 @@ var allScenarios = [
   ...bit6R8(0x74, Z80a.R_H),
   ...bit6R8(0x75, Z80a.R_L),
   ...bit6R8(0x76, Z80a.R_MHL),
+  ...bit6R8(0x76, Z80a.R_MIXd),
+  ...bit6R8(0x76, Z80a.R_MIYd),
   ...bit6R8(0x77, Z80a.R_A),
 
   ...bit7R8(0x78, Z80a.R_B),
@@ -487,6 +501,8 @@ var allScenarios = [
   ...bit7R8(0x7C, Z80a.R_H),
   ...bit7R8(0x7D, Z80a.R_L),
   ...bit7R8(0x7E, Z80a.R_MHL),
+  ...bit7R8(0x7E, Z80a.R_MIXd),
+  ...bit7R8(0x7E, Z80a.R_MIYd),
   ...bit7R8(0x7F, Z80a.R_A),
 
   // RES n, R8
@@ -497,6 +513,8 @@ var allScenarios = [
   ...res0R8(0x84, Z80a.R_H),
   ...res0R8(0x85, Z80a.R_L),
   ...res0R8(0x86, Z80a.R_MHL),
+  ...res0R8(0x86, Z80a.R_MIXd),
+  ...res0R8(0x86, Z80a.R_MIYd),
   ...res0R8(0x87, Z80a.R_A),
 
   ...res1R8(0x88, Z80a.R_B),
@@ -506,6 +524,8 @@ var allScenarios = [
   ...res1R8(0x8C, Z80a.R_H),
   ...res1R8(0x8D, Z80a.R_L),
   ...res1R8(0x8E, Z80a.R_MHL),
+  ...res1R8(0x8E, Z80a.R_MIXd),
+  ...res1R8(0x8E, Z80a.R_MIYd),
   ...res1R8(0x8F, Z80a.R_A),
 
   ...res2R8(0x90, Z80a.R_B),
@@ -515,6 +535,8 @@ var allScenarios = [
   ...res2R8(0x94, Z80a.R_H),
   ...res2R8(0x95, Z80a.R_L),
   ...res2R8(0x96, Z80a.R_MHL),
+  ...res2R8(0x96, Z80a.R_MIXd),
+  ...res2R8(0x96, Z80a.R_MIYd),
   ...res2R8(0x97, Z80a.R_A),
 
   ...res3R8(0x98, Z80a.R_B),
@@ -524,6 +546,8 @@ var allScenarios = [
   ...res3R8(0x9C, Z80a.R_H),
   ...res3R8(0x9D, Z80a.R_L),
   ...res3R8(0x9E, Z80a.R_MHL),
+  ...res3R8(0x9E, Z80a.R_MIXd),
+  ...res3R8(0x9E, Z80a.R_MIYd),
   ...res3R8(0x9F, Z80a.R_A),
 
   ...res4R8(0xA0, Z80a.R_B),
@@ -533,6 +557,8 @@ var allScenarios = [
   ...res4R8(0xA4, Z80a.R_H),
   ...res4R8(0xA5, Z80a.R_L),
   ...res4R8(0xA6, Z80a.R_MHL),
+  ...res4R8(0xA6, Z80a.R_MIXd),
+  ...res4R8(0xA6, Z80a.R_MIYd),
   ...res4R8(0xA7, Z80a.R_A),
 
   ...res5R8(0xA8, Z80a.R_B),
@@ -542,6 +568,8 @@ var allScenarios = [
   ...res5R8(0xAC, Z80a.R_H),
   ...res5R8(0xAD, Z80a.R_L),
   ...res5R8(0xAE, Z80a.R_MHL),
+  ...res5R8(0xAE, Z80a.R_MIXd),
+  ...res5R8(0xAE, Z80a.R_MIYd),
   ...res5R8(0xAF, Z80a.R_A),
 
   ...res6R8(0xB0, Z80a.R_B),
@@ -551,6 +579,8 @@ var allScenarios = [
   ...res6R8(0xB4, Z80a.R_H),
   ...res6R8(0xB5, Z80a.R_L),
   ...res6R8(0xB6, Z80a.R_MHL),
+  ...res6R8(0xB6, Z80a.R_MIXd),
+  ...res6R8(0xB6, Z80a.R_MIYd),
   ...res6R8(0xB7, Z80a.R_A),
 
   ...res7R8(0xB8, Z80a.R_B),
@@ -560,6 +590,8 @@ var allScenarios = [
   ...res7R8(0xBC, Z80a.R_H),
   ...res7R8(0xBD, Z80a.R_L),
   ...res7R8(0xBE, Z80a.R_MHL),
+  ...res7R8(0xBE, Z80a.R_MIXd),
+  ...res7R8(0xBE, Z80a.R_MIYd),
   ...res7R8(0xBF, Z80a.R_A),
 
   // SET n, R8
@@ -570,6 +602,8 @@ var allScenarios = [
   ...set0R8(0xC4, Z80a.R_H),
   ...set0R8(0xC5, Z80a.R_L),
   ...set0R8(0xC6, Z80a.R_MHL),
+  ...set0R8(0xC6, Z80a.R_MIXd),
+  ...set0R8(0xC6, Z80a.R_MIYd),
   ...set0R8(0xC7, Z80a.R_A),
 
   ...set1R8(0xC8, Z80a.R_B),
@@ -579,6 +613,8 @@ var allScenarios = [
   ...set1R8(0xCC, Z80a.R_H),
   ...set1R8(0xCD, Z80a.R_L),
   ...set1R8(0xCE, Z80a.R_MHL),
+  ...set1R8(0xCE, Z80a.R_MIXd),
+  ...set1R8(0xCE, Z80a.R_MIYd),
   ...set1R8(0xCF, Z80a.R_A),
 
   ...set2R8(0xD0, Z80a.R_B),
@@ -588,6 +624,8 @@ var allScenarios = [
   ...set2R8(0xD4, Z80a.R_H),
   ...set2R8(0xD5, Z80a.R_L),
   ...set2R8(0xD6, Z80a.R_MHL),
+  ...set2R8(0xD6, Z80a.R_MIXd),
+  ...set2R8(0xD6, Z80a.R_MIYd),
   ...set2R8(0xD7, Z80a.R_A),
 
   ...set3R8(0xD8, Z80a.R_B),
@@ -597,6 +635,8 @@ var allScenarios = [
   ...set3R8(0xDC, Z80a.R_H),
   ...set3R8(0xDD, Z80a.R_L),
   ...set3R8(0xDE, Z80a.R_MHL),
+  ...set3R8(0xDE, Z80a.R_MIXd),
+  ...set3R8(0xDE, Z80a.R_MIYd),
   ...set3R8(0xDF, Z80a.R_A),
 
   ...set4R8(0xE0, Z80a.R_B),
@@ -606,6 +646,8 @@ var allScenarios = [
   ...set4R8(0xE4, Z80a.R_H),
   ...set4R8(0xE5, Z80a.R_L),
   ...set4R8(0xE6, Z80a.R_MHL),
+  ...set4R8(0xE6, Z80a.R_MIXd),
+  ...set4R8(0xE6, Z80a.R_MIYd),
   ...set4R8(0xE7, Z80a.R_A),
 
   ...set5R8(0xE8, Z80a.R_B),
@@ -615,6 +657,8 @@ var allScenarios = [
   ...set5R8(0xEC, Z80a.R_H),
   ...set5R8(0xED, Z80a.R_L),
   ...set5R8(0xEE, Z80a.R_MHL),
+  ...set5R8(0xEE, Z80a.R_MIXd),
+  ...set5R8(0xEE, Z80a.R_MIYd),
   ...set5R8(0xEF, Z80a.R_A),
 
   ...set6R8(0xF0, Z80a.R_B),
@@ -624,6 +668,8 @@ var allScenarios = [
   ...set6R8(0xF4, Z80a.R_H),
   ...set6R8(0xF5, Z80a.R_L),
   ...set6R8(0xF6, Z80a.R_MHL),
+  ...set6R8(0xF6, Z80a.R_MIXd),
+  ...set6R8(0xF6, Z80a.R_MIYd),
   ...set6R8(0xF7, Z80a.R_A),
 
   ...set7R8(0xF8, Z80a.R_B),
@@ -633,6 +679,8 @@ var allScenarios = [
   ...set7R8(0xFC, Z80a.R_H),
   ...set7R8(0xFD, Z80a.R_L),
   ...set7R8(0xFE, Z80a.R_MHL),
+  ...set7R8(0xFE, Z80a.R_MIXd),
+  ...set7R8(0xFE, Z80a.R_MIYd),
   ...set7R8(0xFF, Z80a.R_A),
 ];
 
@@ -647,7 +695,7 @@ void main() {
 
   test('One Scenario', () {
     print("RUNNING ONLY ONE SCENARIO");
-    var scenarios = rlR8(0x10, Z80a.R_B);
+    var scenarios = bit0R8(0x46, Z80a.R_MIXd);
     scenarios.forEach((scenario) {
       scenario.run();
     });
