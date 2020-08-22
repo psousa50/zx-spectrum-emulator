@@ -1453,9 +1453,8 @@ Scenario resNR8Spec(int opcode, int bit, int r8, int value, int result) =>
         prefix: Z80a.BIT_OPCODES);
 
 List<Scenario> resNR8(int opcode, int bit, int r8) => [
-      resNR8Spec(
-          opcode, bit, r8, 0xFF ^ Z80a.bitMask[bit], 0xFF ^ Z80a.bitMask[bit]),
-      resNR8Spec(opcode, bit, r8, 0xFF, 0xFF ^ Z80a.bitMask[bit]),
+      resNR8Spec(opcode, bit, r8, Z80a.bitMask[bit], 0x00),
+      resNR8Spec(opcode, bit, r8, 0x00, 0x00),
     ];
 
 List<Scenario> res0R8(int opcode, int r8) => resNR8(opcode, 0, r8);
@@ -1466,3 +1465,21 @@ List<Scenario> res4R8(int opcode, int r8) => resNR8(opcode, 4, r8);
 List<Scenario> res5R8(int opcode, int r8) => resNR8(opcode, 5, r8);
 List<Scenario> res6R8(int opcode, int r8) => resNR8(opcode, 6, r8);
 List<Scenario> res7R8(int opcode, int r8) => resNR8(opcode, 7, r8);
+
+Scenario setNR8Spec(int opcode, int bit, int r8, int value, int result) =>
+    changeR8("SET $bit", opcode, r8, value, result, "",
+        prefix: Z80a.BIT_OPCODES);
+
+List<Scenario> setNR8(int opcode, int bit, int r8) => [
+      resNR8Spec(opcode, bit, r8, 0x00, Z80a.bitMask[bit]),
+      resNR8Spec(opcode, bit, r8, Z80a.bitMask[bit], Z80a.bitMask[bit]),
+    ];
+
+List<Scenario> set0R8(int opcode, int r8) => setNR8(opcode, 0, r8);
+List<Scenario> set1R8(int opcode, int r8) => setNR8(opcode, 1, r8);
+List<Scenario> set2R8(int opcode, int r8) => setNR8(opcode, 2, r8);
+List<Scenario> set3R8(int opcode, int r8) => setNR8(opcode, 3, r8);
+List<Scenario> set4R8(int opcode, int r8) => setNR8(opcode, 4, r8);
+List<Scenario> set5R8(int opcode, int r8) => setNR8(opcode, 5, r8);
+List<Scenario> set6R8(int opcode, int r8) => setNR8(opcode, 6, r8);
+List<Scenario> set7R8(int opcode, int r8) => setNR8(opcode, 7, r8);

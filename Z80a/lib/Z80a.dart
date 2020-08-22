@@ -1483,6 +1483,84 @@ class Z80a {
         setReg(r8, getReg(r8) & ~mask);
         break;
 
+      case 0xC0: // SET 0, B
+      case 0xC1: // SET 0, C
+      case 0xC2: // SET 0, D
+      case 0xC3: // SET 0, E
+      case 0xC4: // SET 0, H
+      case 0xC5: // SET 0, L
+      case 0xC6: // SET 0, (HL)
+      case 0xC7: // SET 0, A
+
+      case 0xC8: // SET 1, B
+      case 0xC9: // SET 1, C
+      case 0xCA: // SET 1, D
+      case 0xCB: // SET 1, E
+      case 0xCC: // SET 1, H
+      case 0xCD: // SET 1, L
+      case 0xCE: // SET 1, (HL)
+      case 0xCF: // SET 1, A
+
+      case 0xD0: // SET 2, B
+      case 0xD1: // SET 2, C
+      case 0xD2: // SET 2, D
+      case 0xD3: // SET 2, E
+      case 0xD4: // SET 2, H
+      case 0xD5: // SET 2, L
+      case 0xD6: // SET 2, (HL)
+      case 0xD7: // SET 2, A
+
+      case 0xD8: // SET 3, B
+      case 0xD9: // SET 3, C
+      case 0xDA: // SET 3, D
+      case 0xDB: // SET 3, E
+      case 0xDC: // SET 3, H
+      case 0xDD: // SET 3, L
+      case 0xDE: // SET 3, (HL)
+      case 0xDF: // SET 3, A
+
+      case 0xE0: // SET 4, B
+      case 0xE1: // SET 4, C
+      case 0xE2: // SET 4, D
+      case 0xE3: // SET 4, E
+      case 0xE4: // SET 4, H
+      case 0xE5: // SET 4, L
+      case 0xE6: // SET 4, (HL)
+      case 0xE7: // SET 4, A
+
+      case 0xE8: // SET 5, B
+      case 0xE9: // SET 5, C
+      case 0xEA: // SET 5, D
+      case 0xEB: // SET 5, E
+      case 0xEC: // SET 5, H
+      case 0xED: // SET 5, L
+      case 0xEE: // SET 5, (HL)
+      case 0xEF: // SET 5, A
+
+      case 0xF0: // SET 6, B
+      case 0xF1: // SET 6, C
+      case 0xF2: // SET 6, D
+      case 0xF3: // SET 6, E
+      case 0xF4: // SET 6, H
+      case 0xF5: // SET 6, L
+      case 0xF6: // SET 6, (HL)
+      case 0xF7: // SET 6, A
+
+      case 0xF8: // SET 7, B
+      case 0xF9: // SET 7, C
+      case 0xFA: // SET 7, D
+      case 0xFB: // SET 7, E
+      case 0xFC: // SET 7, H
+      case 0xFD: // SET 7, L
+      case 0xFE: // SET 7, (HL)
+      case 0xFF: // SET 7, A
+
+        var bit = (opcode & 0x38) >> 3;
+        int r8 = r8Table[opcode & 0x07];
+        var mask = bitMask[bit];
+        setReg(r8, getReg(r8) | mask);
+        break;
+
       default:
         processed = false;
         break;
