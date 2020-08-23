@@ -366,6 +366,7 @@ class Z80a {
     var result = this.A & value;
     setZeroAndSignFlagsOn8BitResult(result);
     this.carryFlag = false;
+    this.halfCarryFlag = false;
     this.addSubtractFlag = false;
     this.parityOverflowFlag = parity(result);
 
@@ -376,6 +377,7 @@ class Z80a {
     var result = this.A ^ value;
     setZeroAndSignFlagsOn8BitResult(result);
     this.carryFlag = false;
+    this.halfCarryFlag = false;
     this.addSubtractFlag = false;
     this.parityOverflowFlag = parity(result);
 
@@ -386,6 +388,7 @@ class Z80a {
     var result = this.A | value;
     setZeroAndSignFlagsOn8BitResult(result);
     this.carryFlag = false;
+    this.halfCarryFlag = false;
     this.addSubtractFlag = false;
     this.parityOverflowFlag = parity(result);
 

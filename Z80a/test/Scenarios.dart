@@ -1032,34 +1032,34 @@ List<Scenario> sbcAR8(int opcode, int r8) => r8 == Z80a.R_A
 
 List<Scenario> andR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [
-        r8Operation("AND", opcode, r8, 0x07, 0x07, 0x07, "~S ~Z P ~N ~C"),
-        r8Operation("AND", opcode, r8, 0x00, 0x00, 0x00, "~S Z ~P ~N ~C"),
-        r8Operation("AND", opcode, r8, 0x90, 0x90, 0x90, "S ~Z ~P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x07, 0x07, 0x07, "~S ~Z ~H P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x00, 0x00, 0x00, "~S Z ~H ~P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x90, 0x90, 0x90, "S ~Z ~H ~P ~N ~C"),
       ]
     : [
-        r8Operation("AND", opcode, r8, 0x03, 0x01, 0x01, "~S ~Z P ~N ~C"),
-        r8Operation("AND", opcode, r8, 0x03, 0x04, 0x00, "~S Z ~P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x03, 0x01, 0x01, "~S ~Z ~H P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x03, 0x04, 0x00, "~S Z ~H ~P ~N ~C"),
       ];
 
 List<Scenario> xorR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [
-        r8Operation("XOR", opcode, r8, 0x07, 0x07, 0x00, "~S Z ~P ~N ~C"),
-        r8Operation("XOR", opcode, r8, 0x90, 0x90, 0x00, "~S Z ~P ~N ~C"),
+        r8Operation("XOR", opcode, r8, 0x07, 0x07, 0x00, "~S Z ~H ~P ~N ~C"),
+        r8Operation("XOR", opcode, r8, 0x90, 0x90, 0x00, "~S Z ~H ~P ~N ~C"),
       ]
     : [
-        r8Operation("XOR", opcode, r8, 0x03, 0x01, 0x02, "~S ~Z P ~N ~C"),
-        r8Operation("XOR", opcode, r8, 0x03, 0x81, 0x82, "S ~Z ~P ~N ~C"),
+        r8Operation("XOR", opcode, r8, 0x03, 0x01, 0x02, "~S ~Z ~H P ~N ~C"),
+        r8Operation("XOR", opcode, r8, 0x03, 0x81, 0x82, "S ~Z ~H ~P ~N ~C"),
       ];
 
 List<Scenario> orR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [
-        r8Operation("OR", opcode, r8, 0x00, 0x00, 0x00, "~S Z ~P ~N ~C"),
-        r8Operation("OR", opcode, r8, 0x07, 0x07, 0x07, "~S ~Z P ~N ~C"),
-        r8Operation("OR", opcode, r8, 0x90, 0x90, 0x90, "S ~Z ~P ~N ~C"),
+        r8Operation("OR", opcode, r8, 0x00, 0x00, 0x00, "~S Z ~H ~P ~N ~C"),
+        r8Operation("OR", opcode, r8, 0x07, 0x07, 0x07, "~S ~Z ~H P ~N ~C"),
+        r8Operation("OR", opcode, r8, 0x90, 0x90, 0x90, "S ~Z ~H ~P ~N ~C"),
       ]
     : [
-        r8Operation("OR", opcode, r8, 0x02, 0x01, 0x03, "~S ~Z ~P ~N ~C"),
-        r8Operation("OR", opcode, r8, 0x02, 0x81, 0x83, "S ~Z P ~N ~C"),
+        r8Operation("OR", opcode, r8, 0x02, 0x01, 0x03, "~S ~Z ~H ~P ~N ~C"),
+        r8Operation("OR", opcode, r8, 0x02, 0x81, 0x83, "S ~Z ~H P ~N ~C"),
       ];
 
 List<Scenario> cpR8(int opcode, int r8) => r8 == Z80a.R_A
@@ -1127,18 +1127,18 @@ List<Scenario> sbcAN(int opcode) => [
     ];
 
 List<Scenario> andAN(int opcode) => [
-      nOperation("AND A, N", opcode, 0x03, 0x01, 0x01, "~S ~Z P ~N ~C"),
-      nOperation("AND A, N", opcode, 0x03, 0x04, 0x00, "~S Z ~P ~N ~C"),
+      nOperation("AND A, N", opcode, 0x03, 0x01, 0x01, "~S ~Z ~H P ~N ~C"),
+      nOperation("AND A, N", opcode, 0x03, 0x04, 0x00, "~S Z ~H ~P ~N ~C"),
     ];
 
 List<Scenario> xorN(int opcode) => [
-      nOperation("XOR N", opcode, 0x03, 0x01, 0x02, "~S ~Z P ~N ~C"),
-      nOperation("XOR N", opcode, 0x03, 0x81, 0x82, "S ~Z ~P ~N ~C"),
+      nOperation("XOR N", opcode, 0x03, 0x01, 0x02, "~S ~Z ~H P ~N ~C"),
+      nOperation("XOR N", opcode, 0x03, 0x81, 0x82, "S ~Z ~H ~P ~N ~C"),
     ];
 
 List<Scenario> orN(int opcode) => [
-      nOperation("OR N", opcode, 0x02, 0x01, 0x03, "~S ~Z ~P ~N ~C"),
-      nOperation("OR N", opcode, 0x02, 0x81, 0x83, "S ~Z P ~N ~C"),
+      nOperation("OR N", opcode, 0x02, 0x01, 0x03, "~S ~Z ~H ~P ~N ~C"),
+      nOperation("OR N", opcode, 0x02, 0x81, 0x83, "S ~Z ~H P ~N ~C"),
     ];
 
 List<Scenario> cpN(int opcode) => [
