@@ -33,7 +33,7 @@ var allScenarios = [
   ...ldMHLL(0x75),
   ...ldMHLR8(0x77, Z80a.R_A),
   ...ldMNNR16(0x22, Z80a.R_HL),
-  ...ldHLMNN(0x2A),
+  ...ldR16MNN(0x2A, Z80a.R_HL),
   ...ldMNNA(0x32),
   ...ldAMNN(0x3A),
   ...ldMHLN(0x36),
@@ -360,6 +360,18 @@ var allScenarios = [
   ...ldMNNR16(0x53, Z80a.R_DE, prefix: Z80a.EXTENDED_OPCODES),
   ...ldMNNR16(0x63, Z80a.R_HL, prefix: Z80a.EXTENDED_OPCODES),
   ...ldMNNR16(0x73, Z80a.R_SP, prefix: Z80a.EXTENDED_OPCODES),
+  ...ldR16MNN(0x4B, Z80a.R_BC, prefix: Z80a.EXTENDED_OPCODES),
+  ...ldR16MNN(0x5B, Z80a.R_DE, prefix: Z80a.EXTENDED_OPCODES),
+  ...ldR16MNN(0x6B, Z80a.R_HL, prefix: Z80a.EXTENDED_OPCODES),
+  ...ldR16MNN(0x7B, Z80a.R_SP, prefix: Z80a.EXTENDED_OPCODES),
+  ...neg(0x44),
+  ...neg(0x54),
+  ...neg(0x64),
+  ...neg(0x74),
+  ...neg(0x4C),
+  ...neg(0x5C),
+  ...neg(0x6C),
+  ...neg(0x7C),
 
   // CB
 

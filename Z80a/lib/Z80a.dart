@@ -317,7 +317,7 @@ class Z80a {
   int addA(int value) {
     var sum = this.A + value;
     this.carryFlag = sum > 255;
-    this.halfCarryFlag = (this.A & 0x07) + (value & 0x07) > 0x07;
+    this.halfCarryFlag = (this.A & 0x0F) + (value & 0x0F) > 0x0F;
     var result = byte(sum);
     this.parityOverflowFlag = (((this.A & 0x80) ^ (value & 0x80)) == 0) &&
         (value & 0x80 != (result & 0x80));
@@ -350,7 +350,7 @@ class Z80a {
   int subA(int value) {
     var diff = this.A - value;
     this.carryFlag = diff < 0;
-    this.halfCarryFlag = (this.A & 0x07) - (value & 0x07) < 0;
+    this.halfCarryFlag = (this.A & 0x0F) - (value & 0x0F) < 0;
     var result = byte(diff);
     this.parityOverflowFlag =
         !sameSign8(this.A, value) && sameSign8(value, result);
@@ -1272,6 +1272,32 @@ class Z80a {
       case 0x73: // LD (nn), SP
         int r16 = r16SPTable[(opcode & 0x30) >> 4];
         this.memory.poke2(fetch2(), getReg2(r16));
+        break;
+
+      case 0x4B: // LD BC, (nn)
+      case 0x5B: // LD DE, (nn)
+      case 0x6B: // LD HL, (nn)
+      case 0x7B: // LD SP, (nn)
+        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        var a = fetch2();
+        setReg2(r16, this.memory.peek2(a));
+        break;
+
+      case 0x44: // NEG
+      case 0x54: // NEG
+      case 0x64: // NEG
+      case 0x74: // NEG
+      case 0x4C: // NEG
+      case 0x5C: // NEG
+      case 0x6C: // NEG
+      case 0x7C: // NEG
+        this.carryFlag = this.A != 0;
+        this.parityOverflowFlag = this.A == 0x80;
+        this.halfCarryFlag = this.A != 0;
+        this.addSubtractFlag = true;
+        var result = byte(0 - this.A);
+        this.A = result;
+        setZeroAndSignFlagsOn8BitResult(result);
         break;
 
       default:

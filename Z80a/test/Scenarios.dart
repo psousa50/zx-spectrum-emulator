@@ -108,10 +108,11 @@ List<Scenario> ldMHLN(int opcode) => [
       )
     ];
 
-List<Scenario> ldHLMNN(int opcode) => [
+List<Scenario> ldR16MNN(int opcode, int r16, {int prefix}) => [
       Scenario(
         'LD HL, (NN)',
         [
+          if (prefix != null) prefix,
           opcode,
           lo(Scenario.RAM_START),
           hi(Scenario.RAM_START),
@@ -120,7 +121,7 @@ List<Scenario> ldHLMNN(int opcode) => [
           ram: [12, 34],
         ),
         expectedState: State(
-          register16Values: {Z80a.R_HL: w(12, 34)},
+          register16Values: {r16: w(12, 34)},
           ram: [12, 34],
         ),
       )
@@ -947,8 +948,8 @@ Scenario r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
 
 List<Scenario> addAR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [
-        r8Operation("ADD A,", opcode, r8, 10, 10, 20, "~S ~Z ~H ~P ~N ~C"),
-        r8Operation("ADD A,", opcode, r8, 7, 7, 14, "~S ~Z H ~P ~N ~C"),
+        r8Operation("ADD A,", opcode, r8, 10, 10, 20, "~S ~Z H ~P ~N ~C"),
+        r8Operation("ADD A,", opcode, r8, 7, 7, 14, "~S ~Z ~H ~P ~N ~C"),
         r8Operation("ADD A,", opcode, r8, 128, 128, 0, "~S Z ~H P ~N C"),
       ]
     : [
@@ -959,9 +960,9 @@ List<Scenario> addAR8(int opcode, int r8) => r8 == Z80a.R_A
 
 List<Scenario> adcAR8(int opcode, int r8) => r8 == Z80a.R_A
     ? [
-        r8Operation("ADC A,", opcode, r8, 10, 10, 20, "~S ~Z ~H ~P ~N ~C",
+        r8Operation("ADC A,", opcode, r8, 10, 10, 20, "~S ~Z H ~P ~N ~C",
             inFlags: "~C"),
-        r8Operation("ADC A,", opcode, r8, 10, 10, 21, "~S ~Z ~H ~P ~N ~C",
+        r8Operation("ADC A,", opcode, r8, 10, 10, 21, "~S ~Z H ~P ~N ~C",
             inFlags: "C"),
         r8Operation("ADC A,", opcode, r8, 128, 128, 0, "~S Z ~H P ~N C",
             inFlags: "~C"),
@@ -993,6 +994,7 @@ List<Scenario> subAR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("SUB", opcode, r8, 128, 128, 0, "~S Z ~H N ~P ~C"),
       ]
     : [
+        r8Operation("SUB", opcode, r8, 23, 8, 15, "~S ~Z H N ~P ~C"),
         r8Operation("SUB", opcode, r8, 10, 2, 8, "~S ~Z ~H N ~P ~C"),
         r8Operation("SUB", opcode, r8, 129, 2, 127, "~S ~Z H N P ~C"),
         r8Operation("SUB", opcode, r8, 255, 254, 1, "~S ~Z ~H N ~P ~C"),
@@ -1013,7 +1015,11 @@ List<Scenario> sbcAR8(int opcode, int r8) => r8 == Z80a.R_A
     : [
         r8Operation("SBC A,", opcode, r8, 10, 2, 8, "~S ~Z ~H ~P N ~C",
             inFlags: "~C"),
-        r8Operation("SBC A,", opcode, r8, 10, 2, 7, "~S ~Z H ~P N ~C",
+        r8Operation("SBC A,", opcode, r8, 10, 2, 7, "~S ~Z ~H ~P N ~C",
+            inFlags: "C"),
+        r8Operation("SBC A,", opcode, r8, 23, 8, 14, "~S ~Z H ~P N ~C",
+            inFlags: "C"),
+        r8Operation("SBC A,", opcode, r8, 23, 7, 15, "~S ~Z H ~P N ~C",
             inFlags: "C"),
         r8Operation("SBC A,", opcode, r8, 255, 1, 254, "S ~Z ~H ~P N ~C",
             inFlags: "~C"),
@@ -1102,9 +1108,9 @@ List<Scenario> addAN(int opcode) => [
     ];
 
 List<Scenario> adcAN(int opcode) => [
-      nOperation("ADC A, N", opcode, 10, 10, 20, "~S ~Z ~H ~P ~N ~C",
+      nOperation("ADC A, N", opcode, 10, 10, 20, "~S ~Z H ~P ~N ~C",
           inFlags: "~C"),
-      nOperation("ADC A, N", opcode, 10, 10, 21, "~S ~Z ~H ~P ~N ~C",
+      nOperation("ADC A, N", opcode, 10, 10, 21, "~S ~Z H ~P ~N ~C",
           inFlags: "C"),
       nOperation("ADC A, N", opcode, 128, 128, 0, "~S Z ~H P ~N C",
           inFlags: "~C"),
@@ -1427,6 +1433,15 @@ List<Scenario> adcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
             "~S ~Z ~H ~P ~N C",
             inFlags: "C", prefix: 0xED),
       ];
+
+List<Scenario> neg(int opcode) => [
+      changeR8("NEG", opcode, Z80a.R_A, 3, 253, "S ~Z H ~P N C",
+          prefix: Z80a.EXTENDED_OPCODES),
+      changeR8("NEG", opcode, Z80a.R_A, 0, 0, "~S Z ~H ~P N ~C",
+          prefix: Z80a.EXTENDED_OPCODES),
+      changeR8("NEG", opcode, Z80a.R_A, 0x80, 0x80, "S ~Z H P N C",
+          prefix: Z80a.EXTENDED_OPCODES),
+    ];
 
 Scenario bitNR8R8Spec(int opcode, int bit, int r8, int value, String flags) =>
     Scenario(
