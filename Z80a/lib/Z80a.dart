@@ -317,6 +317,7 @@ class Z80a {
   int addA(int value) {
     var sum = this.A + value;
     this.carryFlag = sum > 255;
+    this.halfCarryFlag = (this.A & 0x07) + (value & 0x07) > 0x07;
     var result = byte(sum);
     this.parityOverflowFlag = (((this.A & 0x80) ^ (value & 0x80)) == 0) &&
         (value & 0x80 != (result & 0x80));
@@ -349,6 +350,7 @@ class Z80a {
   int subA(int value) {
     var diff = this.A - value;
     this.carryFlag = diff < 0;
+    this.halfCarryFlag = (this.A & 0x07) - (value & 0x07) < 0;
     var result = byte(diff);
     this.parityOverflowFlag =
         !sameSign8(this.A, value) && sameSign8(value, result);
