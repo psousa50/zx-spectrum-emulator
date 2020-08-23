@@ -39,16 +39,17 @@ List<Scenario> ldR8NN(int opcode, int r8) => [
       )
     ];
 
-List<Scenario> ldMNNHL(int opcode) => [
+List<Scenario> ldMNNR16(int opcode, int r16, {int prefix}) => [
       Scenario(
-        'LD (NN), HL',
+        'LD (NN), ${Z80a.r16Names[r16]}',
         [
+          if (prefix != null) prefix,
           opcode,
           lo(Scenario.RAM_START),
           hi(Scenario.RAM_START),
         ],
         initialState: State(
-          register16Values: {Z80a.R_HL: 10000},
+          register16Values: {r16: 10000},
           ram: [0, 0],
         ),
         expectedState: State(

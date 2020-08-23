@@ -1266,6 +1266,14 @@ class Z80a {
         setZeroAndSignFlagsOn16BitResult(this.HL);
         break;
 
+      case 0x43: // LD (nn), BC
+      case 0x53: // LD (nn), DE
+      case 0x63: // LD (nn), HL
+      case 0x73: // LD (nn), SP
+        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        this.memory.poke2(fetch2(), getReg2(r16));
+        break;
+
       default:
         // processed = false;
         break;

@@ -32,7 +32,7 @@ var allScenarios = [
   ...ldMHLH(0x74),
   ...ldMHLL(0x75),
   ...ldMHLR8(0x77, Z80a.R_A),
-  ...ldMNNHL(0x22),
+  ...ldMNNR16(0x22, Z80a.R_HL),
   ...ldHLMNN(0x2A),
   ...ldMNNA(0x32),
   ...ldAMNN(0x3A),
@@ -356,6 +356,10 @@ var allScenarios = [
   ...adcHLR16(0x5A, Z80a.R_DE),
   ...adcHLR16(0x6A, Z80a.R_HL),
   ...adcHLR16(0x7A, Z80a.R_SP),
+  ...ldMNNR16(0x43, Z80a.R_BC, prefix: Z80a.EXTENDED_OPCODES),
+  ...ldMNNR16(0x53, Z80a.R_DE, prefix: Z80a.EXTENDED_OPCODES),
+  ...ldMNNR16(0x63, Z80a.R_HL, prefix: Z80a.EXTENDED_OPCODES),
+  ...ldMNNR16(0x73, Z80a.R_SP, prefix: Z80a.EXTENDED_OPCODES),
 
   // CB
 
