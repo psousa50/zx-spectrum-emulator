@@ -1239,8 +1239,23 @@ class Z80a {
         setZeroAndSignFlagsOn16BitResult(this.HL);
         break;
 
+      case 0x4A: // ADC HL, BC
+      case 0x5A: // ADC HL, DE
+      case 0x6A: // ADC HL, HL
+      case 0x7A: // ADC HL, SP
+        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        int value = getReg2(r16);
+        var result = this.HL + value + (this.carryFlag ? 1 : 0);
+        this.parityOverflowFlag =
+            (((this.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
+                (value & 0x8000 != (result & 0x8000));
+        this.carryFlag = result > 65535;
+        this.HL = word(result);
+        setZeroAndSignFlagsOn16BitResult(this.HL);
+        break;
+
       default:
-        processed = false;
+        // processed = false;
         break;
     }
 

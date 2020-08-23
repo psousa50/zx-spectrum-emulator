@@ -1396,6 +1396,33 @@ List<Scenario> sbcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
             inFlags: "C", prefix: 0xED),
       ];
 
+List<Scenario> adcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
+    ? [
+        changeR16R16Spec(
+            "ADC", opcode, Z80a.R_HL, r16, 40000, 40000, 14464, "~S ~Z P C",
+            inFlags: "~C", prefix: 0xED),
+        changeR16R16Spec(
+            "ADC", opcode, Z80a.R_HL, r16, 32768, 32768, 0, "~S Z P C",
+            inFlags: "~C", prefix: 0xED),
+        changeR16R16Spec(
+            "ADC", opcode, Z80a.R_HL, r16, 10000, 10000, 20001, "~S ~Z ~P ~C",
+            inFlags: "C", prefix: 0xED),
+      ]
+    : [
+        changeR16R16Spec(
+            "ADC", opcode, Z80a.R_HL, r16, 20000, 12000, 32000, "~S ~Z ~P ~C",
+            inFlags: "~C", prefix: 0xED),
+        changeR16R16Spec(
+            "ADC", opcode, Z80a.R_HL, r16, 30000, 20000, 50000, "S ~Z P ~C",
+            inFlags: "~C", prefix: 0xED),
+        changeR16R16Spec(
+            "ADC", opcode, Z80a.R_HL, r16, 30000, 42000, 6464, "~S ~Z ~P C",
+            inFlags: "~C", prefix: 0xED),
+        changeR16R16Spec(
+            "ADC", opcode, Z80a.R_HL, r16, 30000, 42000, 6465, "~S ~Z ~P C",
+            inFlags: "C", prefix: 0xED),
+      ];
+
 Scenario bitNR8R8Spec(int opcode, int bit, int r8, int value, String flags) =>
     Scenario(
       "BIT $bit, ${Z80a.r8Names[r8]} (${toBinary8(value)})",

@@ -352,6 +352,10 @@ var allScenarios = [
   ...sbcHLR16(0x52, Z80a.R_DE),
   ...sbcHLR16(0x62, Z80a.R_HL),
   ...sbcHLR16(0x72, Z80a.R_SP),
+  ...adcHLR16(0x4A, Z80a.R_BC),
+  ...adcHLR16(0x5A, Z80a.R_DE),
+  ...adcHLR16(0x6A, Z80a.R_HL),
+  ...adcHLR16(0x7A, Z80a.R_SP),
 
   // CB
 
@@ -697,7 +701,7 @@ void main() {
 
   test('One Scenario', () {
     print("RUNNING ONLY ONE SCENARIO");
-    var scenarios = bit0R8(0x46, Z80a.R_MIXd);
+    var scenarios = adcHLR16(0x4A, Z80a.R_BC);
     scenarios.forEach((scenario) {
       scenario.run();
     });

@@ -44,8 +44,11 @@ class Scenario {
 
   Scenario(this.name, this.opcodes, {this.initialState, this.expectedState});
 
+  String opcodesToString(List<int> opcodes) =>
+      '${opcodes.map((e) => e.toRadixString(16))}';
+
   String scenarioName(List<int> opcodes) =>
-      '${this.name} <=> ${opcodes.map((e) => e.toRadixString(16))}';
+      '${this.name} <=> ${opcodesToString(opcodes)}';
 
   String wrongRegister(List<int> opcodes, int r) =>
       '${scenarioName(opcodes)}\nReason: ${Z80a.r8Names[r]} as wrong value';
@@ -86,7 +89,10 @@ class Scenario {
 
     setZ80Registers(z80a, initialRegisterValues);
 
-    z80a.step();
+    var processed = z80a.step();
+
+    expect(processed, true,
+        reason: "Opcode not processed => ${opcodesToString(opcodes)}");
 
     Map<int, int> actualRegisterValues = getZ80Registers(z80a);
 
