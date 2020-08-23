@@ -1235,11 +1235,14 @@ class Z80a {
       case 0x72: // SBC HL, SP
         int r16 = r16SPTable[(opcode & 0x30) >> 4];
         int value = getReg2(r16);
-        var result = this.HL - value - (this.carryFlag ? 1 : 0);
+        int cf = (this.carryFlag ? 1 : 0);
+        var result = this.HL - value - cf;
         this.parityOverflowFlag =
             (((this.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
                 (value & 0x8000 != (result & 0x8000));
         this.carryFlag = result < 0;
+        this.halfCarryFlag = (this.HL & 0x0FFF) - (value & 0x0FFF) - cf < 0x00;
+        this.addSubtractFlag = true;
         this.HL = word(result);
         setZeroAndSignFlagsOn16BitResult(this.HL);
         break;
@@ -1250,11 +1253,15 @@ class Z80a {
       case 0x7A: // ADC HL, SP
         int r16 = r16SPTable[(opcode & 0x30) >> 4];
         int value = getReg2(r16);
-        var result = this.HL + value + (this.carryFlag ? 1 : 0);
+        int cf = (this.carryFlag ? 1 : 0);
+        var result = this.HL + value + cf;
         this.parityOverflowFlag =
             (((this.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
                 (value & 0x8000 != (result & 0x8000));
         this.carryFlag = result > 65535;
+        this.halfCarryFlag =
+            (this.HL & 0x0FFF) + (value & 0x0FFF) + cf > 0x0FFF;
+        this.addSubtractFlag = false;
         this.HL = word(result);
         setZeroAndSignFlagsOn16BitResult(this.HL);
         break;

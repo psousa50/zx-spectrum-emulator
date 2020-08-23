@@ -1376,54 +1376,54 @@ List<Scenario> inAN(int opcode) => [
 List<Scenario> sbcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
     ? [
         changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 0, "~S Z ~P ~C",
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 0, "~S Z ~H ~P N ~C",
             inFlags: "~C", prefix: 0xED),
         changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 65535, "S ~Z P C",
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 65535, "S ~Z H P N C",
             inFlags: "C", prefix: 0xED),
       ]
     : [
-        changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 12000, 18000, "~S ~Z ~P ~C",
+        changeR16R16Spec("SBC", opcode, Z80a.R_HL, r16, 30000, 12000, 18000,
+            "~S ~Z H ~P N ~C",
             inFlags: "~C", prefix: 0xED),
         changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 0, "~S Z ~P ~C",
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 0, "~S Z ~H ~P N ~C",
             inFlags: "~C", prefix: 0xED),
         changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 40000, 55536, "S ~Z ~P C",
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 40000, 55536, "S ~Z H ~P N C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 12000, 17999, "~S ~Z ~P ~C",
+        changeR16R16Spec("SBC", opcode, Z80a.R_HL, r16, 30000, 12000, 17999,
+            "~S ~Z H ~P N ~C",
             inFlags: "C", prefix: 0xED),
         changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 65535, "S ~Z P C",
+            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 65535, "S ~Z H P N C",
             inFlags: "C", prefix: 0xED),
       ];
 
 List<Scenario> adcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
     ? [
-        changeR16R16Spec(
-            "ADC", opcode, Z80a.R_HL, r16, 40000, 40000, 14464, "~S ~Z P C",
+        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 40000, 40000, 14464,
+            "~S ~Z H P ~N C",
             inFlags: "~C", prefix: 0xED),
         changeR16R16Spec(
-            "ADC", opcode, Z80a.R_HL, r16, 32768, 32768, 0, "~S Z P C",
+            "ADC", opcode, Z80a.R_HL, r16, 32768, 32768, 0, "~S Z ~H P ~N C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec(
-            "ADC", opcode, Z80a.R_HL, r16, 10000, 10000, 20001, "~S ~Z ~P ~C",
+        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 10000, 10000, 20001,
+            "~S ~Z ~H ~P ~N ~C",
             inFlags: "C", prefix: 0xED),
       ]
     : [
-        changeR16R16Spec(
-            "ADC", opcode, Z80a.R_HL, r16, 20000, 12000, 32000, "~S ~Z ~P ~C",
+        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 20000, 12000, 32000,
+            "~S ~Z H ~P ~N ~C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec(
-            "ADC", opcode, Z80a.R_HL, r16, 30000, 20000, 50000, "S ~Z P ~C",
+        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 30000, 20000, 50000,
+            "S ~Z H P ~N ~C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec(
-            "ADC", opcode, Z80a.R_HL, r16, 30000, 42000, 6464, "~S ~Z ~P C",
+        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 30000, 42000, 6464,
+            "~S ~Z ~H ~P ~N C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec(
-            "ADC", opcode, Z80a.R_HL, r16, 30000, 42000, 6465, "~S ~Z ~P C",
+        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 30000, 42000, 6465,
+            "~S ~Z ~H ~P ~N C",
             inFlags: "C", prefix: 0xED),
       ];
 
