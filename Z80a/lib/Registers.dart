@@ -1,3 +1,5 @@
+import 'package:Z80a/Z80a.dart';
+
 import 'Util.dart';
 
 // ignore_for_file: non_constant_identifier_names
@@ -12,6 +14,7 @@ class Registers {
     R_E: "E",
     R_H: "H",
     R_L: "L",
+    Z80a.R_MHL: "(HL)",
     R_S: "S",
     R_P: "P",
     R_IX_L: "IX_l",

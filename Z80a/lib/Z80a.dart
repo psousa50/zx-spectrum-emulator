@@ -6,9 +6,121 @@ import 'package:Z80a/Util.dart';
 
 import 'Registers.dart';
 
+class OpcodeResult {
+  bool processed;
+  int tStates;
+
+  OpcodeResult(this.processed, this.tStates);
+
+  OpcodeResult.processed(int tStates) {
+    this.processed = true;
+    this.tStates = tStates;
+  }
+
+  OpcodeResult.notProcessed() {
+    this.processed = false;
+    this.tStates = 0;
+  }
+}
+
+typedef OpcodeResult OpcodeHandler({int opcode});
+
+class Z80Instruction {
+  String name;
+  OpcodeHandler handler;
+  int tStates;
+
+  Z80Instruction(this.name, this.handler, this.tStates);
+}
+
+class Z80Instructions {
+  static const r8Table = {
+    0: Registers.R_B,
+    1: Registers.R_C,
+    2: Registers.R_D,
+    3: Registers.R_E,
+    4: Registers.R_H,
+    5: Registers.R_L,
+    6: Z80a.R_MHL,
+    7: Registers.R_A,
+  };
+
+  static const r16SPTable = {
+    0: Registers.R_BC,
+    1: Registers.R_DE,
+    2: Registers.R_HL,
+    3: Registers.R_SP,
+  };
+
+  Map<int, Z80Instruction> instructions;
+
+  Z80Instructions() {
+    instructions = Map<int, Z80Instruction>();
+  }
+
+  void add(int opcode, String name, OpcodeHandler handler, int tStates) {
+    instructions[opcode] = Z80Instruction(
+      name,
+      handler,
+      tStates,
+    );
+  }
+
+  void addMultiple(
+      int opcode, int count, String name, OpcodeHandler handler, int tStates,
+      {int multiplier = 1}) {
+    for (var i = 0; i < count; i++) {
+      add(
+        opcode + i * multiplier,
+        name,
+        handler,
+        tStates,
+      );
+    }
+  }
+
+  void addR8(int opcode, String name, OpcodeHandler handler, int tStates,
+      {int multiplier = 1}) {
+    for (var i = 0; i < 8; i++) {
+      var r8 = r8Table[i];
+      add(
+        opcode + i * multiplier,
+        name.replaceAll("[r8]", Registers.r8Names[r8]),
+        handler,
+        tStates + (r8 == Z80a.R_MHL ? 3 : 0),
+      );
+    }
+  }
+
+  void addR16(int opcode, String name, OpcodeHandler handler, int tStates,
+      {int multiplier = 1}) {
+    for (var i = 0; i < 4; i++) {
+      var r16 = r16SPTable[i];
+      add(
+        opcode + i * multiplier,
+        name.replaceAll("[r16]", Registers.r16Names[r16]),
+        handler,
+        tStates,
+      );
+    }
+  }
+
+  OpcodeResult execute(int opcode) {
+    return instructions[opcode] != null
+        ? instructions[opcode].handler(opcode: opcode)
+        : OpcodeResult.notProcessed();
+  }
+}
+
 // ignore_for_file: non_constant_identifier_names
 
 class Z80a {
+  final Memory memory;
+  final Ports ports;
+
+  Z80Instructions unPrefixedOpcodes;
+  Z80Instructions extendedOpcodes;
+
   static List<int> bitMask = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
 
   static const IX_PREFIX = 0xDD;
@@ -51,10 +163,10 @@ class Z80a {
     3: Registers.R_AF,
   };
 
-  final Memory memory;
-  final Ports ports;
-
-  Z80a(this.memory, this.ports);
+  Z80a(this.memory, this.ports) {
+    buildUnprefixedOpcodes();
+    buildExtendedOpcodes();
+  }
 
   var registers = Registers();
   var PC = 0;
@@ -339,6 +451,9 @@ class Z80a {
 
     final opcode = fetch();
 
+    var result = processOpcode(opcode, unPrefixedOpcodes);
+    if (result.processed) return result.processed;
+
     switch (opcode) {
       case IX_PREFIX:
       case IY_PREFIX:
@@ -365,9 +480,6 @@ class Z80a {
     var processed = true;
 
     switch (opcode) {
-      case 0x00: // NOP
-        break;
-
       case 0x08: // EX AF, AF'
         final af = registers.AF;
         registers.AF = registers.AFt;
@@ -407,41 +519,41 @@ class Z80a {
         this.memory.poke(registers.HL, getReg(r8));
         break;
 
-      case 0x80: // ADD A, B
-      case 0x81: // ADD A, C
-      case 0x82: // ADD A, D
-      case 0x83: // ADD A, E
-      case 0x84: // ADD A, H
-      case 0x85: // ADD A, L
-      case 0x86: // ADC A, (HL)
-      case 0x87: // ADD A, A
-        int r8 = r8Table[opcode & 0x07];
-        registers.A = addA(getReg(r8));
-        break;
+      // case 0x80: // ADD A, B
+      // case 0x81: // ADD A, C
+      // case 0x82: // ADD A, D
+      // case 0x83: // ADD A, E
+      // case 0x84: // ADD A, H
+      // case 0x85: // ADD A, L
+      // case 0x86: // ADD A, (HL)
+      // case 0x87: // ADD A, A
+      //   int r8 = r8Table[opcode & 0x07];
+      //   registers.A = addA(getReg(r8));
+      //   break;
 
-      case 0x88: // ADC A, B
-      case 0x89: // ADC A, C
-      case 0x8A: // ADC A, D
-      case 0x8B: // ADC A, E
-      case 0x8C: // ADC A, H
-      case 0x8D: // ADC A, L
-      case 0x8E: // ADC A, (HL)
-      case 0x8F: // ADC A, A
-        int r8 = r8Table[opcode & 0x07];
-        registers.A = adcA(getReg(r8));
-        break;
+      // case 0x88: // ADC A, B
+      // case 0x89: // ADC A, C
+      // case 0x8A: // ADC A, D
+      // case 0x8B: // ADC A, E
+      // case 0x8C: // ADC A, H
+      // case 0x8D: // ADC A, L
+      // case 0x8E: // ADC A, (HL)
+      // case 0x8F: // ADC A, A
+      //   int r8 = r8Table[opcode & 0x07];
+      //   registers.A = adcA(getReg(r8));
+      //   break;
 
-      case 0x90: // SUB B
-      case 0x91: // SUB C
-      case 0x92: // SUB D
-      case 0x93: // SUB E
-      case 0x94: // SUB H
-      case 0x95: // SUB L
-      case 0x96: // SUB (HL)
-      case 0x97: // SUB A
-        int r8 = r8Table[opcode & 0x07];
-        registers.A = subA(getReg(r8));
-        break;
+      // case 0x90: // SUB B
+      // case 0x91: // SUB C
+      // case 0x92: // SUB D
+      // case 0x93: // SUB E
+      // case 0x94: // SUB H
+      // case 0x95: // SUB L
+      // case 0x96: // SUB (HL)
+      // case 0x97: // SUB A
+      //   int r8 = r8Table[opcode & 0x07];
+      //   registers.A = subA(getReg(r8));
+      //   break;
 
       case 0x98: // SBC A, B
       case 0x99: // SBC A, C
@@ -1042,104 +1154,104 @@ class Z80a {
     final opcode = fetch();
 
     switch (opcode) {
-      case 0x40: // IN B, (C)
-      case 0x48: // IN C, (C)
-      case 0x50: // IN D, (C)
-      case 0x58: // IN E, (C)
-      case 0x60: // IN H, (C)
-      case 0x68: // IN L, (C)
-      case 0x78: // IN A, (C)
-        int r8 = r8Table[(opcode & 0x38) >> 3];
-        var result = this.ports.inPort(registers.C);
-        setReg(r8, result);
-        setZeroAndSignFlagsOn8BitResult(result);
-        registers.parityOverflowFlag = parity(result);
-        registers.addSubtractFlag = false;
-        registers.halfCarryFlag = false;
-        break;
+      // case 0x40: // IN B, (C)
+      // case 0x48: // IN C, (C)
+      // case 0x50: // IN D, (C)
+      // case 0x58: // IN E, (C)
+      // case 0x60: // IN H, (C)
+      // case 0x68: // IN L, (C)
+      // case 0x78: // IN A, (C)
+      //   int r8 = r8Table[(opcode & 0x38) >> 3];
+      //   var result = this.ports.inPort(registers.C);
+      //   setReg(r8, result);
+      //   setZeroAndSignFlagsOn8BitResult(result);
+      //   registers.parityOverflowFlag = parity(result);
+      //   registers.addSubtractFlag = false;
+      //   registers.halfCarryFlag = false;
+      //   break;
 
-      case 0x41: // OUT B, (C)
-      case 0x49: // OUT C, (C)
-      case 0x51: // OUT D, (C)
-      case 0x59: // OUT E, (C)
-      case 0x61: // OUT H, (C)
-      case 0x69: // OUT L, (C)
-      case 0x79: // OUT A, (C)
-        int r8 = r8Table[(opcode & 0x38) >> 3];
-        this.ports.outPort(registers.C, getReg(r8));
-        break;
+      // case 0x41: // OUT B, (C)
+      // case 0x49: // OUT C, (C)
+      // case 0x51: // OUT D, (C)
+      // case 0x59: // OUT E, (C)
+      // case 0x61: // OUT H, (C)
+      // case 0x69: // OUT L, (C)
+      // case 0x79: // OUT A, (C)
+      //   int r8 = r8Table[(opcode & 0x38) >> 3];
+      //   this.ports.outPort(registers.C, getReg(r8));
+      //   break;
 
-      case 0x42: // SBC HL, BC
-      case 0x52: // SBC HL, DE
-      case 0x62: // SBC HL, HL
-      case 0x72: // SBC HL, SP
-        int r16 = r16SPTable[(opcode & 0x30) >> 4];
-        int value = getReg2(r16);
-        int cf = (registers.carryFlag ? 1 : 0);
-        var result = registers.HL - value - cf;
-        registers.parityOverflowFlag =
-            (((registers.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
-                (value & 0x8000 != (result & 0x8000));
-        registers.carryFlag = result < 0;
-        registers.halfCarryFlag =
-            (registers.HL & 0x0FFF) - (value & 0x0FFF) - cf < 0x00;
-        registers.addSubtractFlag = true;
-        registers.HL = word(result);
-        setZeroAndSignFlagsOn16BitResult(registers.HL);
-        break;
+      // case 0x42: // SBC HL, BC
+      // case 0x52: // SBC HL, DE
+      // case 0x62: // SBC HL, HL
+      // case 0x72: // SBC HL, SP
+      //   int r16 = r16SPTable[(opcode & 0x30) >> 4];
+      //   int value = getReg2(r16);
+      //   int cf = (registers.carryFlag ? 1 : 0);
+      //   var result = registers.HL - value - cf;
+      //   registers.parityOverflowFlag =
+      //       (((registers.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
+      //           (value & 0x8000 != (result & 0x8000));
+      //   registers.carryFlag = result < 0;
+      //   registers.halfCarryFlag =
+      //       (registers.HL & 0x0FFF) - (value & 0x0FFF) - cf < 0x00;
+      //   registers.addSubtractFlag = true;
+      //   registers.HL = word(result);
+      //   setZeroAndSignFlagsOn16BitResult(registers.HL);
+      //   break;
 
-      case 0x4A: // ADC HL, BC
-      case 0x5A: // ADC HL, DE
-      case 0x6A: // ADC HL, HL
-      case 0x7A: // ADC HL, SP
-        int r16 = r16SPTable[(opcode & 0x30) >> 4];
-        int value = getReg2(r16);
-        int cf = (registers.carryFlag ? 1 : 0);
-        var result = registers.HL + value + cf;
-        registers.parityOverflowFlag =
-            (((registers.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
-                (value & 0x8000 != (result & 0x8000));
-        registers.carryFlag = result > 65535;
-        registers.halfCarryFlag =
-            (registers.HL & 0x0FFF) + (value & 0x0FFF) + cf > 0x0FFF;
-        registers.addSubtractFlag = false;
-        registers.HL = word(result);
-        setZeroAndSignFlagsOn16BitResult(registers.HL);
-        break;
+      // case 0x4A: // ADC HL, BC
+      // case 0x5A: // ADC HL, DE
+      // case 0x6A: // ADC HL, HL
+      // case 0x7A: // ADC HL, SP
+      //   int r16 = r16SPTable[(opcode & 0x30) >> 4];
+      //   int value = getReg2(r16);
+      //   int cf = (registers.carryFlag ? 1 : 0);
+      //   var result = registers.HL + value + cf;
+      //   registers.parityOverflowFlag =
+      //       (((registers.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
+      //           (value & 0x8000 != (result & 0x8000));
+      //   registers.carryFlag = result > 65535;
+      //   registers.halfCarryFlag =
+      //       (registers.HL & 0x0FFF) + (value & 0x0FFF) + cf > 0x0FFF;
+      //   registers.addSubtractFlag = false;
+      //   registers.HL = word(result);
+      //   setZeroAndSignFlagsOn16BitResult(registers.HL);
+      //   break;
 
-      case 0x43: // LD (nn), BC
-      case 0x53: // LD (nn), DE
-      case 0x63: // LD (nn), HL
-      case 0x73: // LD (nn), SP
-        int r16 = r16SPTable[(opcode & 0x30) >> 4];
-        this.memory.poke2(fetch2(), getReg2(r16));
-        break;
+      // case 0x43: // LD (nn), BC
+      // case 0x53: // LD (nn), DE
+      // case 0x63: // LD (nn), HL
+      // case 0x73: // LD (nn), SP
+      //   int r16 = r16SPTable[(opcode & 0x30) >> 4];
+      //   this.memory.poke2(fetch2(), getReg2(r16));
+      //   break;
 
-      case 0x4B: // LD BC, (nn)
-      case 0x5B: // LD DE, (nn)
-      case 0x6B: // LD HL, (nn)
-      case 0x7B: // LD SP, (nn)
-        int r16 = r16SPTable[(opcode & 0x30) >> 4];
-        var a = fetch2();
-        setReg2(r16, this.memory.peek2(a));
-        break;
+      // case 0x4B: // LD BC, (nn)
+      // case 0x5B: // LD DE, (nn)
+      // case 0x6B: // LD HL, (nn)
+      // case 0x7B: // LD SP, (nn)
+      //   int r16 = r16SPTable[(opcode & 0x30) >> 4];
+      //   var a = fetch2();
+      //   setReg2(r16, this.memory.peek2(a));
+      //   break;
 
-      case 0x44: // NEG
-      case 0x54: // NEG
-      case 0x64: // NEG
-      case 0x74: // NEG
-      case 0x4C: // NEG
-      case 0x5C: // NEG
-      case 0x6C: // NEG
-      case 0x7C: // NEG
-        registers.carryFlag = registers.A != 0;
-        registers.parityOverflowFlag = registers.A == 0x80;
-        registers.halfCarryFlag = registers.A != 0;
-        registers.addSubtractFlag = true;
-        var result = byte(0 - registers.A);
-        registers.A = result;
-        setZeroAndSignFlagsOn8BitResult(result);
-        break;
+      // case 0x44: // NEG
+      // case 0x54: // NEG
+      // case 0x64: // NEG
+      // case 0x74: // NEG
+      // case 0x4C: // NEG
+      // case 0x5C: // NEG
+      // case 0x6C: // NEG
+      // case 0x7C: // NEG
+      //   registers.carryFlag = registers.A != 0;
+      //   registers.parityOverflowFlag = registers.A == 0x80;
+      //   registers.halfCarryFlag = registers.A != 0;
+      //   registers.addSubtractFlag = true;
+      //   var result = byte(0 - registers.A);
+      //   registers.A = result;
+      //   setZeroAndSignFlagsOn8BitResult(result);
+      //   break;
 
       default:
         // processed = false;
@@ -1546,5 +1658,135 @@ class Z80a {
     }
 
     return processed;
+  }
+
+  OpcodeResult processOpcode(int opcode, Z80Instructions z80Instructions) {
+    return z80Instructions.execute(opcode);
+  }
+
+  OpcodeResult nop({int opcode}) {
+    return OpcodeResult.processed(4);
+  }
+
+  OpcodeResult addAR8({int opcode}) {
+    int r8 = r8Table[opcode & 0x07];
+    registers.A = addA(getReg(r8));
+    return OpcodeResult.processed(4);
+  }
+
+  OpcodeResult adcAR8({int opcode}) {
+    int r8 = r8Table[opcode & 0x07];
+    registers.A = adcA(getReg(r8));
+    return OpcodeResult.processed(4);
+  }
+
+  OpcodeResult subAR8({int opcode}) {
+    int r8 = r8Table[opcode & 0x07];
+    registers.A = subA(getReg(r8));
+    return OpcodeResult.processed(4);
+  }
+
+  OpcodeResult inR8C({int opcode}) {
+    int r8 = r8Table[(opcode & 0x38) >> 3];
+    var result = this.ports.inPort(registers.C);
+    setReg(r8, result);
+    setZeroAndSignFlagsOn8BitResult(result);
+    registers.parityOverflowFlag = parity(result);
+    registers.addSubtractFlag = false;
+    registers.halfCarryFlag = false;
+    return OpcodeResult.processed(12);
+  }
+
+  OpcodeResult outCR8({int opcode}) {
+    int r8 = r8Table[(opcode & 0x38) >> 3];
+    this.ports.outPort(registers.C, getReg(r8));
+    return OpcodeResult.processed(12);
+  }
+
+  OpcodeResult sbcHLR16({int opcode}) {
+    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int value = getReg2(r16);
+    int cf = (registers.carryFlag ? 1 : 0);
+    var result = registers.HL - value - cf;
+    registers.parityOverflowFlag =
+        (((registers.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
+            (value & 0x8000 != (result & 0x8000));
+    registers.carryFlag = result < 0;
+    registers.halfCarryFlag =
+        (registers.HL & 0x0FFF) - (value & 0x0FFF) - cf < 0x00;
+    registers.addSubtractFlag = true;
+    registers.HL = word(result);
+    setZeroAndSignFlagsOn16BitResult(registers.HL);
+    return OpcodeResult.processed(15);
+  }
+
+  OpcodeResult adcHLR16({int opcode}) {
+    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int value = getReg2(r16);
+    int cf = (registers.carryFlag ? 1 : 0);
+    var result = registers.HL + value + cf;
+    registers.parityOverflowFlag =
+        (((registers.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
+            (value & 0x8000 != (result & 0x8000));
+    registers.carryFlag = result > 65535;
+    registers.halfCarryFlag =
+        (registers.HL & 0x0FFF) + (value & 0x0FFF) + cf > 0x0FFF;
+    registers.addSubtractFlag = false;
+    registers.HL = word(result);
+    setZeroAndSignFlagsOn16BitResult(registers.HL);
+    return OpcodeResult.processed(15);
+  }
+
+  OpcodeResult ldMNNR16({int opcode}) {
+    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    this.memory.poke2(fetch2(), getReg2(r16));
+    return OpcodeResult.processed(20);
+  }
+
+  OpcodeResult ldR16MNN({int opcode}) {
+    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    var a = fetch2();
+    setReg2(r16, this.memory.peek2(a));
+    return OpcodeResult.processed(20);
+  }
+
+  OpcodeResult neg({int opcode}) {
+    registers.carryFlag = registers.A != 0;
+    registers.parityOverflowFlag = registers.A == 0x80;
+    registers.halfCarryFlag = registers.A != 0;
+    registers.addSubtractFlag = true;
+    var result = byte(0 - registers.A);
+    registers.A = result;
+    setZeroAndSignFlagsOn8BitResult(result);
+    return OpcodeResult.processed(8);
+  }
+
+  OpcodeResult extended({int opcode}) {
+    return processOpcode(fetch(), extendedOpcodes);
+  }
+
+  void buildUnprefixedOpcodes() {
+    unPrefixedOpcodes = Z80Instructions();
+
+    unPrefixedOpcodes.add(EXTENDED_OPCODES, "", extended, 0);
+
+    unPrefixedOpcodes.add(0x00, "NOP", nop, 4);
+    unPrefixedOpcodes.addR8(0x80, "ADD A, [r8]", addAR8, 4);
+    unPrefixedOpcodes.addR8(0x88, "ADC A, [r8]", adcAR8, 4);
+    unPrefixedOpcodes.addR8(0x90, "SUB [r8]", subAR8, 4);
+  }
+
+  void buildExtendedOpcodes() {
+    extendedOpcodes = Z80Instructions();
+    extendedOpcodes.addR8(0x40, "IN [r8], C", inR8C, 12, multiplier: 8);
+    extendedOpcodes.addR8(0x41, "OUT C, [r8]", outCR8, 12, multiplier: 8);
+    extendedOpcodes.addR16(0x42, "SBC HL, [r16]", sbcHLR16, 15, multiplier: 16);
+    extendedOpcodes.addR16(0x4A, "ADC HL, [r16]", adcHLR16, 15, multiplier: 16);
+    extendedOpcodes.addR16(0x43, "LD (NN), [r16]", ldMNNR16, 20,
+        multiplier: 16);
+    extendedOpcodes.addR16(0x4B, "LD [R16], (NN)", ldR16MNN, 20,
+        multiplier: 16);
+    extendedOpcodes.addMultiple(0x44, 4, "NEG", neg, 8, multiplier: 16);
+    extendedOpcodes.addMultiple(0x4C, 4, "NEG", neg, 8, multiplier: 16);
   }
 }

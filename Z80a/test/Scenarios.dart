@@ -1325,7 +1325,7 @@ List<Scenario> ldMIXYdR8(int opcode, int r8, int rxy) => [
 
 Scenario inR8CSpec(int opcode, int r8, int value, String flags) => Scenario(
       'IN ${Registers.r8Names[r8]}, (C) => ($value)',
-      [0xED, opcode],
+      [Z80a.EXTENDED_OPCODES, opcode],
       initialState: State(
         register8Values: {Registers.R_C: 254},
         ports: {254: value},
