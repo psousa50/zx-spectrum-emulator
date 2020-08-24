@@ -1,3 +1,4 @@
+import 'package:Z80a/Registers.dart';
 import 'package:Z80a/Util.dart';
 import 'package:Z80a/Z80a.dart';
 import 'Scenario.dart';
@@ -8,15 +9,15 @@ log(String m, value) {
   return value;
 }
 
-bool isIXIY(int rhxy) => rhxy == Z80a.R_IX || rhxy == Z80a.R_IY;
+bool isIXIY(int rhxy) => rhxy == Registers.R_IX || rhxy == Registers.R_IY;
 
 bool isMIXIY(int rhxy) => rhxy == Z80a.R_MIXd || rhxy == Z80a.R_MIYd;
 
-int rMIXY(int rxy) => rxy == Z80a.R_MIXd ? Z80a.R_IX : Z80a.R_IY;
+int rMIXY(int rxy) => rxy == Z80a.R_MIXd ? Registers.R_IX : Registers.R_IY;
 
 List<int> ixyPrefix(int rhxy) => [
-      if (rhxy == Z80a.R_IX) Z80a.IX_PREFIX,
-      if (rhxy == Z80a.R_IY) Z80a.IY_PREFIX
+      if (rhxy == Registers.R_IX) Z80a.IX_PREFIX,
+      if (rhxy == Registers.R_IY) Z80a.IY_PREFIX
     ];
 
 List<Scenario> nop(int opcode) => [
@@ -30,7 +31,7 @@ List<Scenario> nop(int opcode) => [
 
 List<Scenario> ldR8NN(int opcode, int r8) => [
       Scenario(
-        'LD ${Z80a.r8Names[r8]}, NN',
+        'LD ${Registers.r8Names[r8]}, NN',
         [opcode, 12],
         initialState: State(),
         expectedState: State(
@@ -41,7 +42,7 @@ List<Scenario> ldR8NN(int opcode, int r8) => [
 
 List<Scenario> ldMNNR16(int opcode, int r16, {int prefix}) => [
       Scenario(
-        'LD (NN), ${Z80a.r16Names[r16]}',
+        'LD (NN), ${Registers.r16Names[r16]}',
         [
           if (prefix != null) prefix,
           opcode,
@@ -67,7 +68,7 @@ List<Scenario> ldMNNA(int opcode) => [
           hi(Scenario.RAM_START),
         ],
         initialState: State(
-          register8Values: {Z80a.R_A: 100},
+          register8Values: {Registers.R_A: 100},
           ram: [0],
         ),
         expectedState: State(
@@ -88,7 +89,7 @@ List<Scenario> ldAMNN(int opcode) => [
           ram: [12],
         ),
         expectedState: State(
-          register8Values: {Z80a.R_A: 12},
+          register8Values: {Registers.R_A: 12},
           ram: [12],
         ),
       )
@@ -99,7 +100,7 @@ List<Scenario> ldMHLN(int opcode) => [
         'LD (HL), N',
         [opcode, 12],
         initialState: State(
-          register16Values: {Z80a.R_HL: Scenario.RAM_START},
+          register16Values: {Registers.R_HL: Scenario.RAM_START},
           ram: [0],
         ),
         expectedState: State(
@@ -129,7 +130,7 @@ List<Scenario> ldR16MNN(int opcode, int r16, {int prefix}) => [
 
 List<Scenario> ldR16NN(int opcode, int r16) => [
       Scenario(
-        'LD ${Z80a.r16Names[r16]}, NN',
+        'LD ${Registers.r16Names[r16]}, NN',
         [opcode, 12, 34],
         initialState: State(),
         expectedState: State(
@@ -142,7 +143,7 @@ Scenario changeR16R16Spec(String name, int opcode, int rhxy, int r16,
         int hxyValue, int r16Value, int result, String flags,
         {String inFlags = "", int prefix}) =>
     Scenario(
-      "$name ${Z80a.r16Names[rhxy]}, ${Z80a.r16Names[r16]} => ($hxyValue $r16Value)",
+      "$name ${Registers.r16Names[rhxy]}, ${Registers.r16Names[r16]} => ($hxyValue $r16Value)",
       [...ixyPrefix(rhxy), if (prefix != null) prefix, opcode],
       initialState: State(
         register16Values: {rhxy: hxyValue, r16: r16Value},
@@ -164,7 +165,7 @@ List<Scenario> addHLR16(int opcode, int rhxy, int r16) => [
 Scenario addHLHLSpec(
         int opcode, int rhxy, int hxyValue, int result, String flags) =>
     Scenario(
-      "ADD ${Z80a.r16Names[rhxy]}, ${Z80a.r16Names[rhxy]}",
+      "ADD ${Registers.r16Names[rhxy]}, ${Registers.r16Names[rhxy]}",
       [...ixyPrefix(rhxy), opcode],
       initialState: State(register16Values: {rhxy: hxyValue}),
       expectedState: State(
@@ -180,7 +181,7 @@ List<Scenario> addHLHL(int opcode, int rhxy) => [
 
 Scenario changeR16(String name, int opcode, int rhxy, int value, int result) =>
     Scenario(
-      '$name ${Z80a.r16Names[rhxy]}',
+      '$name ${Registers.r16Names[rhxy]}',
       [...ixyPrefix(rhxy), opcode],
       initialState: State(
         register16Values: {rhxy: value},
@@ -204,7 +205,7 @@ Scenario changeR8R8(
         String name, int opcode, int r8, int value, int result, String flags,
         {String inFlags = "", int prefix}) =>
     Scenario(
-      '$name ${Z80a.r8Names[r8]} ($value $result)',
+      '$name ${Registers.r8Names[r8]} ($value $result)',
       [if (prefix != null) prefix, opcode],
       initialState: State(
         register8Values: {r8: value},
@@ -223,7 +224,7 @@ Scenario changeR8HL(
       '$name (HL)',
       [if (prefix != null) prefix, opcode],
       initialState: State(
-        register16Values: {Z80a.R_HL: Scenario.RAM_START},
+        register16Values: {Registers.R_HL: Scenario.RAM_START},
         ram: [value],
         flags: inFlags,
       ),
@@ -283,20 +284,20 @@ List<Scenario> exAFAFt(int opcode) => [
         'EX AF, AF' '',
         [opcode],
         initialState: State(
-          register16Values: {Z80a.R_AF: 1000, Z80a.R_AFt: 1500},
+          register16Values: {Registers.R_AF: 1000, Registers.R_AFt: 1500},
         ),
         expectedState: State(
-          register16Values: {Z80a.R_AF: 1500, Z80a.R_AFt: 1000},
+          register16Values: {Registers.R_AF: 1500, Registers.R_AFt: 1000},
         ),
       )
     ];
 
 List<Scenario> ldR16A(int opcode, int r16) => [
       Scenario(
-        'LD (${Z80a.r16Names[r16]}), A',
+        'LD (${Registers.r16Names[r16]}), A',
         [opcode],
         initialState: State(
-          register8Values: {Z80a.R_A: 55},
+          register8Values: {Registers.R_A: 55},
           register16Values: {r16: Scenario.RAM_START + 1},
           ram: [0, 0],
         ),
@@ -308,60 +309,60 @@ List<Scenario> ldR16A(int opcode, int r16) => [
 
 List<Scenario> ldAR16(int opcode, int r16) => [
       Scenario(
-        'LD A, (${Z80a.r16Names[r16]})',
+        'LD A, (${Registers.r16Names[r16]})',
         [opcode],
         initialState: State(
           register16Values: {r16: Scenario.RAM_START + 1},
           ram: [0, 55],
         ),
         expectedState: State(
-          register8Values: {Z80a.R_A: 55},
+          register8Values: {Registers.R_A: 55},
           ram: [0, 55],
         ),
       )
     ];
 
 List<Scenario> rlca(int opcode) => [
-      changeR8("RLCA", 0x07, Z80a.R_A, binary("00010011"), binary("00100110"),
-          "~C ~N ~H"),
-      changeR8("RLCA", 0x07, Z80a.R_A, binary("10010011"), binary("00100111"),
-          "C ~N ~H"),
+      changeR8("RLCA", 0x07, Registers.R_A, binary("00010011"),
+          binary("00100110"), "~C ~N ~H"),
+      changeR8("RLCA", 0x07, Registers.R_A, binary("10010011"),
+          binary("00100111"), "C ~N ~H"),
     ];
 
 List<Scenario> rrca(int opcode) => [
-      changeR8("RRCA", 0x0F, Z80a.R_A, binary("10100010"), binary("01010001"),
-          "~C ~N ~H"),
-      changeR8("RRCA", 0x0F, Z80a.R_A, binary("10100011"), binary("11010001"),
-          "C ~N ~H"),
+      changeR8("RRCA", 0x0F, Registers.R_A, binary("10100010"),
+          binary("01010001"), "~C ~N ~H"),
+      changeR8("RRCA", 0x0F, Registers.R_A, binary("10100011"),
+          binary("11010001"), "C ~N ~H"),
     ];
 
 List<Scenario> rla(int opcode) => [
-      changeR8("RLA", 0x17, Z80a.R_A, binary("00100010"), binary("01000100"),
-          "~C ~N ~H",
+      changeR8("RLA", 0x17, Registers.R_A, binary("00100010"),
+          binary("01000100"), "~C ~N ~H",
           inFlags: "~C"),
-      changeR8("RLA", 0x17, Z80a.R_A, binary("10100010"), binary("01000100"),
-          "C ~N ~H",
+      changeR8("RLA", 0x17, Registers.R_A, binary("10100010"),
+          binary("01000100"), "C ~N ~H",
           inFlags: "~C"),
-      changeR8("RLA", 0x17, Z80a.R_A, binary("00100010"), binary("01000101"),
-          "~C ~N ~H",
+      changeR8("RLA", 0x17, Registers.R_A, binary("00100010"),
+          binary("01000101"), "~C ~N ~H",
           inFlags: "C"),
-      changeR8("RLA", 0x17, Z80a.R_A, binary("10100010"), binary("01000101"),
-          "C ~N ~H",
+      changeR8("RLA", 0x17, Registers.R_A, binary("10100010"),
+          binary("01000101"), "C ~N ~H",
           inFlags: "C"),
     ];
 
 List<Scenario> rra(int opcode) => [
-      changeR8("RRA", 0x1F, Z80a.R_A, binary("00100010"), binary("00010001"),
-          "~C ~N ~H",
+      changeR8("RRA", 0x1F, Registers.R_A, binary("00100010"),
+          binary("00010001"), "~C ~N ~H",
           inFlags: "~C"),
-      changeR8("RRA", 0x1F, Z80a.R_A, binary("00100011"), binary("00010001"),
-          "C ~N ~H",
+      changeR8("RRA", 0x1F, Registers.R_A, binary("00100011"),
+          binary("00010001"), "C ~N ~H",
           inFlags: "~C"),
-      changeR8("RRA", 0x1F, Z80a.R_A, binary("00100010"), binary("10010001"),
-          "~C ~N ~H",
+      changeR8("RRA", 0x1F, Registers.R_A, binary("00100010"),
+          binary("10010001"), "~C ~N ~H",
           inFlags: "C"),
-      changeR8("RRA", 0x1F, Z80a.R_A, binary("00100011"), binary("10010001"),
-          "C ~N ~H",
+      changeR8("RRA", 0x1F, Registers.R_A, binary("00100011"),
+          binary("10010001"), "C ~N ~H",
           inFlags: "C"),
     ];
 
@@ -496,7 +497,7 @@ List<Scenario> srlR8(int opcode, int r8) =>
 
 List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
       Scenario(
-        'LD ${Z80a.r8Names[r8Source]}, ${Z80a.r8Names[r8Dest]}',
+        'LD ${Registers.r8Names[r8Source]}, ${Registers.r8Names[r8Dest]}',
         [opcode],
         initialState: State(
           register8Values: {r8Source: 10, r8Dest: r8Source == r8Dest ? 10 : 5},
@@ -509,10 +510,10 @@ List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
 
 List<Scenario> ldR8MHL(int opcode, int r8) => [
       Scenario(
-        'LD ${Z80a.r8Names[r8]}, (HL)',
+        'LD ${Registers.r8Names[r8]}, (HL)',
         [opcode],
         initialState: State(
-          register16Values: {Z80a.R_HL: Scenario.RAM_START},
+          register16Values: {Registers.R_HL: Scenario.RAM_START},
           ram: [12],
         ),
         expectedState: State(
@@ -524,11 +525,11 @@ List<Scenario> ldR8MHL(int opcode, int r8) => [
 
 List<Scenario> ldMHLR8(int opcode, int r8) => [
       Scenario(
-        'LD (HL), ${Z80a.r8Names[r8]}',
+        'LD (HL), ${Registers.r8Names[r8]}',
         [opcode],
         initialState: State(
           register8Values: {r8: 12},
-          register16Values: {Z80a.R_HL: Scenario.RAM_START},
+          register16Values: {Registers.R_HL: Scenario.RAM_START},
           ram: [0],
         ),
         expectedState: State(
@@ -542,7 +543,7 @@ List<Scenario> ldMHLH(int opcode) => [
         'LD (HL), H',
         [opcode],
         initialState: State(
-          register16Values: {Z80a.R_HL: Scenario.RAM_START},
+          register16Values: {Registers.R_HL: Scenario.RAM_START},
           ram: [0],
         ),
         expectedState: State(
@@ -556,7 +557,7 @@ List<Scenario> ldMHLL(int opcode) => [
         'LD (HL), H',
         [opcode],
         initialState: State(
-          register16Values: {Z80a.R_HL: Scenario.RAM_START},
+          register16Values: {Registers.R_HL: Scenario.RAM_START},
           ram: [0],
         ),
         expectedState: State(
@@ -570,12 +571,12 @@ List<Scenario> callNN(int opcode) => [
         "CALL NN",
         [opcode, 12, 34],
         initialState: State(
-          register16Values: {Z80a.R_SP: Scenario.RAM_START + 2},
+          register16Values: {Registers.R_SP: Scenario.RAM_START + 2},
           ram: [0, 0, 0],
           pc: 5,
         ),
         expectedState: State(
-          register16Values: {Z80a.R_SP: Scenario.RAM_START + 0},
+          register16Values: {Registers.R_SP: Scenario.RAM_START + 0},
           ram: [lo(8), hi(8), 0],
           pc: w(12, 34),
         ),
@@ -587,11 +588,11 @@ List<Scenario> ret(int opcode) => [
         "RET",
         [opcode],
         initialState: State(
-          register16Values: {Z80a.R_SP: Scenario.RAM_START + 0},
+          register16Values: {Registers.R_SP: Scenario.RAM_START + 0},
           ram: [lo(12345), hi(12345), 0],
         ),
         expectedState: State(
-            register16Values: {Z80a.R_SP: Scenario.RAM_START + 2},
+            register16Values: {Registers.R_SP: Scenario.RAM_START + 2},
             ram: [lo(12345), hi(12345), 0],
             pc: 12345),
       )
@@ -602,12 +603,12 @@ Scenario callCCNNJump(int opcode, String flag) => Scenario(
       [opcode, 12, 34],
       initialState: State(
         flags: flag,
-        register16Values: {Z80a.R_SP: Scenario.RAM_START + 2},
+        register16Values: {Registers.R_SP: Scenario.RAM_START + 2},
         ram: [0, 0, 0],
         pc: 5,
       ),
       expectedState: State(
-        register16Values: {Z80a.R_SP: Scenario.RAM_START + 0},
+        register16Values: {Registers.R_SP: Scenario.RAM_START + 0},
         ram: [lo(8), hi(8), 0],
         pc: w(12, 34),
       ),
@@ -632,11 +633,11 @@ Scenario retCCJump(int opcode, String flag) => Scenario(
       [opcode],
       initialState: State(
         flags: flag,
-        register16Values: {Z80a.R_SP: Scenario.RAM_START + 0},
+        register16Values: {Registers.R_SP: Scenario.RAM_START + 0},
         ram: [lo(12345), hi(12345), 0],
       ),
       expectedState: State(
-          register16Values: {Z80a.R_SP: Scenario.RAM_START + 2},
+          register16Values: {Registers.R_SP: Scenario.RAM_START + 2},
           ram: [lo(12345), hi(12345), 0],
           pc: 12345),
     );
@@ -693,15 +694,15 @@ List<Scenario> jpNN(int opcode) => [
 
 List<Scenario> popR16(int opcode, int rhxy) => [
       Scenario(
-        'POP ${Z80a.r16Names[rhxy]}',
+        'POP ${Registers.r16Names[rhxy]}',
         [...ixyPrefix(rhxy), opcode],
         initialState: State(
-          register16Values: {Z80a.R_SP: Scenario.RAM_START + 0},
+          register16Values: {Registers.R_SP: Scenario.RAM_START + 0},
           ram: [lo(12345), hi(12345), 0],
         ),
         expectedState: State(
           register16Values: {
-            Z80a.R_SP: Scenario.RAM_START + 2,
+            Registers.R_SP: Scenario.RAM_START + 2,
             rhxy: 12345,
           },
           ram: [lo(12345), hi(12345), 0],
@@ -715,22 +716,22 @@ List<Scenario> exx(int opcode) => [
         [opcode],
         initialState: State(
           register16Values: {
-            Z80a.R_BC: 10000,
-            Z80a.R_DE: 20000,
-            Z80a.R_HL: 30000,
-            Z80a.R_BCt: 11111,
-            Z80a.R_DEt: 22222,
-            Z80a.R_HLt: 33333,
+            Registers.R_BC: 10000,
+            Registers.R_DE: 20000,
+            Registers.R_HL: 30000,
+            Registers.R_BCt: 11111,
+            Registers.R_DEt: 22222,
+            Registers.R_HLt: 33333,
           },
         ),
         expectedState: State(
           register16Values: {
-            Z80a.R_BC: 11111,
-            Z80a.R_DE: 22222,
-            Z80a.R_HL: 33333,
-            Z80a.R_BCt: 10000,
-            Z80a.R_DEt: 20000,
-            Z80a.R_HLt: 30000,
+            Registers.R_BC: 11111,
+            Registers.R_DE: 22222,
+            Registers.R_HL: 33333,
+            Registers.R_BCt: 10000,
+            Registers.R_DEt: 20000,
+            Registers.R_HLt: 30000,
           },
         ),
       ),
@@ -738,18 +739,18 @@ List<Scenario> exx(int opcode) => [
 
 List<Scenario> pushR16(int opcode, int rhxy) => [
       Scenario(
-        'PUSH ${Z80a.r16Names[rhxy]}',
+        'PUSH ${Registers.r16Names[rhxy]}',
         [...ixyPrefix(rhxy), opcode],
         initialState: State(
           register16Values: {
             rhxy: 10000,
-            Z80a.R_SP: Scenario.RAM_START + 2,
+            Registers.R_SP: Scenario.RAM_START + 2,
           },
           ram: [0, 0, 0],
         ),
         expectedState: State(
           register16Values: {
-            Z80a.R_SP: Scenario.RAM_START + 0,
+            Registers.R_SP: Scenario.RAM_START + 0,
           },
           ram: [lo(10000), hi(10000), 0],
         ),
@@ -762,14 +763,14 @@ List<Scenario> rstNN(int opcode, int rst) => [
         [opcode],
         initialState: State(
           register16Values: {
-            Z80a.R_SP: Scenario.RAM_START + 2,
+            Registers.R_SP: Scenario.RAM_START + 2,
           },
           ram: [0, 0, 0],
           pc: 5,
         ),
         expectedState: State(
           register16Values: {
-            Z80a.R_SP: Scenario.RAM_START + 0,
+            Registers.R_SP: Scenario.RAM_START + 0,
           },
           ram: [lo(6), hi(6), 0],
           pc: rst,
@@ -781,10 +782,10 @@ Scenario djnzNJump(int opcode) => Scenario(
       "DJNZ n",
       [opcode, 10],
       initialState: State(
-        register8Values: {Z80a.R_B: 1},
+        register8Values: {Registers.R_B: 1},
       ),
       expectedState: State(
-        register8Values: {Z80a.R_B: 0},
+        register8Values: {Registers.R_B: 0},
         pc: 12,
       ),
     );
@@ -793,10 +794,10 @@ Scenario djnzNNotJump(int opcode) => Scenario(
       "DJNZ n",
       [opcode, 10],
       initialState: State(
-        register8Values: {Z80a.R_B: 5},
+        register8Values: {Registers.R_B: 5},
       ),
       expectedState: State(
-        register8Values: {Z80a.R_B: 4},
+        register8Values: {Registers.R_B: 4},
       ),
     );
 
@@ -837,10 +838,10 @@ List<Scenario> jrCCNN(int opcode, String flag, bool jumpIfSet) => [
 
 Scenario cplN(int opcode, int value, int result) => Scenario("CPL", [opcode],
     initialState: State(
-      register8Values: {Z80a.R_A: value},
+      register8Values: {Registers.R_A: value},
     ),
     expectedState: State(
-      register8Values: {Z80a.R_A: result},
+      register8Values: {Registers.R_A: result},
     ));
 
 List<Scenario> cpl(int opcode) => [
@@ -871,18 +872,18 @@ Scenario r8r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
         int result, String flags,
         {String inFlags = ""}) =>
     Scenario(
-      '$name ${Z80a.r8Names[r8]} -> ($aValue)',
+      '$name ${Registers.r8Names[r8]} -> ($aValue)',
       [opcode],
       initialState: State(
         register8Values: {
-          Z80a.R_A: aValue,
+          Registers.R_A: aValue,
           r8: r8Value,
         },
         flags: inFlags,
       ),
       expectedState: State(
         register8Values: {
-          Z80a.R_A: result,
+          Registers.R_A: result,
         },
         flags: flags,
       ),
@@ -896,15 +897,15 @@ Scenario r8HLOperation(String name, int opcode, int aValue, int mhlValue,
       [opcode],
       initialState: State(
         register8Values: {
-          Z80a.R_A: aValue,
+          Registers.R_A: aValue,
         },
-        register16Values: {Z80a.R_HL: Scenario.RAM_START},
+        register16Values: {Registers.R_HL: Scenario.RAM_START},
         ram: [mhlValue],
         flags: inFlags,
       ),
       expectedState: State(
         register8Values: {
-          Z80a.R_A: result,
+          Registers.R_A: result,
         },
         ram: [mhlValue],
         flags: flags,
@@ -915,11 +916,11 @@ Scenario r8IXYOperation(String name, int opcode, int rxy, int aValue,
         int mxyValue, int result, String flags,
         {String inFlags = ""}) =>
     Scenario(
-      '$name (${Z80a.r16Names[rxy]} + d) -> ($aValue)',
+      '$name (${Registers.r16Names[rxy]} + d) -> ($aValue)',
       [...ixyPrefix(rxy), opcode, 1],
       initialState: State(
         register8Values: {
-          Z80a.R_A: aValue,
+          Registers.R_A: aValue,
         },
         register16Values: {rxy: Scenario.RAM_START},
         ram: [0, mxyValue],
@@ -927,7 +928,7 @@ Scenario r8IXYOperation(String name, int opcode, int rxy, int aValue,
       ),
       expectedState: State(
         register8Values: {
-          Z80a.R_A: result,
+          Registers.R_A: result,
         },
         ram: [0, mxyValue],
         flags: flags,
@@ -946,7 +947,7 @@ Scenario r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
             : r8r8Operation(name, opcode, r8, aValue, r8Value, result, flags,
                 inFlags: inFlags);
 
-List<Scenario> addAR8(int opcode, int r8) => r8 == Z80a.R_A
+List<Scenario> addAR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
         r8Operation("ADD A,", opcode, r8, 10, 10, 20, "~S ~Z H ~P ~N ~C"),
         r8Operation("ADD A,", opcode, r8, 7, 7, 14, "~S ~Z ~H ~P ~N ~C"),
@@ -958,7 +959,7 @@ List<Scenario> addAR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("ADD A,", opcode, r8, 254, 2, 0, "~S Z H ~P ~N C"),
       ];
 
-List<Scenario> adcAR8(int opcode, int r8) => r8 == Z80a.R_A
+List<Scenario> adcAR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
         r8Operation("ADC A,", opcode, r8, 10, 10, 20, "~S ~Z H ~P ~N ~C",
             inFlags: "~C"),
@@ -988,7 +989,7 @@ List<Scenario> adcAR8(int opcode, int r8) => r8 == Z80a.R_A
             inFlags: "C"),
       ];
 
-List<Scenario> subAR8(int opcode, int r8) => r8 == Z80a.R_A
+List<Scenario> subAR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
         r8Operation("SUB", opcode, r8, 20, 20, 0, "~S Z ~H N ~P ~C"),
         r8Operation("SUB", opcode, r8, 128, 128, 0, "~S Z ~H N ~P ~C"),
@@ -1001,7 +1002,7 @@ List<Scenario> subAR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("SUB", opcode, r8, 3, 5, 254, "S ~Z H N ~P C"),
       ];
 
-List<Scenario> sbcAR8(int opcode, int r8) => r8 == Z80a.R_A
+List<Scenario> sbcAR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
         r8Operation("SBC A,", opcode, r8, 10, 10, 0, "~S Z ~H ~P N ~C",
             inFlags: "~C"),
@@ -1037,7 +1038,7 @@ List<Scenario> sbcAR8(int opcode, int r8) => r8 == Z80a.R_A
             inFlags: "C"),
       ];
 
-List<Scenario> andR8(int opcode, int r8) => r8 == Z80a.R_A
+List<Scenario> andR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
         r8Operation("AND", opcode, r8, 0x07, 0x07, 0x07, "~S ~Z ~H P ~N ~C"),
         r8Operation("AND", opcode, r8, 0x00, 0x00, 0x00, "~S Z ~H ~P ~N ~C"),
@@ -1048,7 +1049,7 @@ List<Scenario> andR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("AND", opcode, r8, 0x03, 0x04, 0x00, "~S Z ~H ~P ~N ~C"),
       ];
 
-List<Scenario> xorR8(int opcode, int r8) => r8 == Z80a.R_A
+List<Scenario> xorR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
         r8Operation("XOR", opcode, r8, 0x07, 0x07, 0x00, "~S Z ~H ~P ~N ~C"),
         r8Operation("XOR", opcode, r8, 0x90, 0x90, 0x00, "~S Z ~H ~P ~N ~C"),
@@ -1058,7 +1059,7 @@ List<Scenario> xorR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("XOR", opcode, r8, 0x03, 0x81, 0x82, "S ~Z ~H ~P ~N ~C"),
       ];
 
-List<Scenario> orR8(int opcode, int r8) => r8 == Z80a.R_A
+List<Scenario> orR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
         r8Operation("OR", opcode, r8, 0x00, 0x00, 0x00, "~S Z ~H ~P ~N ~C"),
         r8Operation("OR", opcode, r8, 0x07, 0x07, 0x07, "~S ~Z ~H P ~N ~C"),
@@ -1069,7 +1070,7 @@ List<Scenario> orR8(int opcode, int r8) => r8 == Z80a.R_A
         r8Operation("OR", opcode, r8, 0x02, 0x81, 0x83, "S ~Z ~H P ~N ~C"),
       ];
 
-List<Scenario> cpR8(int opcode, int r8) => r8 == Z80a.R_A
+List<Scenario> cpR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
         r8Operation("CP", opcode, r8, 20, 20, 20, "~S Z ~H ~P N ~C"),
         r8Operation("CP", opcode, r8, 128, 128, 128, "~S Z ~H ~P N ~C"),
@@ -1089,13 +1090,13 @@ Scenario nOperation(String name, int opcode, int aValue, int nValue, int result,
       [opcode, nValue],
       initialState: State(
         register8Values: {
-          Z80a.R_A: aValue,
+          Registers.R_A: aValue,
         },
         flags: inFlags,
       ),
       expectedState: State(
         register8Values: {
-          Z80a.R_A: result,
+          Registers.R_A: result,
         },
         flags: flags,
       ),
@@ -1157,10 +1158,10 @@ List<Scenario> cpN(int opcode) => [
 
 List<Scenario> exMSPHL(int opcode, int rhxy) => [
       Scenario(
-        "EX (SP), ${Z80a.r16Names[rhxy]}",
+        "EX (SP), ${Registers.r16Names[rhxy]}",
         [...ixyPrefix(rhxy), opcode],
         initialState: State(
-          register16Values: {Z80a.R_SP: Scenario.RAM_START, rhxy: 10000},
+          register16Values: {Registers.R_SP: Scenario.RAM_START, rhxy: 10000},
           ram: [12, 34],
         ),
         expectedState: State(
@@ -1174,7 +1175,7 @@ List<Scenario> exMSPHL(int opcode, int rhxy) => [
 
 List<Scenario> jpMHL(int opcode, int rhxy) => [
       Scenario(
-        "JP (${Z80a.r16Names[rhxy]})",
+        "JP (${Registers.r16Names[rhxy]})",
         [...ixyPrefix(rhxy), opcode],
         initialState: State(
           register16Values: {
@@ -1195,14 +1196,14 @@ List<Scenario> exDEHL(int opcode) => [
         [opcode],
         initialState: State(
           register16Values: {
-            Z80a.R_DE: 10000,
-            Z80a.R_HL: 20000,
+            Registers.R_DE: 10000,
+            Registers.R_HL: 20000,
           },
         ),
         expectedState: State(
           register16Values: {
-            Z80a.R_DE: 20000,
-            Z80a.R_HL: 10000,
+            Registers.R_DE: 20000,
+            Registers.R_HL: 10000,
           },
         ),
       )
@@ -1210,7 +1211,7 @@ List<Scenario> exDEHL(int opcode) => [
 
 List<Scenario> ldSPHL(int opcode, int rhxy) => [
       Scenario(
-        "LD SP, ${Z80a.r16Names[rhxy]}",
+        "LD SP, ${Registers.r16Names[rhxy]}",
         [...ixyPrefix(rhxy), opcode],
         initialState: State(
           register16Values: {
@@ -1219,7 +1220,7 @@ List<Scenario> ldSPHL(int opcode, int rhxy) => [
         ),
         expectedState: State(
           register16Values: {
-            Z80a.R_SP: 10000,
+            Registers.R_SP: 10000,
           },
         ),
       )
@@ -1240,7 +1241,7 @@ List<Scenario> ldIXYNN(int opcode, int rxy) => [
 
 List<Scenario> ldMNNIXY(int opcode, int rxy) => [
       Scenario(
-        "LD (NN), ${Z80a.r16Names[rxy]}",
+        "LD (NN), ${Registers.r16Names[rxy]}",
         [
           ...ixyPrefix(rxy),
           opcode,
@@ -1261,7 +1262,7 @@ List<Scenario> ldMNNIXY(int opcode, int rxy) => [
 
 List<Scenario> ldIXYMN(int opcode, rxy) => [
       Scenario(
-        'LD ${Z80a.r16Names[rxy]}, (NN)',
+        'LD ${Registers.r16Names[rxy]}, (NN)',
         [
           ...ixyPrefix(rxy),
           opcode,
@@ -1280,7 +1281,7 @@ List<Scenario> ldIXYMN(int opcode, rxy) => [
 
 List<Scenario> ldMIXYdN(int opcode, rxy) => [
       Scenario(
-        'LD ${Z80a.r16Names[rxy]}, (NN)',
+        'LD ${Registers.r16Names[rxy]}, (NN)',
         [...ixyPrefix(rxy), opcode, 1, 12],
         initialState: State(
           register16Values: {rxy: Scenario.RAM_START},
@@ -1294,7 +1295,7 @@ List<Scenario> ldMIXYdN(int opcode, rxy) => [
 
 List<Scenario> ldR8MIXYd(int opcode, int r8, int rxy) => [
       Scenario(
-        'LD ${Z80a.r8Names[r8]}, (${Z80a.r16Names[rxy]} + d)',
+        'LD ${Registers.r8Names[r8]}, (${Registers.r16Names[rxy]} + d)',
         [...ixyPrefix(rxy), opcode, 1],
         initialState: State(
           register16Values: {rxy: Scenario.RAM_START},
@@ -1309,7 +1310,7 @@ List<Scenario> ldR8MIXYd(int opcode, int r8, int rxy) => [
 
 List<Scenario> ldMIXYdR8(int opcode, int r8, int rxy) => [
       Scenario(
-        'LD (${Z80a.r16Names[rxy]} + d), ${Z80a.r8Names[r8]}',
+        'LD (${Registers.r16Names[rxy]} + d), ${Registers.r8Names[r8]}',
         [...ixyPrefix(rxy), opcode, 1],
         initialState: State(
           register16Values: {rxy: Scenario.RAM_START},
@@ -1323,10 +1324,10 @@ List<Scenario> ldMIXYdR8(int opcode, int r8, int rxy) => [
     ];
 
 Scenario inR8CSpec(int opcode, int r8, int value, String flags) => Scenario(
-      'IN ${Z80a.r8Names[r8]}, (C) => ($value)',
+      'IN ${Registers.r8Names[r8]}, (C) => ($value)',
       [0xED, opcode],
       initialState: State(
-        register8Values: {Z80a.R_C: 254},
+        register8Values: {Registers.R_C: 254},
         ports: {254: value},
       ),
       expectedState: State(
@@ -1343,13 +1344,16 @@ List<Scenario> inR8C(int opcode, int r8) => [
 
 List<Scenario> outCR8(int opcode, int r8) => [
       Scenario(
-        'OUT (C) ${Z80a.r8Names[r8]}',
+        'OUT (C) ${Registers.r8Names[r8]}',
         [0xED, opcode],
         initialState: State(
-          register8Values: {Z80a.R_C: 254, r8: r8 == Z80a.R_C ? 254 : 12},
+          register8Values: {
+            Registers.R_C: 254,
+            r8: r8 == Registers.R_C ? 254 : 12
+          },
         ),
         expectedState: State(
-          ports: {254: r8 == Z80a.R_C ? 254 : 12},
+          ports: {254: r8 == Registers.R_C ? 254 : 12},
         ),
       )
     ];
@@ -1359,7 +1363,7 @@ List<Scenario> outNA(int opcode) => [
         'OUT (N), A',
         [opcode, 253],
         initialState: State(
-          register8Values: {Z80a.R_A: 12},
+          register8Values: {Registers.R_A: 12},
         ),
         expectedState: State(
           ports: {253: 12},
@@ -1375,77 +1379,77 @@ List<Scenario> inAN(int opcode) => [
           ports: {253: 12},
         ),
         expectedState: State(
-          register8Values: {Z80a.R_A: 12},
+          register8Values: {Registers.R_A: 12},
         ),
       )
     ];
 
-List<Scenario> sbcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
+List<Scenario> sbcHLR16(int opcode, int r16) => r16 == Registers.R_HL
     ? [
-        changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 0, "~S Z ~H ~P N ~C",
+        changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000, 0,
+            "~S Z ~H ~P N ~C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 65535, "S ~Z H P N C",
+        changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000,
+            65535, "S ~Z H P N C",
             inFlags: "C", prefix: 0xED),
       ]
     : [
-        changeR16R16Spec("SBC", opcode, Z80a.R_HL, r16, 30000, 12000, 18000,
-            "~S ~Z H ~P N ~C",
+        changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 12000,
+            18000, "~S ~Z H ~P N ~C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 0, "~S Z ~H ~P N ~C",
+        changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000, 0,
+            "~S Z ~H ~P N ~C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 40000, 55536, "S ~Z H ~P N C",
+        changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 40000,
+            55536, "S ~Z H ~P N C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec("SBC", opcode, Z80a.R_HL, r16, 30000, 12000, 17999,
-            "~S ~Z H ~P N ~C",
+        changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 12000,
+            17999, "~S ~Z H ~P N ~C",
             inFlags: "C", prefix: 0xED),
-        changeR16R16Spec(
-            "SBC", opcode, Z80a.R_HL, r16, 30000, 30000, 65535, "S ~Z H P N C",
+        changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000,
+            65535, "S ~Z H P N C",
             inFlags: "C", prefix: 0xED),
       ];
 
-List<Scenario> adcHLR16(int opcode, int r16) => r16 == Z80a.R_HL
+List<Scenario> adcHLR16(int opcode, int r16) => r16 == Registers.R_HL
     ? [
-        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 40000, 40000, 14464,
-            "~S ~Z H P ~N C",
+        changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 40000, 40000,
+            14464, "~S ~Z H P ~N C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec(
-            "ADC", opcode, Z80a.R_HL, r16, 32768, 32768, 0, "~S Z ~H P ~N C",
+        changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 32768, 32768, 0,
+            "~S Z ~H P ~N C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 10000, 10000, 20001,
-            "~S ~Z ~H ~P ~N ~C",
+        changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 10000, 10000,
+            20001, "~S ~Z ~H ~P ~N ~C",
             inFlags: "C", prefix: 0xED),
       ]
     : [
-        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 20000, 12000, 32000,
-            "~S ~Z H ~P ~N ~C",
+        changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 20000, 12000,
+            32000, "~S ~Z H ~P ~N ~C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 30000, 20000, 50000,
-            "S ~Z H P ~N ~C",
+        changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 30000, 20000,
+            50000, "S ~Z H P ~N ~C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 30000, 42000, 6464,
+        changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 30000, 42000, 6464,
             "~S ~Z ~H ~P ~N C",
             inFlags: "~C", prefix: 0xED),
-        changeR16R16Spec("ADC", opcode, Z80a.R_HL, r16, 30000, 42000, 6465,
+        changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 30000, 42000, 6465,
             "~S ~Z ~H ~P ~N C",
             inFlags: "C", prefix: 0xED),
       ];
 
 List<Scenario> neg(int opcode) => [
-      changeR8("NEG", opcode, Z80a.R_A, 3, 253, "S ~Z H ~P N C",
+      changeR8("NEG", opcode, Registers.R_A, 3, 253, "S ~Z H ~P N C",
           prefix: Z80a.EXTENDED_OPCODES),
-      changeR8("NEG", opcode, Z80a.R_A, 0, 0, "~S Z ~H ~P N ~C",
+      changeR8("NEG", opcode, Registers.R_A, 0, 0, "~S Z ~H ~P N ~C",
           prefix: Z80a.EXTENDED_OPCODES),
-      changeR8("NEG", opcode, Z80a.R_A, 0x80, 0x80, "S ~Z H P N C",
+      changeR8("NEG", opcode, Registers.R_A, 0x80, 0x80, "S ~Z H P N C",
           prefix: Z80a.EXTENDED_OPCODES),
     ];
 
 Scenario bitNR8R8Spec(int opcode, int bit, int r8, int value, String flags) =>
     Scenario(
-      "BIT $bit, ${Z80a.r8Names[r8]} (${toBinary8(value)})",
+      "BIT $bit, ${Registers.r8Names[r8]} (${toBinary8(value)})",
       [Z80a.BIT_OPCODES, opcode],
       initialState: State(
         register8Values: {r8: value},
@@ -1457,7 +1461,7 @@ Scenario bitNR8HLSpec(int opcode, int bit, int value, String flags) => Scenario(
       "BIT $bit, (HL) (${toBinary8(value)})",
       [Z80a.BIT_OPCODES, opcode],
       initialState: State(
-        register16Values: {Z80a.R_HL: Scenario.RAM_START + 1},
+        register16Values: {Registers.R_HL: Scenario.RAM_START + 1},
         ram: [0, value],
       ),
       expectedState: State(

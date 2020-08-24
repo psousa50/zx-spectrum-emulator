@@ -14,7 +14,7 @@ void main() {
         z80a.memory.poke(2, 0);
         z80a.memory.poke(3, 0);
         z80a.PC = 0;
-        z80a.SP = 9;
+        z80a.registers.SP = 9;
         if (!z80a.step()) {
           print('Opcode ${opcode.toRadixString(16)} not processed');
         }
@@ -28,7 +28,7 @@ void main() {
           z80a.memory.poke(0, Z80a.BIT_OPCODES);
           z80a.memory.poke(1, opcode);
           z80a.PC = 0;
-          z80a.SP = 9;
+          z80a.registers.SP = 9;
           if (!z80a.step()) {
             print('Opcode ${opcode.toRadixString(16)} not processed');
           }
