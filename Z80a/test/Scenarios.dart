@@ -495,9 +495,9 @@ List<Scenario> sraR8(int opcode, int r8) =>
 List<Scenario> srlR8(int opcode, int r8) =>
     srlR8Spec("SRL", opcode, r8, prefix: Z80a.BIT_OPCODES);
 
-List<Scenario> ldR8R8(int opcode, int r8Source, int r8Dest) => [
+List<Scenario> ldR8R8(int opcode, int r8Dest, int r8Source) => [
       Scenario(
-        'LD ${Registers.r8Names[r8Source]}, ${Registers.r8Names[r8Dest]}',
+        'LD ${Registers.r8Names[r8Dest]}, ${Registers.r8Names[r8Source]}',
         [opcode],
         initialState: State(
           register8Values: {r8Source: 10, r8Dest: r8Source == r8Dest ? 10 : 5},

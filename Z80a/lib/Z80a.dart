@@ -75,6 +75,23 @@ class Z80Instructions {
     }
   }
 
+  void addR8R8(int opcode, String name, OpcodeHandler handler, int tStates) {
+    for (var r1 = 0; r1 < 8; r1++) {
+      var rSource = r8Table[r1];
+      for (var r2 = 0; r2 < 8; r2++) {
+        var rDest = r8Table[r2];
+        add(
+          opcode + r1 * 8 + r2,
+          name
+              .replaceAll("[rDest]", Registers.r8Names[rDest])
+              .replaceAll("[rSource]", Registers.r8Names[rSource]),
+          handler,
+          tStates + (rSource == Z80a.R_MHL || rDest == Z80a.R_MHL ? 3 : 0),
+        );
+      }
+    }
+  }
+
   void addR16(int opcode, String name, OpcodeHandler handler, int tStates,
       {int multiplier = 1}) {
     for (var i = 0; i < 4; i++) {
@@ -468,173 +485,6 @@ class Z80a {
     var processed = true;
 
     switch (opcode) {
-      case 0x08: // EX AF, AF'
-        final af = registers.AF;
-        registers.AF = registers.AFt;
-        registers.AFt = af;
-        break;
-
-      case 0x06: // LD B, n
-      case 0x0E: // LD C, n
-      case 0x16: // LD D, n
-      case 0x1E: // LD E, n
-      case 0x26: // LD H, n
-      case 0x2E: // LD L, n
-      case 0x3E: // LD A, n
-        int r8 = r8Table[(opcode & 0x38) >> 3];
-        setReg(r8, fetch());
-        break;
-
-      case 0x46: // LD B, (HL)
-      case 0x4E: // LD C, (HL)
-      case 0x56: // LD D, (HL)
-      case 0x5E: // LD E, (HL)
-      case 0x66: // LD H, (HL)
-      case 0x6E: // LD L, (HL)
-      case 0x7E: // LD A, (HL)
-        int r8 = r8Table[(opcode & 0x38) >> 3];
-        setReg(r8, this.memory.peek(registers.HL));
-        break;
-
-      case 0x70: // LD (HL), B
-      case 0x71: // LD (HL), C
-      case 0x72: // LD (HL), D
-      case 0x73: // LD (HL), E
-      case 0x74: // LD (HL), H
-      case 0x75: // LD (HL), L
-      case 0x77: // LD (HL), A
-        int r8 = r8Table[opcode & 0x07];
-        this.memory.poke(registers.HL, getReg(r8));
-        break;
-
-      // case 0x80: // ADD A, B
-      // case 0x81: // ADD A, C
-      // case 0x82: // ADD A, D
-      // case 0x83: // ADD A, E
-      // case 0x84: // ADD A, H
-      // case 0x85: // ADD A, L
-      // case 0x86: // ADD A, (HL)
-      // case 0x87: // ADD A, A
-      //   int r8 = r8Table[opcode & 0x07];
-      //   registers.A = addA(getReg(r8));
-      //   break;
-
-      // case 0x88: // ADC A, B
-      // case 0x89: // ADC A, C
-      // case 0x8A: // ADC A, D
-      // case 0x8B: // ADC A, E
-      // case 0x8C: // ADC A, H
-      // case 0x8D: // ADC A, L
-      // case 0x8E: // ADC A, (HL)
-      // case 0x8F: // ADC A, A
-      //   int r8 = r8Table[opcode & 0x07];
-      //   registers.A = adcA(getReg(r8));
-      //   break;
-
-      // case 0x90: // SUB B
-      // case 0x91: // SUB C
-      // case 0x92: // SUB D
-      // case 0x93: // SUB E
-      // case 0x94: // SUB H
-      // case 0x95: // SUB L
-      // case 0x96: // SUB (HL)
-      // case 0x97: // SUB A
-      //   int r8 = r8Table[opcode & 0x07];
-      //   registers.A = subA(getReg(r8));
-      //   break;
-
-      case 0x98: // SBC A, B
-      case 0x99: // SBC A, C
-      case 0x9A: // SBC A, D
-      case 0x9B: // SBC A, E
-      case 0x9C: // SBC A, H
-      case 0x9D: // SBC A, L
-      case 0x9E: // SBC A, (HL)
-      case 0x9F: // SBC A, A
-        int r8 = r8Table[opcode & 0x07];
-        registers.A = sbcA(getReg(r8));
-        break;
-
-      case 0xA0: // AND B
-      case 0xA1: // AND C
-      case 0xA2: // AND D
-      case 0xA3: // AND E
-      case 0xA4: // AND H
-      case 0xA5: // AND L
-      case 0xA6: // AND (HL)
-      case 0xA7: // AND A
-        int r8 = r8Table[opcode & 0x07];
-        registers.A = andA(getReg(r8));
-        break;
-
-      case 0xA8: // XOR B
-      case 0xA9: // XOR C
-      case 0xAA: // XOR D
-      case 0xAB: // XOR E
-      case 0xAC: // XOR H
-      case 0xAD: // XOR L
-      case 0xAE: // XOR (HL)
-      case 0xAF: // XOR A
-        int r8 = r8Table[opcode & 0x07];
-        registers.A = xorA(getReg(r8));
-        break;
-
-      case 0xB0: // OR B
-      case 0xB1: // OR C
-      case 0xB2: // OR D
-      case 0xB3: // OR E
-      case 0xB4: // OR H
-      case 0xB5: // OR L
-      case 0xB6: // OR (HL)
-      case 0xB7: // OR A
-        int r8 = r8Table[opcode & 0x07];
-        registers.A = orA(getReg(r8));
-        break;
-
-      case 0xB8: // CP B
-      case 0xB9: // CP C
-      case 0xBA: // CP D
-      case 0xBB: // CP E
-      case 0xBC: // CP H
-      case 0xBD: // CP L
-      case 0xBE: // CP (HL)
-      case 0xBF: // CP A
-        int r8 = r8Table[opcode & 0x07];
-        subA(getReg(r8));
-        break;
-
-      case 0xC6: // ADD A, N
-        registers.A = addA(fetch());
-        break;
-
-      case 0xCE: // ADC A, N
-        registers.A = adcA(fetch());
-        break;
-
-      case 0xD6: // SUB N
-        registers.A = subA(fetch());
-        break;
-
-      case 0xDE: // SBC A, N
-        registers.A = sbcA(fetch());
-        break;
-
-      case 0xE6: // AND A, N
-        registers.A = andA(fetch());
-        break;
-
-      case 0xEE: // XOR N
-        registers.A = xorA(fetch());
-        break;
-
-      case 0xF6: // OR N
-        registers.A = orA(fetch());
-        break;
-
-      case 0xFE: // CP N
-        cpA(fetch());
-        break;
-
       case 0x22: // LD (nn), HL
         this.memory.poke2(fetch2(), registers.HL);
         break;
@@ -654,14 +504,6 @@ class Z80a {
 
       case 0x3A: // LD A, (NN)
         registers.A = this.memory.peek(fetch2());
-        break;
-
-      case 0x01: // LD BC, nn
-      case 0x11: // LD DE, nn
-      case 0x21: // LD HL, nn
-      case 0x31: // LD SP, nn
-        int r16 = r16SPTable[(opcode & 0x30) >> 4];
-        setReg2(r16, fetch2());
         break;
 
       case 0x03: // INC BC
@@ -754,60 +596,6 @@ class Z80a {
 
       case 0x3F: // CCF
         registers.F = registers.F & ~Registers.F_ADD_SUB ^ Registers.F_CARRY;
-        break;
-
-      case 0x40: // LD B, B
-      case 0x41: // LD B, C
-      case 0x42: // LD B, D
-      case 0x43: // LD B, E
-      case 0x44: // LD B, H
-      case 0x45: // LD B, L
-      case 0x47: // LD B, A
-      case 0x48: // LD C, B
-      case 0x49: // LD C, C
-      case 0x4A: // LD C, D
-      case 0x4B: // LD C, E
-      case 0x4C: // LD C, H
-      case 0x4D: // LD C, L
-      case 0x4F: // LD C, A
-      case 0x50: // LD D, B
-      case 0x51: // LD D, C
-      case 0x52: // LD D, D
-      case 0x53: // LD D, E
-      case 0x54: // LD D, H
-      case 0x55: // LD D, L
-      case 0x57: // LD D, A
-      case 0x58: // LD E, B
-      case 0x59: // LD E, C
-      case 0x5A: // LD E, D
-      case 0x5B: // LD E, E
-      case 0x5C: // LD E, H
-      case 0x5D: // LD E, L
-      case 0x5F: // LD E, A
-      case 0x60: // LD H, B
-      case 0x61: // LD H, C
-      case 0x62: // LD H, D
-      case 0x63: // LD H, E
-      case 0x64: // LD H, H
-      case 0x65: // LD H, L
-      case 0x67: // LD H, A
-      case 0x68: // LD L, B
-      case 0x69: // LD L, C
-      case 0x6A: // LD L, D
-      case 0x6B: // LD L, E
-      case 0x6C: // LD L, H
-      case 0x6D: // LD L, L
-      case 0x6F: // LD L, A
-      case 0x78: // LD A, B
-      case 0x79: // LD A, C
-      case 0x7A: // LD A, D
-      case 0x7B: // LD A, E
-      case 0x7C: // LD A, H
-      case 0x7D: // LD A, L
-      case 0x7F: // LD A, A
-        int r8Source = r8Table[(opcode & 0x38) >> 3];
-        int r8Dest = r8Table[(opcode & 0x07)];
-        this.setReg(r8Dest, getReg(r8Source));
         break;
 
       case 0xCD: // CALL NN
@@ -1541,6 +1329,27 @@ class Z80a {
 
   void nop({int opcode}) {}
 
+  void exAFAFq({int opcode}) {
+    final af = registers.AF;
+    registers.AF = registers.AFt;
+    registers.AFt = af;
+  }
+
+  void ldR8n({int opcode}) {
+    int r8 = r8Table[(opcode & 0x38) >> 3];
+    setReg(r8, fetch());
+  }
+
+  void ldR8MHL({int opcode}) {
+    int r8 = r8Table[(opcode & 0x38) >> 3];
+    setReg(r8, this.memory.peek(registers.HL));
+  }
+
+  void ldMHLR8({int opcode}) {
+    int r8 = r8Table[opcode & 0x07];
+    this.memory.poke(registers.HL, getReg(r8));
+  }
+
   void addAR8({int opcode}) {
     int r8 = r8Table[opcode & 0x07];
     registers.A = addA(getReg(r8));
@@ -1554,6 +1363,74 @@ class Z80a {
   void subAR8({int opcode}) {
     int r8 = r8Table[opcode & 0x07];
     registers.A = subA(getReg(r8));
+  }
+
+  void sbcAR8({int opcode}) {
+    int r8 = r8Table[opcode & 0x07];
+    registers.A = sbcA(getReg(r8));
+  }
+
+  void andAR8({int opcode}) {
+    int r8 = r8Table[opcode & 0x07];
+    registers.A = andA(getReg(r8));
+  }
+
+  void xorAR8({int opcode}) {
+    int r8 = r8Table[opcode & 0x07];
+    registers.A = xorA(getReg(r8));
+  }
+
+  void orAR8({int opcode}) {
+    int r8 = r8Table[opcode & 0x07];
+    registers.A = orA(getReg(r8));
+  }
+
+  void cpAR8({int opcode}) {
+    int r8 = r8Table[opcode & 0x07];
+    subA(getReg(r8));
+  }
+
+  void addAN({int opcode}) {
+    registers.A = addA(fetch());
+  }
+
+  void adcAN({int opcode}) {
+    registers.A = adcA(fetch());
+  }
+
+  void subAN({int opcode}) {
+    registers.A = subA(fetch());
+  }
+
+  void sbcAN({int opcode}) {
+    registers.A = sbcA(fetch());
+  }
+
+  void andAN({int opcode}) {
+    registers.A = andA(fetch());
+  }
+
+  void xorAN({int opcode}) {
+    registers.A = xorA(fetch());
+  }
+
+  void orAN({int opcode}) {
+    registers.A = orA(fetch());
+  }
+
+  void cpAN({int opcode}) {
+    cpA(fetch());
+  }
+
+  void ldR8R8({int opcode}) {
+    int r8Dest = r8Table[(opcode & 0x38) >> 3];
+    int r8Source = r8Table[(opcode & 0x07)];
+    this.setReg(r8Dest, getReg(r8Source));
+  }
+
+  void ldR16nn({int opcode}) {
+    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    setReg2(r16, fetch2());
   }
 
   void inR8C({int opcode}) {
@@ -1628,9 +1505,28 @@ class Z80a {
     unPrefixedOpcodes = Z80Instructions();
 
     unPrefixedOpcodes.add(0x00, "NOP", nop, 4);
+    unPrefixedOpcodes.addR16(0x01, "LD [r16], nn", ldR16nn, 4, multiplier: 16);
+    unPrefixedOpcodes.addR8(0x06, "LD [r8], n", ldR8n, 4, multiplier: 8);
+    unPrefixedOpcodes.addR8R8(0x40, "LD [rDest], [rSource]", ldR8R8, 4);
+    unPrefixedOpcodes.addR8(0x70, "LD (HL), [r8]", ldMHLR8, 4);
+    unPrefixedOpcodes.add(0x08, "EX AF, AF'", exAFAFq, 4);
     unPrefixedOpcodes.addR8(0x80, "ADD A, [r8]", addAR8, 4);
     unPrefixedOpcodes.addR8(0x88, "ADC A, [r8]", adcAR8, 4);
     unPrefixedOpcodes.addR8(0x90, "SUB [r8]", subAR8, 4);
+    unPrefixedOpcodes.addR8(0x98, "SBC [r8]", sbcAR8, 4);
+    unPrefixedOpcodes.addR8(0xA0, "AND [r8]", andAR8, 4);
+    unPrefixedOpcodes.addR8(0xA8, "XOR [r8]", xorAR8, 4);
+    unPrefixedOpcodes.addR8(0xB0, "OR [r8]", orAR8, 4);
+    unPrefixedOpcodes.addR8(0xB8, "CP [r8]", cpAR8, 4);
+
+    unPrefixedOpcodes.add(0xC6, "ADD A, N", addAN, 4);
+    unPrefixedOpcodes.add(0xCE, "ADC A, N", adcAN, 4);
+    unPrefixedOpcodes.add(0xD6, "SUB N", subAN, 4);
+    unPrefixedOpcodes.add(0xDE, "SBC A, N", sbcAN, 4);
+    unPrefixedOpcodes.add(0xE6, "AND A, N", andAN, 4);
+    unPrefixedOpcodes.add(0xEE, "XOR N", xorAN, 4);
+    unPrefixedOpcodes.add(0xF6, "OR N", orAN, 4);
+    unPrefixedOpcodes.add(0xFE, "CP N", cpAN, 4);
   }
 
   void buildExtendedOpcodes() {
@@ -1641,7 +1537,7 @@ class Z80a {
     extendedOpcodes.addR16(0x4A, "ADC HL, [r16]", adcHLR16, 15, multiplier: 16);
     extendedOpcodes.addR16(0x43, "LD (NN), [r16]", ldMNNR16, 20,
         multiplier: 16);
-    extendedOpcodes.addR16(0x4B, "LD [R16], (NN)", ldR16MNN, 20,
+    extendedOpcodes.addR16(0x4B, "LD [r16], (nn)", ldR16MNN, 20,
         multiplier: 16);
     extendedOpcodes.addMultiple(0x44, 4, "NEG", neg, 8, multiplier: 16);
     extendedOpcodes.addMultiple(0x4C, 4, "NEG", neg, 8, multiplier: 16);

@@ -718,7 +718,7 @@ void main() {
 
   test('One Scenario', () {
     print("RUNNING ONLY ONE SCENARIO");
-    var scenarios = inR8C(0x40, Registers.R_B);
+    var scenarios = ldR8R8(0x41, Registers.R_B, Registers.R_C);
     scenarios.forEach((scenario) {
       scenario.run();
     });
