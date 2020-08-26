@@ -52,6 +52,18 @@ class Z80Instructions {
     }
   }
 
+  void addBit8(int opcode, String name, OpcodeHandler handler, int tStates,
+      {int multiplier = 1, int count = 8}) {
+    for (var i = 0; i < count; i++) {
+      add(
+        opcode + i * multiplier,
+        name.replaceAll("[bit]", i.toString()),
+        handler,
+        tStates,
+      );
+    }
+  }
+
   void addR8(int opcode, String name, OpcodeHandler handler, int tStates,
       {int multiplier = 1}) {
     for (var i = 0; i < 8; i++) {

@@ -15,7 +15,7 @@ class Z80a {
   Z80Instructions unPrefixedOpcodes;
   Z80Instructions extendedOpcodes;
   Z80Instructions iXYOpcodes;
-  Z80Instructions bitOpcodes;
+  Z80Instructions iXYbitOpcodes;
 
   static List<int> bitMask = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
 
@@ -34,7 +34,7 @@ class Z80a {
     buildUnprefixedOpcodes();
     buildExtendedOpcodes();
     buildIXYOpcodes();
-    buildBitOpcodes();
+    buildIXYBitOpcodes();
   }
 
   var registers = Registers();
@@ -350,7 +350,7 @@ class Z80a {
 
     switch (opcode) {
       case BIT_OPCODES:
-        tStates = processOpcode(fetch(), bitOpcodes);
+        tStates = processOpcode(fetch(), iXYbitOpcodes);
         if (tStates == 0) {
           this.PC = this.PC - 1;
           processIXYBitOpcodes(prefix);
@@ -1267,6 +1267,26 @@ class Z80a {
     registers.SP = getIXY(prefix);
   }
 
+  void bitnMIXYd({int opcode, int prefix}) {
+    var d = 0;
+    var bit = (opcode & 0x38) >> 3;
+    bitNR8(bit, this.memory.peek(getIXY(prefix) + d));
+  }
+
+  void resnMIXYd({int opcode, int prefix}) {
+    var d = 0;
+    var bit = (opcode & 0x38) >> 3;
+    var address = getIXY(prefix) + d;
+    this.memory.poke(address, resNR8(bit, this.memory.peek(address)));
+  }
+
+  void setnMIXYd({int opcode, int prefix}) {
+    var d = 0;
+    var bit = (opcode & 0x38) >> 3;
+    var address = getIXY(prefix) + d;
+    this.memory.poke(address, setNR8(bit, this.memory.peek(address)));
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
 
@@ -1401,7 +1421,14 @@ class Z80a {
     iXYOpcodes.add(0xF9, "LD SP, IXY", ldSPIXY, 19);
   }
 
-  void buildBitOpcodes() {
-    bitOpcodes = Z80Instructions();
+  void buildIXYBitOpcodes() {
+    iXYbitOpcodes = Z80Instructions();
+
+    iXYbitOpcodes.addBit8(0x46, "BIT [bit], (IXY + d)", bitnMIXYd, 20,
+        multiplier: 8);
+    iXYbitOpcodes.addBit8(0x86, "RES [bit], (IXY + d)", resnMIXYd, 20,
+        multiplier: 8);
+    iXYbitOpcodes.addBit8(0xC6, "RES [bit], (IXY + d)", setnMIXYd, 20,
+        multiplier: 8);
   }
 }
