@@ -285,12 +285,14 @@ var allScenarios = [
   ...ldR8MIXYd(0x5E, Registers.R_E, Registers.R_IX),
   ...ldR8MIXYd(0x66, Registers.R_H, Registers.R_IX),
   ...ldR8MIXYd(0x6E, Registers.R_L, Registers.R_IX),
+  ...ldR8MIXYd(0x7E, Registers.R_A, Registers.R_IX),
   ...ldR8MIXYd(0x46, Registers.R_B, Registers.R_IY),
   ...ldR8MIXYd(0x4E, Registers.R_C, Registers.R_IY),
   ...ldR8MIXYd(0x56, Registers.R_D, Registers.R_IY),
   ...ldR8MIXYd(0x5E, Registers.R_E, Registers.R_IY),
   ...ldR8MIXYd(0x66, Registers.R_H, Registers.R_IY),
   ...ldR8MIXYd(0x6E, Registers.R_L, Registers.R_IY),
+  ...ldR8MIXYd(0x7E, Registers.R_A, Registers.R_IY),
   ...ldMIXYdR8(0x70, Registers.R_B, Registers.R_IX),
   ...ldMIXYdR8(0x71, Registers.R_C, Registers.R_IX),
   ...ldMIXYdR8(0x72, Registers.R_D, Registers.R_IX),
@@ -717,7 +719,7 @@ void main() {
 
   test('One Scenario', () {
     print("RUNNING ONLY ONE SCENARIO");
-    var scenarios = ldR8R8(0x41, Registers.R_B, Registers.R_C);
+    var scenarios = bit0R8(0x46, Registers.R_MIXd);
     scenarios.forEach((scenario) {
       scenario.run();
     });

@@ -1,6 +1,6 @@
 import 'package:Z80a/Cpu/Registers.dart';
 
-typedef void OpcodeHandler({int opcode});
+typedef void OpcodeHandler({int opcode, int prefix});
 
 class Z80Instruction {
   String name;
@@ -96,11 +96,11 @@ class Z80Instructions {
     }
   }
 
-  int execute(int opcode) {
+  int execute(int opcode, {int prefix}) {
     var tStates = 0;
     var instruction = instructions[opcode];
     if (instruction != null) {
-      instruction.handler(opcode: opcode);
+      instruction.handler(opcode: opcode, prefix: prefix);
       tStates = instruction.tStates;
     }
     return tStates;
