@@ -1,10 +1,10 @@
 import 'package:Z80a/Ports.dart';
-import 'package:Z80a/Registers.dart';
+import 'package:Z80a/Cpu/Registers.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Z80a/Memory.dart';
 import 'package:Z80a/Util.dart';
-import 'package:Z80a/Z80a.dart';
+import 'package:Z80a/Cpu/Z80a.dart';
 
 import 'MemoryTest.dart';
 import 'PortsTest.dart';

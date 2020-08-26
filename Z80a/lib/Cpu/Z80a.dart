@@ -1,134 +1,10 @@
 library z80a;
 
+import 'package:Z80a/Cpu/Z80Instructions.dart';
 import 'package:Z80a/Memory.dart';
 import 'package:Z80a/Ports.dart';
+import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Util.dart';
-
-import 'Registers.dart';
-
-typedef void OpcodeHandler({int opcode});
-
-class Z80Instruction {
-  String name;
-  OpcodeHandler handler;
-  int tStates;
-
-  Z80Instruction(this.name, this.handler, this.tStates);
-}
-
-class Z80Instructions {
-  static const r8Table = {
-    0: Registers.R_B,
-    1: Registers.R_C,
-    2: Registers.R_D,
-    3: Registers.R_E,
-    4: Registers.R_H,
-    5: Registers.R_L,
-    6: Z80a.R_MHL,
-    7: Registers.R_A,
-  };
-
-  static const r16SPTable = {
-    0: Registers.R_BC,
-    1: Registers.R_DE,
-    2: Registers.R_HL,
-    3: Registers.R_SP,
-  };
-
-  Map<int, Z80Instruction> instructions;
-
-  Z80Instructions() {
-    instructions = Map<int, Z80Instruction>();
-  }
-
-  void add(int opcode, String name, OpcodeHandler handler, int tStates) {
-    instructions[opcode] = Z80Instruction(
-      name,
-      handler,
-      tStates,
-    );
-  }
-
-  void addMultiple(
-      int opcode, int count, String name, OpcodeHandler handler, int tStates,
-      {int multiplier = 1}) {
-    for (var i = 0; i < count; i++) {
-      add(
-        opcode + i * multiplier,
-        name,
-        handler,
-        tStates,
-      );
-    }
-  }
-
-  void addFlags(int opcode, String name, OpcodeHandler handler, int tStates,
-      {int multiplier = 1, int count = 8}) {
-    var flags = ["NZ", "Z", "NC", "C", "PO", "PE", "P", "M"];
-    for (var i = 0; i < count; i++) {
-      var flag = flags[i];
-      add(
-        opcode + i * multiplier,
-        name.replaceAll("[r8]", flag),
-        handler,
-        tStates,
-      );
-    }
-  }
-
-  void addR8(int opcode, String name, OpcodeHandler handler, int tStates,
-      {int multiplier = 1}) {
-    for (var i = 0; i < 8; i++) {
-      var r8 = r8Table[i];
-      add(
-        opcode + i * multiplier,
-        name.replaceAll("[r8]", Registers.r8Names[r8]),
-        handler,
-        tStates + (r8 == Z80a.R_MHL ? 3 : 0),
-      );
-    }
-  }
-
-  void addR8R8(int opcode, String name, OpcodeHandler handler, int tStates) {
-    for (var r1 = 0; r1 < 8; r1++) {
-      var rSource = r8Table[r1];
-      for (var r2 = 0; r2 < 8; r2++) {
-        var rDest = r8Table[r2];
-        add(
-          opcode + r1 * 8 + r2,
-          name
-              .replaceAll("[rDest]", Registers.r8Names[rDest])
-              .replaceAll("[rSource]", Registers.r8Names[rSource]),
-          handler,
-          tStates + (rSource == Z80a.R_MHL || rDest == Z80a.R_MHL ? 3 : 0),
-        );
-      }
-    }
-  }
-
-  void addR16(int opcode, String name, OpcodeHandler handler, int tStates,
-      {int multiplier = 1}) {
-    for (var i = 0; i < 4; i++) {
-      var r16 = r16SPTable[i];
-      add(
-        opcode + i * multiplier,
-        name.replaceAll("[r16]", Registers.r16Names[r16]),
-        handler,
-        tStates,
-      );
-    }
-  }
-
-  int execute(int opcode) {
-    var tStates = 0;
-    var instruction = instructions[opcode];
-    if (instruction != null) {
-      instruction.handler(opcode: opcode);
-      tStates = instruction.tStates;
-    }
-    return tStates;
-  }
-}
 
 // ignore_for_file: non_constant_identifier_names
 
@@ -147,39 +23,10 @@ class Z80a {
   static const BIT_OPCODES = 0xCB;
   static const EXTENDED_OPCODES = 0xED;
 
-  static const R_MHL = 1000;
-  static const R_MIXd = 2000;
-  static const R_MIYd = 3000;
-
   int getIXY(int prefix) => prefix == IX_PREFIX ? registers.IX : registers.IY;
 
   void setIXY(int prefix, int w) =>
       prefix == IX_PREFIX ? registers.IX = w : registers.IY = w;
-
-  static const r8Table = {
-    0: Registers.R_B,
-    1: Registers.R_C,
-    2: Registers.R_D,
-    3: Registers.R_E,
-    4: Registers.R_H,
-    5: Registers.R_L,
-    6: R_MHL,
-    7: Registers.R_A,
-  };
-
-  static const r16SPTable = {
-    0: Registers.R_BC,
-    1: Registers.R_DE,
-    2: Registers.R_HL,
-    3: Registers.R_SP,
-  };
-
-  static const r16AFTable = {
-    0: Registers.R_BC,
-    1: Registers.R_DE,
-    2: Registers.R_HL,
-    3: Registers.R_AF,
-  };
 
   Z80a(this.memory, this.ports) {
     buildUnprefixedOpcodes();
@@ -206,11 +53,11 @@ class Z80a {
   int word(int v) => v % 65536;
 
   int getReg(int r) =>
-      r == R_MHL ? this.memory.peek(registers.HL) : registers[r];
+      r == Registers.R_MHL ? this.memory.peek(registers.HL) : registers[r];
 
   int getReg2(int r) => 256 * registers[r] + registers[r + 1];
 
-  void setReg(int r, int b) => r == R_MHL
+  void setReg(int r, int b) => r == Registers.R_MHL
       ? this.memory.poke(registers.HL, byte(b))
       : registers[r] = byte(b);
 
@@ -518,7 +365,7 @@ class Z80a {
       case 0x09: // ADD IXY, BC
       case 0x19: // ADD IXY, DE
       case 0x39: // ADD IXY, SP
-        int r16 = r16SPTable[(opcode & 0x30) >> 4];
+        int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
         setIXY(prefix, addW(getIXY(prefix), getReg2(r16)));
         break;
 
@@ -558,7 +405,7 @@ class Z80a {
       case 0x5E: // LD E, (IXY + d)
       case 0x66: // LD H, (IXY + d)
       case 0x6E: // LD L, (IXY + d)
-        int r8 = r8Table[(opcode & 0x38) >> 3];
+        int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
         int d = fetch();
         setReg(r8, this.memory.peek(getIXY(prefix) + d));
         break;
@@ -570,7 +417,7 @@ class Z80a {
       case 0x74: // LD H, (IXY + d)
       case 0x75: // LD L, (IXY + d)
       case 0x77: // LD A, (IXY + d)
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         int d = fetch();
         this.memory.poke(getIXY(prefix) + d, getReg(r8));
         break;
@@ -675,7 +522,7 @@ class Z80a {
       case 0x05: // RLC L
       case 0x06: // RLC (HL)
       case 0x07: // RLC A
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         setReg(r8, rlc(getReg(r8)));
         break;
 
@@ -687,7 +534,7 @@ class Z80a {
       case 0x0D: // RRC L
       case 0x0E: // RRC (HL)
       case 0x0F: // RRC A
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         setReg(r8, rrc(getReg(r8)));
         break;
 
@@ -699,7 +546,7 @@ class Z80a {
       case 0x15: // RL L
       case 0x16: // RL (HL)
       case 0x17: // RL A
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         setReg(r8, rl(getReg(r8)));
         break;
 
@@ -711,7 +558,7 @@ class Z80a {
       case 0x1D: // RR L
       case 0x1E: // RR (HL)
       case 0x1F: // RR A
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         setReg(r8, rr(getReg(r8)));
         break;
 
@@ -723,7 +570,7 @@ class Z80a {
       case 0x25: // SLA L
       case 0x26: // SLA (HL)
       case 0x27: // SLA A
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         setReg(r8, sla(getReg(r8)));
         break;
 
@@ -735,7 +582,7 @@ class Z80a {
       case 0x2D: // SRA L
       case 0x2E: // SRA (HL)
       case 0x2F: // SRA A
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         setReg(r8, sra(getReg(r8)));
         break;
 
@@ -747,7 +594,7 @@ class Z80a {
       case 0x3D: // SRL L
       case 0x3E: // SRA (HL)
       case 0x3F: // SRA A
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         setReg(r8, srl(getReg(r8)));
         break;
 
@@ -824,7 +671,7 @@ class Z80a {
       case 0x7F: // BIT 7, A
 
         var bit = (opcode & 0x38) >> 3;
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         bitNR8(bit, getReg(r8));
         break;
 
@@ -901,7 +748,7 @@ class Z80a {
       case 0xBF: // RES 7, A
 
         var bit = (opcode & 0x38) >> 3;
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         setReg(r8, resNR8(bit, getReg(r8)));
         break;
 
@@ -978,7 +825,7 @@ class Z80a {
       case 0xFF: // SET 7, A
 
         var bit = (opcode & 0x38) >> 3;
-        int r8 = r8Table[opcode & 0x07];
+        int r8 = Registers.r8Table[opcode & 0x07];
         setReg(r8, setNR8(bit, getReg(r8)));
         break;
 
@@ -1121,42 +968,42 @@ class Z80a {
   }
 
   void incR8({int opcode}) {
-    int r8 = r8Table[(opcode & 0x38) >> 3];
+    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
     setReg(r8, incR8Value(this.getReg(r8)));
   }
 
   void decR8({int opcode}) {
-    int r8 = r8Table[(opcode & 0x38) >> 3];
+    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
     setReg(r8, decR8Value(this.getReg(r8)));
   }
 
   void incR16({int opcode}) {
-    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
     setReg2(r16, word(getReg2(r16) + 1));
   }
 
   void decR16({int opcode}) {
-    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
     setReg2(r16, word(getReg2(r16) - 1));
   }
 
   void addHLR16({int opcode}) {
-    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
     registers.HL = addW(registers.HL, getReg2(r16));
   }
 
   void ldR8n({int opcode}) {
-    int r8 = r8Table[(opcode & 0x38) >> 3];
+    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
     setReg(r8, fetch());
   }
 
   void ldR8mHL({int opcode}) {
-    int r8 = r8Table[(opcode & 0x38) >> 3];
+    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
     setReg(r8, this.memory.peek(registers.HL));
   }
 
   void ldmHLR8({int opcode}) {
-    int r8 = r8Table[opcode & 0x07];
+    int r8 = Registers.r8Table[opcode & 0x07];
     this.memory.poke(registers.HL, getReg(r8));
   }
 
@@ -1181,42 +1028,42 @@ class Z80a {
   }
 
   void addAR8({int opcode}) {
-    int r8 = r8Table[opcode & 0x07];
+    int r8 = Registers.r8Table[opcode & 0x07];
     registers.A = addA(getReg(r8));
   }
 
   void adcAR8({int opcode}) {
-    int r8 = r8Table[opcode & 0x07];
+    int r8 = Registers.r8Table[opcode & 0x07];
     registers.A = adcA(getReg(r8));
   }
 
   void subAR8({int opcode}) {
-    int r8 = r8Table[opcode & 0x07];
+    int r8 = Registers.r8Table[opcode & 0x07];
     registers.A = subA(getReg(r8));
   }
 
   void sbcAR8({int opcode}) {
-    int r8 = r8Table[opcode & 0x07];
+    int r8 = Registers.r8Table[opcode & 0x07];
     registers.A = sbcA(getReg(r8));
   }
 
   void andAR8({int opcode}) {
-    int r8 = r8Table[opcode & 0x07];
+    int r8 = Registers.r8Table[opcode & 0x07];
     registers.A = andA(getReg(r8));
   }
 
   void xorAR8({int opcode}) {
-    int r8 = r8Table[opcode & 0x07];
+    int r8 = Registers.r8Table[opcode & 0x07];
     registers.A = xorA(getReg(r8));
   }
 
   void orAR8({int opcode}) {
-    int r8 = r8Table[opcode & 0x07];
+    int r8 = Registers.r8Table[opcode & 0x07];
     registers.A = orA(getReg(r8));
   }
 
   void cpAR8({int opcode}) {
-    int r8 = r8Table[opcode & 0x07];
+    int r8 = Registers.r8Table[opcode & 0x07];
     subA(getReg(r8));
   }
 
@@ -1253,18 +1100,18 @@ class Z80a {
   }
 
   void ldR8R8({int opcode}) {
-    int r8Dest = r8Table[(opcode & 0x38) >> 3];
-    int r8Source = r8Table[(opcode & 0x07)];
+    int r8Dest = Registers.r8Table[(opcode & 0x38) >> 3];
+    int r8Source = Registers.r8Table[(opcode & 0x07)];
     this.setReg(r8Dest, getReg(r8Source));
   }
 
   void ldR16nn({int opcode}) {
-    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
     setReg2(r16, fetch2());
   }
 
   void inR8C({int opcode}) {
-    int r8 = r8Table[(opcode & 0x38) >> 3];
+    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
     var result = this.ports.inPort(registers.C);
     setReg(r8, result);
     setZeroAndSignFlagsOn8BitResult(result);
@@ -1274,12 +1121,12 @@ class Z80a {
   }
 
   void outCR8({int opcode}) {
-    int r8 = r8Table[(opcode & 0x38) >> 3];
+    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
     this.ports.outPort(registers.C, getReg(r8));
   }
 
   void sbcHLR16({int opcode}) {
-    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
     int value = getReg2(r16);
     int cf = (registers.carryFlag ? 1 : 0);
     var result = registers.HL - value - cf;
@@ -1295,7 +1142,7 @@ class Z80a {
   }
 
   void adcHLR16({int opcode}) {
-    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
     int value = getReg2(r16);
     int cf = (registers.carryFlag ? 1 : 0);
     var result = registers.HL + value + cf;
@@ -1311,12 +1158,12 @@ class Z80a {
   }
 
   void ldmnnR16({int opcode}) {
-    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
     this.memory.poke2(fetch2(), getReg2(r16));
   }
 
   void ldR16mnn({int opcode}) {
-    int r16 = r16SPTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
     var a = fetch2();
     setReg2(r16, this.memory.peek2(a));
   }
@@ -1409,12 +1256,12 @@ class Z80a {
   }
 
   void pushR16({int opcode}) {
-    int r16 = r16AFTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16AFTable[(opcode & 0x30) >> 4];
     push2(getReg2(r16));
   }
 
   void popR16({int opcode}) {
-    int r16 = r16AFTable[(opcode & 0x30) >> 4];
+    int r16 = Registers.r16AFTable[(opcode & 0x30) >> 4];
     setReg2(r16, pop2());
   }
 

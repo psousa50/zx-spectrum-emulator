@@ -1,6 +1,6 @@
-import 'package:Z80a/Registers.dart';
+import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Util.dart';
-import 'package:Z80a/Z80a.dart';
+import 'package:Z80a/Cpu/Z80a.dart';
 import 'Scenario.dart';
 
 log(String m, value) {
@@ -11,9 +11,9 @@ log(String m, value) {
 
 bool isIXIY(int rhxy) => rhxy == Registers.R_IX || rhxy == Registers.R_IY;
 
-bool isMIXIY(int rhxy) => rhxy == Z80a.R_MIXd || rhxy == Z80a.R_MIYd;
+bool isMIXIY(int rhxy) => rhxy == Registers.R_MIXd || rhxy == Registers.R_MIYd;
 
-int rMIXY(int rxy) => rxy == Z80a.R_MIXd ? Registers.R_IX : Registers.R_IY;
+int rMIXY(int rxy) => rxy == Registers.R_MIXd ? Registers.R_IX : Registers.R_IY;
 
 List<int> ixyPrefix(int rhxy) => [
       if (rhxy == Registers.R_IX) Z80a.IX_PREFIX,
@@ -259,7 +259,7 @@ Scenario changeR8(
     isMIXIY(r8)
         ? changeR8IXYd(name, opcode, rMIXY(r8), value, result, flags,
             inFlags: inFlags, prefix: prefix)
-        : r8 == Z80a.R_MHL
+        : r8 == Registers.R_MHL
             ? changeR8HL(name, opcode, value, result, flags,
                 inFlags: inFlags, prefix: prefix)
             : changeR8R8(name, opcode, r8, value, result, flags,
@@ -941,7 +941,7 @@ Scenario r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
         ? r8IXYOperation(
             name, opcode, rMIXY(r8), aValue, r8Value, result, flags,
             inFlags: inFlags)
-        : r8 == Z80a.R_MHL
+        : r8 == Registers.R_MHL
             ? r8HLOperation(name, opcode, aValue, r8Value, result, flags,
                 inFlags: inFlags)
             : r8r8Operation(name, opcode, r8, aValue, r8Value, result, flags,

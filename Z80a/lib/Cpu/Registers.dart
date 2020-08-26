@@ -1,6 +1,4 @@
-import 'package:Z80a/Z80a.dart';
-
-import 'Util.dart';
+import '../Util.dart';
 
 // ignore_for_file: non_constant_identifier_names
 
@@ -14,7 +12,7 @@ class Registers {
     R_E: "E",
     R_H: "H",
     R_L: "L",
-    Z80a.R_MHL: "(HL)",
+    R_MHL: "(HL)",
     R_S: "S",
     R_P: "P",
     R_IX_L: "IX_l",
@@ -79,6 +77,10 @@ class Registers {
 
   static const R_COUNT = 22;
 
+  static const R_MHL = 1000;
+  static const R_MIXd = 2000;
+  static const R_MIYd = 3000;
+
   static const R_AF = R_A;
   static const R_BC = R_B;
   static const R_DE = R_D;
@@ -97,6 +99,31 @@ class Registers {
   static const F_HALF_CARRY = 0x08;
   static const F_ZERO = 0x10;
   static const F_SIGN = 0x20;
+
+  static const r8Table = {
+    0: R_B,
+    1: R_C,
+    2: R_D,
+    3: R_E,
+    4: R_H,
+    5: R_L,
+    6: R_MHL,
+    7: R_A,
+  };
+
+  static const r16SPTable = {
+    0: R_BC,
+    1: R_DE,
+    2: R_HL,
+    3: R_SP,
+  };
+
+  static const r16AFTable = {
+    0: R_BC,
+    1: R_DE,
+    2: R_HL,
+    3: R_AF,
+  };
 
   List<int> registers;
 
