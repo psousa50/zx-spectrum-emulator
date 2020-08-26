@@ -62,6 +62,20 @@ class Z80Instructions {
     }
   }
 
+  void addFlags(int opcode, String name, OpcodeHandler handler, int tStates,
+      {int multiplier = 1, int count = 8}) {
+    var flags = ["NZ", "Z", "NC", "C", "PO", "PE", "P", "M"];
+    for (var i = 0; i < count; i++) {
+      var flag = flags[i];
+      add(
+        opcode + i * multiplier,
+        name.replaceAll("[r8]", flag),
+        handler,
+        tStates,
+      );
+    }
+  }
+
   void addR8(int opcode, String name, OpcodeHandler handler, int tStates,
       {int multiplier = 1}) {
     for (var i = 0; i < 8; i++) {
@@ -160,7 +174,7 @@ class Z80a {
     3: Registers.R_SP,
   };
 
-  static const r16SAFTable = {
+  static const r16AFTable = {
     0: Registers.R_BC,
     1: Registers.R_DE,
     2: Registers.R_HL,
@@ -473,219 +487,10 @@ class Z80a {
 
       default:
         tStates = processOpcode(opcode, unPrefixedOpcodes);
-        if (tStates == 0) processUnprefixedOpCodes(opcode);
-        tStates = 1;
         break;
     }
 
     return tStates;
-  }
-
-  bool processUnprefixedOpCodes(int opcode) {
-    var processed = true;
-
-    switch (opcode) {
-      case 0x07: // RLCA
-        registers.A = rlcOp(registers.A);
-        break;
-
-      case 0x0F: // RRCA
-        registers.A = rrcOp(registers.A);
-        break;
-
-      case 0x17: // RLA
-        registers.A = rlOp(registers.A);
-        break;
-
-      case 0x1F: // RRA
-        registers.A = rrOp(registers.A);
-        break;
-
-      case 0x2F: // CPL
-        registers.A = registers.A ^ 255;
-        break;
-
-      case 0x37: // CCF
-        registers.F = registers.F & ~Registers.F_ADD_SUB | Registers.F_CARRY;
-        break;
-
-      case 0x3F: // CCF
-        registers.F = registers.F & ~Registers.F_ADD_SUB ^ Registers.F_CARRY;
-        break;
-
-      case 0xCD: // CALL NN
-        var address = fetch2();
-        push2(PC);
-        this.PC = address;
-        break;
-
-      case 0xC4: // CALL NZ
-      case 0xCC: // CALL Z
-      case 0xD4: // CALL NC
-      case 0xDC: // CALL C
-      case 0xE4: // CALL PO
-      case 0xEC: // CALL PE
-      case 0xF4: // CALL P
-      case 0xFC: // CALL M
-        var cond = getFlagCondition((opcode & 0x38) >> 3);
-        var address = fetch2();
-        if (cond) {
-          push2(PC);
-          this.PC = address;
-        }
-        break;
-
-      case 0xC9: // RET
-        this.PC = pop2();
-        break;
-
-      case 0xC0: // RET NZ
-      case 0xC8: // RET Z
-      case 0xD0: // RET NC
-      case 0xD8: // RET C
-      case 0xE0: // RET PO
-      case 0xE8: // RET PE
-      case 0xF0: // RET P
-      case 0xF8: // RET M
-        var cond = getFlagCondition((opcode & 0x38) >> 3);
-        if (cond) {
-          this.PC = pop2();
-        }
-        break;
-
-      case 0xC2: // JP NZ
-      case 0xCA: // JP Z
-      case 0xD2: // JP NC
-      case 0xDA: // JP C
-      case 0xE2: // JP PO
-      case 0xEA: // JP PE
-      case 0xF2: // JP P
-      case 0xFA: // JP M
-        var cond = getFlagCondition((opcode & 0x38) >> 3);
-        if (cond) {
-          this.PC = fetch2();
-        }
-        break;
-
-      case 0xC3: // JP NN
-        this.PC = fetch2();
-        break;
-
-      case 0xC5: // PUSH BC
-        push2(registers.BC);
-        break;
-
-      case 0xD5: // PUSH DE
-        push2(registers.DE);
-        break;
-
-      case 0xE5: // PUSH HL
-        push2(registers.HL);
-        break;
-
-      case 0xF5: // PUSH AF
-        push2(registers.AF);
-        break;
-
-      case 0xC1: // POP BC
-        registers.BC = pop2();
-        break;
-
-      case 0xD1: // POP DE
-        registers.DE = pop2();
-        break;
-
-      case 0xE1: // POP HL
-        registers.HL = pop2();
-        break;
-
-      case 0xF1: // POP AF
-        registers.AF = pop2();
-        break;
-
-      case 0xC7: // RST 00
-      case 0xCF: // RST 08
-      case 0xD7: // RST 16
-      case 0xDF: // RST 24
-      case 0xE7: // RST 32
-      case 0xEF: // RST 40
-      case 0xF7: // RST 48
-      case 0xFF: // RST 56
-        var rst = opcode & 0x38;
-        push2(this.PC);
-        this.PC = rst;
-        break;
-
-      case 0xD9: // EXX
-        var bc = registers.BC;
-        var de = registers.DE;
-        var hl = registers.HL;
-        registers.BC = registers.BCt;
-        registers.DE = registers.DEt;
-        registers.HL = registers.HLt;
-        registers.BCt = bc;
-        registers.DEt = de;
-        registers.HLt = hl;
-        break;
-
-      case 0x10: // DJNZ NN
-        var d = fetch();
-        registers.B = byte(registers.B - 1);
-        if (registers.B == 0) {
-          this.PC = this.PC + d;
-        }
-        break;
-
-      case 0x18: // JR NN
-        var d = fetch();
-        this.PC = this.PC + d;
-        break;
-
-      case 0x20: // JR NZ
-      case 0x28: // JR Z
-      case 0x30: // JR NC
-      case 0x38: // JR C
-        var d = fetch();
-        var cond = getFlagCondition(((opcode & 0x38) >> 3) - 4);
-        if (cond) {
-          this.PC = this.PC + d;
-        }
-        break;
-
-      case 0xE3: // EX (SP), HL
-        var msp = this.memory.peek2(registers.SP);
-        this.memory.poke2(registers.SP, registers.HL);
-        registers.HL = msp;
-        break;
-
-      case 0xE9: // JP (HL)
-        this.PC = this.memory.peek2(registers.HL);
-        break;
-
-      case 0xEB: // EX DE, HL
-        var de = registers.DE;
-        registers.DE = registers.HL;
-        registers.HL = de;
-        break;
-
-      case 0xF9: // LD SP, HL
-        registers.SP = registers.HL;
-        break;
-
-      case 0xD3: // OUT (N), A
-        this.ports.outPort(fetch(), registers.A);
-        break;
-
-      case 0xDB: // IN A, (N)
-        registers.A = this.ports.inPort(fetch());
-        break;
-
-      default:
-        processed = false;
-        break;
-    }
-
-    return processed;
   }
 
   bool processIXYOpcodes(int prefix) {
@@ -1244,6 +1049,55 @@ class Z80a {
 
   void nop({int opcode}) {}
 
+  void rlca({int opcode}) {
+    registers.A = rlcOp(registers.A);
+  }
+
+  void rrca({int opcode}) {
+    registers.A = rrcOp(registers.A);
+  }
+
+  void rla({int opcode}) {
+    registers.A = rlOp(registers.A);
+  }
+
+  void rra({int opcode}) {
+    registers.A = rrOp(registers.A);
+  }
+
+  void cpl({int opcode}) {
+    registers.A = registers.A ^ 255;
+  }
+
+  void scf({int opcode}) {
+    registers.F = registers.F & ~Registers.F_ADD_SUB | Registers.F_CARRY;
+  }
+
+  void ccf({int opcode}) {
+    registers.F = registers.F & ~Registers.F_ADD_SUB ^ Registers.F_CARRY;
+  }
+
+  void djnz({int opcode}) {
+    var d = fetch();
+    registers.B = byte(registers.B - 1);
+    if (registers.B == 0) {
+      this.PC = this.PC + d;
+    }
+  }
+
+  void jr({int opcode}) {
+    var d = fetch();
+    this.PC = this.PC + d;
+  }
+
+  void jrcc({int opcode}) {
+    var d = fetch();
+    var cond = getFlagCondition(((opcode & 0x38) >> 3) - 4);
+    if (cond) {
+      this.PC = this.PC + d;
+    }
+  }
+
   void ldmBCA({int opcode}) {
     this.memory.poke(registers.BC, registers.A);
   }
@@ -1477,6 +1331,99 @@ class Z80a {
     setZeroAndSignFlagsOn8BitResult(result);
   }
 
+  void callnn({int opcode}) {
+    var address = fetch2();
+    push2(PC);
+    this.PC = address;
+  }
+
+  void ret({int opcode}) {
+    this.PC = pop2();
+  }
+
+  void jp({int opcode}) {
+    this.PC = fetch2();
+  }
+
+  void callccnn({int opcode}) {
+    var cond = getFlagCondition((opcode & 0x38) >> 3);
+    var address = fetch2();
+    if (cond) {
+      push2(PC);
+      this.PC = address;
+    }
+  }
+
+  void retcc({int opcode}) {
+    var cond = getFlagCondition((opcode & 0x38) >> 3);
+    if (cond) {
+      this.PC = pop2();
+    }
+  }
+
+  void jpccnn({int opcode}) {
+    var cond = getFlagCondition((opcode & 0x38) >> 3);
+    if (cond) {
+      this.PC = fetch2();
+    }
+  }
+
+  void outnA({int opcode}) {
+    this.ports.outPort(fetch(), registers.A);
+  }
+
+  void inAn({int opcode}) {
+    registers.A = this.ports.inPort(fetch());
+  }
+
+  void exx({int opcode}) {
+    var bc = registers.BC;
+    var de = registers.DE;
+    var hl = registers.HL;
+    registers.BC = registers.BCt;
+    registers.DE = registers.DEt;
+    registers.HL = registers.HLt;
+    registers.BCt = bc;
+    registers.DEt = de;
+    registers.HLt = hl;
+  }
+
+  void exSPHL({int opcode}) {
+    var msp = this.memory.peek2(registers.SP);
+    this.memory.poke2(registers.SP, registers.HL);
+    registers.HL = msp;
+  }
+
+  void jpmHL({int opcode}) {
+    this.PC = this.memory.peek2(registers.HL);
+  }
+
+  void exDEHL({int opcode}) {
+    var de = registers.DE;
+    registers.DE = registers.HL;
+    registers.HL = de;
+  }
+
+  void ldSPHL({int opcode}) {
+    registers.SP = registers.HL;
+  }
+
+  void pushR16({int opcode}) {
+    int r16 = r16AFTable[(opcode & 0x30) >> 4];
+    push2(getReg2(r16));
+  }
+
+  void popR16({int opcode}) {
+    int r16 = r16AFTable[(opcode & 0x30) >> 4];
+    setReg2(r16, pop2());
+  }
+
+  void rstNN({int opcode}) {
+    var rst = opcode & 0x38;
+    push2(this.PC);
+    this.PC = rst;
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
 
@@ -1487,6 +1434,20 @@ class Z80a {
     unPrefixedOpcodes.addR8(0x04, "INC [r8]", incR8, 4, multiplier: 8);
     unPrefixedOpcodes.addR8(0x05, "DEC [r8]", decR8, 4, multiplier: 8);
     unPrefixedOpcodes.addR8(0x06, "LD [r8], n", ldR8n, 4, multiplier: 8);
+    unPrefixedOpcodes.add(0x07, "RLCA", rlca, 4);
+    unPrefixedOpcodes.add(0x0F, "RRCA", rrca, 4);
+
+    unPrefixedOpcodes.add(0x10, "DJNZ nn", djnz, 4);
+    unPrefixedOpcodes.add(0x18, "JR nn", jr, 4);
+
+    unPrefixedOpcodes.addFlags(0x20, "JR CC, nn", jrcc, 4,
+        multiplier: 8, count: 4);
+
+    unPrefixedOpcodes.add(0x17, "RLA", rla, 4);
+    unPrefixedOpcodes.add(0x1F, "RRA", rra, 4);
+    unPrefixedOpcodes.add(0x2F, "CPL", cpl, 4);
+    unPrefixedOpcodes.add(0x37, "SCF", scf, 4);
+    unPrefixedOpcodes.add(0x3F, "CCF", ccf, 4);
     unPrefixedOpcodes.addR16(0x09, "ADD HL, [r16]", addHLR16, 4,
         multiplier: 16);
     unPrefixedOpcodes.add(0x0A, " LD A, (BC)", ldAmBC, 4);
@@ -1509,6 +1470,30 @@ class Z80a {
     unPrefixedOpcodes.addR8(0xA8, "XOR [r8]", xorAR8, 4);
     unPrefixedOpcodes.addR8(0xB0, "OR [r8]", orAR8, 4);
     unPrefixedOpcodes.addR8(0xB8, "CP [r8]", cpAR8, 4);
+
+    unPrefixedOpcodes.addR16(0xC1, "POP [r16]", popR16, 4, multiplier: 16);
+    unPrefixedOpcodes.addR16(0xC5, "PUSH [r16]", pushR16, 4, multiplier: 16);
+
+    unPrefixedOpcodes.addR8(0xC7, "RST", rstNN, 4, multiplier: 8);
+
+    unPrefixedOpcodes.add(0xCD, "CALL nn", callnn, 4);
+    unPrefixedOpcodes.add(0xC9, "RET", ret, 4);
+    unPrefixedOpcodes.add(0xC3, "JP", jp, 4);
+
+    unPrefixedOpcodes.addFlags(0xC4, "CALL [flag], nn", callccnn, 4,
+        multiplier: 8);
+    unPrefixedOpcodes.addFlags(0xC0, "RET [flag]", retcc, 4, multiplier: 8);
+    unPrefixedOpcodes.addFlags(0xC2, "JP [flag], nn", jpccnn, 4, multiplier: 8);
+
+    unPrefixedOpcodes.add(0xD3, "OUT (N), A", outnA, 4);
+    unPrefixedOpcodes.add(0xDB, "IN A, (N)", inAn, 4);
+
+    unPrefixedOpcodes.add(0xD9, "EXX", exx, 4);
+    unPrefixedOpcodes.add(0xE3, "EX (SP), HL", exSPHL, 4);
+
+    unPrefixedOpcodes.add(0xE9, "JP (HL)", jpmHL, 4);
+    unPrefixedOpcodes.add(0xEB, "EX DE, HL", exDEHL, 4);
+    unPrefixedOpcodes.add(0xF9, "LD SP, HL", ldSPHL, 4);
 
     unPrefixedOpcodes.add(0xC6, "ADD A, N", addAn, 4);
     unPrefixedOpcodes.add(0xCE, "ADC A, N", adcAn, 4);
