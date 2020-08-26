@@ -354,11 +354,6 @@ class Z80a {
         tStates = processOpcode(
             InstructionContext.withPrefixAndDisplacement(fetch(), prefix, d),
             iXYbitOpcodes);
-        if (tStates == 0) {
-          this.PC = this.PC - 1;
-          processIXYBitOpcodes(prefix);
-          tStates = 1;
-        }
         break;
 
       default:
@@ -368,23 +363,6 @@ class Z80a {
     }
 
     return tStates;
-  }
-
-  void bitNR8(int bit, int value) {
-    var mask = bitMask[bit];
-    registers.zeroFlag = value & mask == 0;
-    registers.halfCarryFlag = true;
-    registers.addSubtractFlag = false;
-  }
-
-  int resNR8(int bit, int value) {
-    var mask = bitMask[bit];
-    return value & ~mask;
-  }
-
-  int setNR8(int bit, int value) {
-    var mask = bitMask[bit];
-    return value | mask;
   }
 
   bool processBitOpcodes() {
@@ -716,62 +694,26 @@ class Z80a {
     return processed;
   }
 
-  bool processIXYBitOpcodes(int prefix) {
-    var processed = true;
-
-    final d = fetch();
-    final opcode = fetch();
-
-    switch (opcode) {
-      case 0x46: // BIT 0, (IXY + d)
-      case 0x4E: // BIT 1, (IXY + d)
-      case 0x56: // BIT 2, (IXY + d)
-      case 0x5E: // BIT 3, (IXY + d)
-      case 0x66: // BIT 4, (IXY + d)
-      case 0x6E: // BIT 5, (IXY + d)
-      case 0x76: // BIT 6, (IXY + d)
-      case 0x7E: // BIT 7, (IXY + d)
-        var bit = (opcode & 0x38) >> 3;
-        bitNR8(bit, this.memory.peek(getIXY(prefix) + d));
-        break;
-
-      case 0x86: // RES 0, (IXY + d)
-      case 0x8E: // RES 1, (IXY + d)
-      case 0x96: // RES 2, (IXY + d)
-      case 0x9E: // RES 3, (IXY + d)
-      case 0xA6: // RES 4, (IXY + d)
-      case 0xAE: // RES 5, (IXY + d)
-      case 0xB6: // RES 6, (IXY + d)
-      case 0xBE: // RES 7, (IXY + d)
-        var bit = (opcode & 0x38) >> 3;
-        var address = getIXY(prefix) + d;
-        this.memory.poke(address, resNR8(bit, this.memory.peek(address)));
-        break;
-
-      case 0xC6: // SET 0, (IXY + d)
-      case 0xCE: // SET 1, (IXY + d)
-      case 0xD6: // SET 2, (IXY + d)
-      case 0xDE: // SET 3, (IXY + d)
-      case 0xE6: // SET 4, (IXY + d)
-      case 0xEE: // SET 5, (IXY + d)
-      case 0xF6: // SET 6, (IXY + d)
-      case 0xFE: // SET 7, (IXY + d)
-        var bit = (opcode & 0x38) >> 3;
-        var address = getIXY(prefix) + d;
-        this.memory.poke(address, setNR8(bit, this.memory.peek(address)));
-        break;
-
-      default:
-        processed = false;
-        break;
-    }
-
-    return processed;
-  }
-
   int processOpcode(
       InstructionContext context, Z80Instructions z80Instructions) {
     return z80Instructions.execute(context);
+  }
+
+  void bitNR8(int bit, int value) {
+    var mask = bitMask[bit];
+    registers.zeroFlag = value & mask == 0;
+    registers.halfCarryFlag = true;
+    registers.addSubtractFlag = false;
+  }
+
+  int resNR8(int bit, int value) {
+    var mask = bitMask[bit];
+    return value & ~mask;
+  }
+
+  int setNR8(int bit, int value) {
+    var mask = bitMask[bit];
+    return value | mask;
   }
 
   void nop(InstructionContext context) {}
