@@ -63,6 +63,22 @@ class Z80Instructions {
     }
   }
 
+  void addBit8R8(int opcode, String name, OpcodeHandler handler, int tStates) {
+    for (var b = 0; b < 8; b++) {
+      for (var i = 0; i < 8; i++) {
+        var r8 = Registers.r8Table[i];
+        add(
+          opcode + b * 8 + i,
+          name
+              .replaceAll("[bit]", b.toString())
+              .replaceAll("[r8]", Registers.r8Names[r8]),
+          handler,
+          tStates,
+        );
+      }
+    }
+  }
+
   void addBit8(int opcode, String name, OpcodeHandler handler, int tStates,
       {int multiplier = 1, int count = 8}) {
     for (var i = 0; i < count; i++) {
@@ -81,7 +97,9 @@ class Z80Instructions {
       var r8 = Registers.r8Table[i];
       add(
         opcode + i * multiplier,
-        name.replaceAll("[r8]", Registers.r8Names[r8]),
+        name
+            .replaceAll("[r8]", Registers.r8Names[r8])
+            .replaceAll("[bit]", i.toString()),
         handler,
         tStates + (r8 == Registers.R_MHL ? 3 : 0),
       );
