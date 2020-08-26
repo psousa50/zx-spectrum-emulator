@@ -1,6 +1,17 @@
 import 'package:Z80a/Cpu/Registers.dart';
 
-typedef void OpcodeHandler({int opcode, int prefix});
+class InstructionContext {
+  int opcode;
+  int prefix;
+  int displacement;
+
+  InstructionContext(this.opcode);
+  InstructionContext.withPrefix(this.opcode, this.prefix);
+  InstructionContext.withPrefixAndDisplacement(
+      this.opcode, this.prefix, this.displacement);
+}
+
+typedef void OpcodeHandler(InstructionContext context);
 
 class Z80Instruction {
   String name;
@@ -108,11 +119,11 @@ class Z80Instructions {
     }
   }
 
-  int execute(int opcode, {int prefix}) {
+  int execute(InstructionContext context) {
     var tStates = 0;
-    var instruction = instructions[opcode];
+    var instruction = instructions[context.opcode];
     if (instruction != null) {
-      instruction.handler(opcode: opcode, prefix: prefix);
+      instruction.handler(context);
       tStates = instruction.tStates;
     }
     return tStates;

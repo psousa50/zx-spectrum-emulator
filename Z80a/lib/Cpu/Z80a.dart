@@ -327,7 +327,7 @@ class Z80a {
         break;
 
       case EXTENDED_OPCODES:
-        tStates = processOpcode(fetch(), extendedOpcodes);
+        tStates = processOpcode(InstructionContext(fetch()), extendedOpcodes);
         break;
 
       case BIT_OPCODES:
@@ -336,7 +336,7 @@ class Z80a {
         break;
 
       default:
-        tStates = processOpcode(opcode, unPrefixedOpcodes);
+        tStates = processOpcode(InstructionContext(opcode), unPrefixedOpcodes);
         break;
     }
 
@@ -350,7 +350,10 @@ class Z80a {
 
     switch (opcode) {
       case BIT_OPCODES:
-        tStates = processOpcode(fetch(), iXYbitOpcodes);
+        var d = fetch();
+        tStates = processOpcode(
+            InstructionContext.withPrefixAndDisplacement(fetch(), prefix, d),
+            iXYbitOpcodes);
         if (tStates == 0) {
           this.PC = this.PC - 1;
           processIXYBitOpcodes(prefix);
@@ -359,7 +362,8 @@ class Z80a {
         break;
 
       default:
-        tStates = processOpcode(opcode, iXYOpcodes, prefix: prefix);
+        tStates = processOpcode(
+            InstructionContext.withPrefix(opcode, prefix), iXYOpcodes);
         break;
     }
 
@@ -765,41 +769,42 @@ class Z80a {
     return processed;
   }
 
-  int processOpcode(int opcode, Z80Instructions z80Instructions, {int prefix}) {
-    return z80Instructions.execute(opcode, prefix: prefix);
+  int processOpcode(
+      InstructionContext context, Z80Instructions z80Instructions) {
+    return z80Instructions.execute(context);
   }
 
-  void nop({int opcode, int prefix}) {}
+  void nop(InstructionContext context) {}
 
-  void rlca({int opcode, int prefix}) {
+  void rlca(InstructionContext context) {
     registers.A = rlcOp(registers.A);
   }
 
-  void rrca({int opcode, int prefix}) {
+  void rrca(InstructionContext context) {
     registers.A = rrcOp(registers.A);
   }
 
-  void rla({int opcode, int prefix}) {
+  void rla(InstructionContext context) {
     registers.A = rlOp(registers.A);
   }
 
-  void rra({int opcode, int prefix}) {
+  void rra(InstructionContext context) {
     registers.A = rrOp(registers.A);
   }
 
-  void cpl({int opcode, int prefix}) {
+  void cpl(InstructionContext context) {
     registers.A = registers.A ^ 255;
   }
 
-  void scf({int opcode, int prefix}) {
+  void scf(InstructionContext context) {
     registers.F = registers.F & ~Registers.F_ADD_SUB | Registers.F_CARRY;
   }
 
-  void ccf({int opcode, int prefix}) {
+  void ccf(InstructionContext context) {
     registers.F = registers.F & ~Registers.F_ADD_SUB ^ Registers.F_CARRY;
   }
 
-  void djnz({int opcode, int prefix}) {
+  void djnz(InstructionContext context) {
     var d = fetch();
     registers.B = byte(registers.B - 1);
     if (registers.B == 0) {
@@ -807,207 +812,208 @@ class Z80a {
     }
   }
 
-  void jr({int opcode, int prefix}) {
+  void jr(InstructionContext context) {
     var d = fetch();
     this.PC = this.PC + d;
   }
 
-  void jrcc({int opcode, int prefix}) {
+  void jrcc(InstructionContext context) {
     var d = fetch();
-    var cond = getFlagCondition(((opcode & 0x38) >> 3) - 4);
+    var cond = getFlagCondition(((context.opcode & 0x38) >> 3) - 4);
     if (cond) {
       this.PC = this.PC + d;
     }
   }
 
-  void ldmBCA({int opcode, int prefix}) {
+  void ldmBCA(InstructionContext context) {
     this.memory.poke(registers.BC, registers.A);
   }
 
-  void ldAmBC({int opcode, int prefix}) {
+  void ldAmBC(InstructionContext context) {
     registers.A = this.memory.peek(registers.BC);
   }
 
-  void ldAmDE({int opcode, int prefix}) {
+  void ldAmDE(InstructionContext context) {
     registers.A = this.memory.peek(registers.DE);
   }
 
-  void ldmDEA({int opcode, int prefix}) {
+  void ldmDEA(InstructionContext context) {
     this.memory.poke(registers.DE, registers.A);
   }
 
-  void exAFAFq({int opcode, int prefix}) {
+  void exAFAFq(InstructionContext context) {
     final af = registers.AF;
     registers.AF = registers.AFt;
     registers.AFt = af;
   }
 
-  void incR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
+  void incR8(InstructionContext context) {
+    int r8 = Registers.r8Table[(context.opcode & 0x38) >> 3];
     setReg(r8, incR8Value(this.getReg(r8)));
   }
 
-  void incmIXY({int opcode, int prefix}) {
+  void incmIXY(InstructionContext context) {
     var d = fetch();
-    this.memory.poke(
-        getIXY(prefix) + d, incR8Value(this.memory.peek(getIXY(prefix) + d)));
+    this.memory.poke(getIXY(context.prefix) + d,
+        incR8Value(this.memory.peek(getIXY(context.prefix) + d)));
   }
 
-  void decmIXY({int opcode, int prefix}) {
+  void decmIXY(InstructionContext context) {
     var d = fetch();
-    this.memory.poke(
-        getIXY(prefix) + d, decR8Value(this.memory.peek(getIXY(prefix) + d)));
+    this.memory.poke(getIXY(context.prefix) + d,
+        decR8Value(this.memory.peek(getIXY(context.prefix) + d)));
   }
 
-  void addIXYR16({int opcode, int prefix}) {
-    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
-    setIXY(prefix, addW(getIXY(prefix), getReg2(r16)));
+  void addIXYR16(InstructionContext context) {
+    int r16 = Registers.r16SPTable[(context.opcode & 0x30) >> 4];
+    setIXY(context.prefix, addW(getIXY(context.prefix), getReg2(r16)));
   }
 
-  void addIXYIXY({int opcode, int prefix}) {
-    setIXY(prefix, addW(getIXY(prefix), getIXY(prefix)));
+  void addIXYIXY(InstructionContext context) {
+    setIXY(
+        context.prefix, addW(getIXY(context.prefix), getIXY(context.prefix)));
   }
 
-  void decR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
+  void decR8(InstructionContext context) {
+    int r8 = Registers.r8Table[(context.opcode & 0x38) >> 3];
     setReg(r8, decR8Value(this.getReg(r8)));
   }
 
-  void incR16({int opcode, int prefix}) {
-    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
+  void incR16(InstructionContext context) {
+    int r16 = Registers.r16SPTable[(context.opcode & 0x30) >> 4];
     setReg2(r16, word(getReg2(r16) + 1));
   }
 
-  void decR16({int opcode, int prefix}) {
-    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
+  void decR16(InstructionContext context) {
+    int r16 = Registers.r16SPTable[(context.opcode & 0x30) >> 4];
     setReg2(r16, word(getReg2(r16) - 1));
   }
 
-  void addHLR16({int opcode, int prefix}) {
-    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
+  void addHLR16(InstructionContext context) {
+    int r16 = Registers.r16SPTable[(context.opcode & 0x30) >> 4];
     registers.HL = addW(registers.HL, getReg2(r16));
   }
 
-  void ldR8n({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
+  void ldR8n(InstructionContext context) {
+    int r8 = Registers.r8Table[(context.opcode & 0x38) >> 3];
     setReg(r8, fetch());
   }
 
-  void ldR8mHL({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
+  void ldR8mHL(InstructionContext context) {
+    int r8 = Registers.r8Table[(context.opcode & 0x38) >> 3];
     setReg(r8, this.memory.peek(registers.HL));
   }
 
-  void ldmHLR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void ldmHLR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     this.memory.poke(registers.HL, getReg(r8));
   }
 
-  void ldmnnHL({int opcode, int prefix}) {
+  void ldmnnHL(InstructionContext context) {
     this.memory.poke2(fetch2(), registers.HL);
   }
 
-  void ldHLmnn({int opcode, int prefix}) {
+  void ldHLmnn(InstructionContext context) {
     registers.HL = this.memory.peek2(fetch2());
   }
 
-  void ldmnnA({int opcode, int prefix}) {
+  void ldmnnA(InstructionContext context) {
     this.memory.poke(fetch2(), registers.A);
   }
 
-  void ldAmnn({int opcode, int prefix}) {
+  void ldAmnn(InstructionContext context) {
     registers.A = this.memory.peek(fetch2());
   }
 
-  void ldmHLnn({int opcode, int prefix}) {
+  void ldmHLnn(InstructionContext context) {
     this.memory.poke(registers.HL, fetch());
   }
 
-  void addAR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void addAR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     registers.A = addA(getReg(r8));
   }
 
-  void adcAR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void adcAR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     registers.A = adcA(getReg(r8));
   }
 
-  void subAR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void subAR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     registers.A = subA(getReg(r8));
   }
 
-  void sbcAR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void sbcAR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     registers.A = sbcA(getReg(r8));
   }
 
-  void andAR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void andAR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     registers.A = andA(getReg(r8));
   }
 
-  void xorAR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void xorAR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     registers.A = xorA(getReg(r8));
   }
 
-  void orAR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void orAR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     registers.A = orA(getReg(r8));
   }
 
-  void cpAR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void cpAR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     subA(getReg(r8));
   }
 
-  void addAn({int opcode, int prefix}) {
+  void addAn(InstructionContext context) {
     registers.A = addA(fetch());
   }
 
-  void adcAn({int opcode, int prefix}) {
+  void adcAn(InstructionContext context) {
     registers.A = adcA(fetch());
   }
 
-  void subAn({int opcode, int prefix}) {
+  void subAn(InstructionContext context) {
     registers.A = subA(fetch());
   }
 
-  void sbcAn({int opcode, int prefix}) {
+  void sbcAn(InstructionContext context) {
     registers.A = sbcA(fetch());
   }
 
-  void andAn({int opcode, int prefix}) {
+  void andAn(InstructionContext context) {
     registers.A = andA(fetch());
   }
 
-  void xorAn({int opcode, int prefix}) {
+  void xorAn(InstructionContext context) {
     registers.A = xorA(fetch());
   }
 
-  void orAn({int opcode, int prefix}) {
+  void orAn(InstructionContext context) {
     registers.A = orA(fetch());
   }
 
-  void cpAn({int opcode, int prefix}) {
+  void cpAn(InstructionContext context) {
     cpA(fetch());
   }
 
-  void ldR8R8({int opcode, int prefix}) {
-    int r8Dest = Registers.r8Table[(opcode & 0x38) >> 3];
-    int r8Source = Registers.r8Table[(opcode & 0x07)];
+  void ldR8R8(InstructionContext context) {
+    int r8Dest = Registers.r8Table[(context.opcode & 0x38) >> 3];
+    int r8Source = Registers.r8Table[(context.opcode & 0x07)];
     this.setReg(r8Dest, getReg(r8Source));
   }
 
-  void ldR16nn({int opcode, int prefix}) {
-    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
+  void ldR16nn(InstructionContext context) {
+    int r16 = Registers.r16SPTable[(context.opcode & 0x30) >> 4];
     setReg2(r16, fetch2());
   }
 
-  void inR8C({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
+  void inR8C(InstructionContext context) {
+    int r8 = Registers.r8Table[(context.opcode & 0x38) >> 3];
     var result = this.ports.inPort(registers.C);
     setReg(r8, result);
     setZeroAndSignFlagsOn8BitResult(result);
@@ -1016,13 +1022,13 @@ class Z80a {
     registers.halfCarryFlag = false;
   }
 
-  void outCR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
+  void outCR8(InstructionContext context) {
+    int r8 = Registers.r8Table[(context.opcode & 0x38) >> 3];
     this.ports.outPort(registers.C, getReg(r8));
   }
 
-  void sbcHLR16({int opcode, int prefix}) {
-    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
+  void sbcHLR16(InstructionContext context) {
+    int r16 = Registers.r16SPTable[(context.opcode & 0x30) >> 4];
     int value = getReg2(r16);
     int cf = (registers.carryFlag ? 1 : 0);
     var result = registers.HL - value - cf;
@@ -1037,8 +1043,8 @@ class Z80a {
     setZeroAndSignFlagsOn16BitResult(registers.HL);
   }
 
-  void adcHLR16({int opcode, int prefix}) {
-    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
+  void adcHLR16(InstructionContext context) {
+    int r16 = Registers.r16SPTable[(context.opcode & 0x30) >> 4];
     int value = getReg2(r16);
     int cf = (registers.carryFlag ? 1 : 0);
     var result = registers.HL + value + cf;
@@ -1053,18 +1059,18 @@ class Z80a {
     setZeroAndSignFlagsOn16BitResult(registers.HL);
   }
 
-  void ldmnnR16({int opcode, int prefix}) {
-    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
+  void ldmnnR16(InstructionContext context) {
+    int r16 = Registers.r16SPTable[(context.opcode & 0x30) >> 4];
     this.memory.poke2(fetch2(), getReg2(r16));
   }
 
-  void ldR16mnn({int opcode, int prefix}) {
-    int r16 = Registers.r16SPTable[(opcode & 0x30) >> 4];
+  void ldR16mnn(InstructionContext context) {
+    int r16 = Registers.r16SPTable[(context.opcode & 0x30) >> 4];
     var a = fetch2();
     setReg2(r16, this.memory.peek2(a));
   }
 
-  void neg({int opcode, int prefix}) {
+  void neg(InstructionContext context) {
     registers.carryFlag = registers.A != 0;
     registers.parityOverflowFlag = registers.A == 0x80;
     registers.halfCarryFlag = registers.A != 0;
@@ -1074,22 +1080,22 @@ class Z80a {
     setZeroAndSignFlagsOn8BitResult(result);
   }
 
-  void callnn({int opcode, int prefix}) {
+  void callnn(InstructionContext context) {
     var address = fetch2();
     push2(PC);
     this.PC = address;
   }
 
-  void ret({int opcode, int prefix}) {
+  void ret(InstructionContext context) {
     this.PC = pop2();
   }
 
-  void jp({int opcode, int prefix}) {
+  void jp(InstructionContext context) {
     this.PC = fetch2();
   }
 
-  void callccnn({int opcode, int prefix}) {
-    var cond = getFlagCondition((opcode & 0x38) >> 3);
+  void callccnn(InstructionContext context) {
+    var cond = getFlagCondition((context.opcode & 0x38) >> 3);
     var address = fetch2();
     if (cond) {
       push2(PC);
@@ -1097,29 +1103,29 @@ class Z80a {
     }
   }
 
-  void retcc({int opcode, int prefix}) {
-    var cond = getFlagCondition((opcode & 0x38) >> 3);
+  void retcc(InstructionContext context) {
+    var cond = getFlagCondition((context.opcode & 0x38) >> 3);
     if (cond) {
       this.PC = pop2();
     }
   }
 
-  void jpccnn({int opcode, int prefix}) {
-    var cond = getFlagCondition((opcode & 0x38) >> 3);
+  void jpccnn(InstructionContext context) {
+    var cond = getFlagCondition((context.opcode & 0x38) >> 3);
     if (cond) {
       this.PC = fetch2();
     }
   }
 
-  void outnA({int opcode, int prefix}) {
+  void outnA(InstructionContext context) {
     this.ports.outPort(fetch(), registers.A);
   }
 
-  void inAn({int opcode, int prefix}) {
+  void inAn(InstructionContext context) {
     registers.A = this.ports.inPort(fetch());
   }
 
-  void exx({int opcode, int prefix}) {
+  void exx(InstructionContext context) {
     var bc = registers.BC;
     var de = registers.DE;
     var hl = registers.HL;
@@ -1131,159 +1137,159 @@ class Z80a {
     registers.HLt = hl;
   }
 
-  void exSPHL({int opcode, int prefix}) {
+  void exSPHL(InstructionContext context) {
     var msp = this.memory.peek2(registers.SP);
     this.memory.poke2(registers.SP, registers.HL);
     registers.HL = msp;
   }
 
-  void jpmHL({int opcode, int prefix}) {
+  void jpmHL(InstructionContext context) {
     this.PC = this.memory.peek2(registers.HL);
   }
 
-  void exDEHL({int opcode, int prefix}) {
+  void exDEHL(InstructionContext context) {
     var de = registers.DE;
     registers.DE = registers.HL;
     registers.HL = de;
   }
 
-  void ldSPHL({int opcode, int prefix}) {
+  void ldSPHL(InstructionContext context) {
     registers.SP = registers.HL;
   }
 
-  void pushR16({int opcode, int prefix}) {
-    int r16 = Registers.r16AFTable[(opcode & 0x30) >> 4];
+  void pushR16(InstructionContext context) {
+    int r16 = Registers.r16AFTable[(context.opcode & 0x30) >> 4];
     push2(getReg2(r16));
   }
 
-  void popR16({int opcode, int prefix}) {
-    int r16 = Registers.r16AFTable[(opcode & 0x30) >> 4];
+  void popR16(InstructionContext context) {
+    int r16 = Registers.r16AFTable[(context.opcode & 0x30) >> 4];
     setReg2(r16, pop2());
   }
 
-  void rstNN({int opcode, int prefix}) {
-    var rst = opcode & 0x38;
+  void rstNN(InstructionContext context) {
+    var rst = context.opcode & 0x38;
     push2(this.PC);
     this.PC = rst;
   }
 
-  void ldIXYnn({int opcode, int prefix}) {
-    setIXY(prefix, fetch2());
+  void ldIXYnn(InstructionContext context) {
+    setIXY(context.prefix, fetch2());
   }
 
-  void ldmnnIXY({int opcode, int prefix}) {
-    this.memory.poke2(fetch2(), getIXY(prefix));
+  void ldmnnIXY(InstructionContext context) {
+    this.memory.poke2(fetch2(), getIXY(context.prefix));
   }
 
-  void ldIXYmnn({int opcode, int prefix}) {
-    setIXY(prefix, this.memory.peek2(fetch2()));
+  void ldIXYmnn(InstructionContext context) {
+    setIXY(context.prefix, this.memory.peek2(fetch2()));
   }
 
-  void incIXY({int opcode, int prefix}) {
-    setIXY(prefix, word(getIXY(prefix) + 1));
+  void incIXY(InstructionContext context) {
+    setIXY(context.prefix, word(getIXY(context.prefix) + 1));
   }
 
-  void decIXY({int opcode, int prefix}) {
-    setIXY(prefix, word(getIXY(prefix) - 1));
+  void decIXY(InstructionContext context) {
+    setIXY(context.prefix, word(getIXY(context.prefix) - 1));
   }
 
-  void ldmIXYdn({int opcode, int prefix}) {
+  void ldmIXYdn(InstructionContext context) {
     var d = fetch();
     var value = fetch();
-    this.memory.poke(getIXY(prefix) + d, value);
+    this.memory.poke(getIXY(context.prefix) + d, value);
   }
 
-  void ldR8mIXYd({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[(opcode & 0x38) >> 3];
+  void ldR8mIXYd(InstructionContext context) {
+    int r8 = Registers.r8Table[(context.opcode & 0x38) >> 3];
     int d = fetch();
-    setReg(r8, this.memory.peek(getIXY(prefix) + d));
+    setReg(r8, this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void ldmIXYdR8({int opcode, int prefix}) {
-    int r8 = Registers.r8Table[opcode & 0x07];
+  void ldmIXYdR8(InstructionContext context) {
+    int r8 = Registers.r8Table[context.opcode & 0x07];
     int d = fetch();
-    this.memory.poke(getIXY(prefix) + d, getReg(r8));
+    this.memory.poke(getIXY(context.prefix) + d, getReg(r8));
   }
 
-  void addAIXYd({int opcode, int prefix}) {
+  void addAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = addA(this.memory.peek(getIXY(prefix) + d));
+    registers.A = addA(this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void adcAIXYd({int opcode, int prefix}) {
+  void adcAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = adcA(this.memory.peek(getIXY(prefix) + d));
+    registers.A = adcA(this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void subAIXYd({int opcode, int prefix}) {
+  void subAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = subA(this.memory.peek(getIXY(prefix) + d));
+    registers.A = subA(this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void sbcAIXYd({int opcode, int prefix}) {
+  void sbcAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = sbcA(this.memory.peek(getIXY(prefix) + d));
+    registers.A = sbcA(this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void andAIXYd({int opcode, int prefix}) {
+  void andAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = andA(this.memory.peek(getIXY(prefix) + d));
+    registers.A = andA(this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void xorAIXYd({int opcode, int prefix}) {
+  void xorAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = xorA(this.memory.peek(getIXY(prefix) + d));
+    registers.A = xorA(this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void orAIXYd({int opcode, int prefix}) {
+  void orAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = orA(this.memory.peek(getIXY(prefix) + d));
+    registers.A = orA(this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void cpAIXYd({int opcode, int prefix}) {
+  void cpAIXYd(InstructionContext context) {
     var d = fetch();
-    cpA(this.memory.peek(getIXY(prefix) + d));
+    cpA(this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void popIXY({int opcode, int prefix}) {
-    setIXY(prefix, pop2());
+  void popIXY(InstructionContext context) {
+    setIXY(context.prefix, pop2());
   }
 
-  void pushIXY({int opcode, int prefix}) {
-    push2(getIXY(prefix));
+  void pushIXY(InstructionContext context) {
+    push2(getIXY(context.prefix));
   }
 
-  void jpmIXY({int opcode, int prefix}) {
-    this.PC = this.memory.peek2(getIXY(prefix));
+  void jpmIXY(InstructionContext context) {
+    this.PC = this.memory.peek2(getIXY(context.prefix));
   }
 
-  void exmSPIXY({int opcode, int prefix}) {
+  void exmSPIXY(InstructionContext context) {
     var msp = this.memory.peek2(registers.SP);
-    this.memory.poke2(registers.SP, getIXY(prefix));
-    setIXY(prefix, msp);
+    this.memory.poke2(registers.SP, getIXY(context.prefix));
+    setIXY(context.prefix, msp);
   }
 
-  void ldSPIXY({int opcode, int prefix}) {
-    registers.SP = getIXY(prefix);
+  void ldSPIXY(InstructionContext context) {
+    registers.SP = getIXY(context.prefix);
   }
 
-  void bitnMIXYd({int opcode, int prefix}) {
-    var d = 0;
-    var bit = (opcode & 0x38) >> 3;
-    bitNR8(bit, this.memory.peek(getIXY(prefix) + d));
+  void bitnMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var bit = (context.opcode & 0x38) >> 3;
+    bitNR8(bit, this.memory.peek(getIXY(context.prefix) + d));
   }
 
-  void resnMIXYd({int opcode, int prefix}) {
-    var d = 0;
-    var bit = (opcode & 0x38) >> 3;
-    var address = getIXY(prefix) + d;
+  void resnMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var bit = (context.opcode & 0x38) >> 3;
+    var address = getIXY(context.prefix) + d;
     this.memory.poke(address, resNR8(bit, this.memory.peek(address)));
   }
 
-  void setnMIXYd({int opcode, int prefix}) {
-    var d = 0;
-    var bit = (opcode & 0x38) >> 3;
-    var address = getIXY(prefix) + d;
+  void setnMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var bit = (context.opcode & 0x38) >> 3;
+    var address = getIXY(context.prefix) + d;
     this.memory.poke(address, setNR8(bit, this.memory.peek(address)));
   }
 
