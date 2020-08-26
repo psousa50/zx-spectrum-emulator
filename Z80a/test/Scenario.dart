@@ -141,14 +141,14 @@ class Scenario {
   Map<int, int> getZ80Registers(Z80a z80a) {
     Map<int, int> actualRegisterValues = {};
     for (var r = 0; r < Registers.R_COUNT; r++) {
-      actualRegisterValues[r] = z80a.getReg(r);
+      actualRegisterValues[r] = z80a.r8Value(r);
     }
     return actualRegisterValues;
   }
 
   void setZ80Registers(Z80a z80a, Map<int, int> initialRegisterValues) {
     initialRegisterValues.keys.forEach((r) {
-      z80a.setReg(r, initialRegisterValues[r]);
+      z80a.setR8Value(r, initialRegisterValues[r]);
     });
 
     z80a.PC = initialState.pc;

@@ -12,3 +12,7 @@ String toBinary8(int b) {
 int lo(int w) => w % 256;
 int hi(int w) => w ~/ 256;
 int w(int lo, int hi) => lo + 256 * hi;
+
+int bit012(int byte) => byte & 0x07;
+int bit345(int byte) => (byte & 0x38) >> 3;
+int bit45(int byte) => (byte & 0x30) >> 4;

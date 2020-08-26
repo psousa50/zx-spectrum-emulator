@@ -207,4 +207,8 @@ class Registers {
   set halfCarryFlag(bool b) => F = b ? F | F_HALF_CARRY : F & ~F_HALF_CARRY;
   set zeroFlag(bool b) => F = b ? F | F_ZERO : F & ~F_ZERO;
   set signFlag(bool b) => F = b ? F | F_SIGN : F & ~F_SIGN;
+
+  static int rBit012(int opcode) => Registers.r8Table[opcode & 0x07];
+  static int rBit345(int opcode) => Registers.r8Table[(opcode & 0x38) >> 3];
+  static int rBit45(int opcode) => Registers.r16SPTable[(opcode & 0x30) >> 4];
 }
