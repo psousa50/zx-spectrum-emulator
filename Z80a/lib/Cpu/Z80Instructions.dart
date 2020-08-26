@@ -49,6 +49,8 @@ class Z80Instructions {
     }
   }
 
+  Z80Instruction operator [](int i) => instructions[i];
+
   void addFlags(int opcode, String name, OpcodeHandler handler, int tStates,
       {int multiplier = 1, int count = 8}) {
     var flags = ["NZ", "Z", "NC", "C", "PO", "PE", "P", "M"];
@@ -56,7 +58,7 @@ class Z80Instructions {
       var flag = flags[i];
       add(
         opcode + i * multiplier,
-        name.replaceAll("[r8]", flag),
+        name.replaceAll("[flag]", flag),
         handler,
         tStates,
       );

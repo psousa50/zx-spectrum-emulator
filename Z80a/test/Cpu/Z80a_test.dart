@@ -384,6 +384,8 @@ var allScenarios = [
   ...rlcR8(0x04, Registers.R_H),
   ...rlcR8(0x05, Registers.R_L),
   ...rlcR8(0x06, Registers.R_MHL),
+  ...rlcR8(0x06, Registers.R_MIXd),
+  ...rlcR8(0x06, Registers.R_MIYd),
   ...rlcR8(0x07, Registers.R_A),
 
   ...rrcR8(0x08, Registers.R_B),
@@ -393,6 +395,8 @@ var allScenarios = [
   ...rrcR8(0x0C, Registers.R_H),
   ...rrcR8(0x0D, Registers.R_L),
   ...rrcR8(0x0E, Registers.R_MHL),
+  ...rrcR8(0x0E, Registers.R_MIXd),
+  ...rrcR8(0x0E, Registers.R_MIYd),
   ...rrcR8(0x0F, Registers.R_A),
 
   ...rlR8(0x10, Registers.R_B),
@@ -402,6 +406,8 @@ var allScenarios = [
   ...rlR8(0x14, Registers.R_H),
   ...rlR8(0x15, Registers.R_L),
   ...rlR8(0x16, Registers.R_MHL),
+  ...rlR8(0x16, Registers.R_MIXd),
+  ...rlR8(0x16, Registers.R_MIYd),
   ...rlR8(0x17, Registers.R_A),
 
   ...rrR8(0x18, Registers.R_B),
@@ -411,6 +417,8 @@ var allScenarios = [
   ...rrR8(0x1C, Registers.R_H),
   ...rrR8(0x1D, Registers.R_L),
   ...rrR8(0x1E, Registers.R_MHL),
+  ...rrR8(0x1E, Registers.R_MIXd),
+  ...rrR8(0x1E, Registers.R_MIYd),
   ...rrR8(0x1F, Registers.R_A),
 
   ...slaR8(0x20, Registers.R_B),
@@ -420,6 +428,8 @@ var allScenarios = [
   ...slaR8(0x24, Registers.R_H),
   ...slaR8(0x25, Registers.R_L),
   ...slaR8(0x26, Registers.R_MHL),
+  ...slaR8(0x26, Registers.R_MIXd),
+  ...slaR8(0x26, Registers.R_MIYd),
   ...slaR8(0x27, Registers.R_A),
 
   ...sraR8(0x28, Registers.R_B),
@@ -429,6 +439,8 @@ var allScenarios = [
   ...sraR8(0x2C, Registers.R_H),
   ...sraR8(0x2D, Registers.R_L),
   ...sraR8(0x2E, Registers.R_MHL),
+  ...sraR8(0x2E, Registers.R_MIXd),
+  ...sraR8(0x2E, Registers.R_MIYd),
   ...sraR8(0x2F, Registers.R_A),
 
   ...srlR8(0x38, Registers.R_B),
@@ -438,6 +450,8 @@ var allScenarios = [
   ...srlR8(0x3C, Registers.R_H),
   ...srlR8(0x3D, Registers.R_L),
   ...srlR8(0x3E, Registers.R_MHL),
+  ...srlR8(0x3E, Registers.R_MIXd),
+  ...srlR8(0x3E, Registers.R_MIYd),
   ...srlR8(0x3F, Registers.R_A),
 
   // BIT n, R8
@@ -618,7 +632,6 @@ var allScenarios = [
   ...res7R8(0xBE, Registers.R_MIYd),
   ...res7R8(0xBF, Registers.R_A),
 
-  // SET n, R8
   ...set0R8(0xC0, Registers.R_B),
   ...set0R8(0xC1, Registers.R_C),
   ...set0R8(0xC2, Registers.R_D),

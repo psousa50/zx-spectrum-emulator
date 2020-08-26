@@ -43,5 +43,50 @@ void main() {
         }
       }
     }
-  }, skip: false);
+  }, skip: true);
+
+  test('Show opcodes', () {
+    var z80a = Z80a(MemoryTest(size: 20), PortsTest());
+
+    for (var opcode = 0; opcode < 256; opcode++) {
+      if (![
+        Z80a.IX_PREFIX,
+        Z80a.IY_PREFIX,
+        Z80a.EXTENDED_OPCODES,
+      ].contains(opcode)) {
+        var instruction = z80a.unPrefixedOpcodes[opcode];
+        var name =
+            instruction != null ? instruction.name : "(*** NOT DEFINED ***)";
+        print("${opcode.toRadixString(16)} => $name");
+      }
+    }
+
+    for (var opcode = 0; opcode < 256; opcode++) {
+      if (![
+        Z80a.BIT_OPCODES,
+      ].contains(opcode)) {
+        var instruction = z80a.iXYOpcodes[opcode];
+        var name =
+            instruction != null ? instruction.name : "(*** NOT DEFINED ***)";
+        print("${opcode.toRadixString(16)} => $name");
+      }
+    }
+
+    for (var opcode = 0; opcode < 256; opcode++) {
+      var o = opcode.toRadixString(16);
+      if (o[o.length - 1] == "6" || o[o.length - 1] == "e") {
+        var instruction = z80a.iXYbitOpcodes[opcode];
+        var name =
+            instruction != null ? instruction.name : "(*** NOT DEFINED ***)";
+        print("${opcode.toRadixString(16)} => $name");
+      }
+    }
+
+    for (var opcode = 0; opcode < 256; opcode++) {
+      var instruction = z80a.bitOpcodes[opcode];
+      var name =
+          instruction != null ? instruction.name : "(*** NOT DEFINED ***)";
+      print("${opcode.toRadixString(16)} => $name");
+    }
+  });
 }

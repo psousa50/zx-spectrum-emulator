@@ -26,11 +26,6 @@ class Z80a {
 
   static List<int> bitMask = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
 
-  int getIXY(int prefix) => prefix == IX_PREFIX ? registers.IX : registers.IY;
-
-  void setIXY(int prefix, int w) =>
-      prefix == IX_PREFIX ? registers.IX = w : registers.IY = w;
-
   Z80a(this.memory, this.ports) {
     buildUnprefixedOpcodes();
     buildExtendedOpcodes();
@@ -54,9 +49,68 @@ class Z80a {
     return v;
   }
 
+  int step() {
+    var tStates = 0;
+
+    final opcode = fetch();
+
+    switch (opcode) {
+      case IX_PREFIX:
+      case IY_PREFIX:
+        tStates = processIXYOpcodes(opcode);
+        break;
+
+      case EXTENDED_OPCODES:
+        tStates = processOpcode(InstructionContext(fetch()), extendedOpcodes);
+        break;
+
+      case BIT_OPCODES:
+        tStates = processOpcode(InstructionContext(fetch()), bitOpcodes);
+        break;
+
+      default:
+        tStates = processOpcode(InstructionContext(opcode), unPrefixedOpcodes);
+        break;
+    }
+
+    return tStates;
+  }
+
+  int processIXYOpcodes(int prefix) {
+    var tStates = 0;
+
+    final opcode = fetch();
+
+    switch (opcode) {
+      case BIT_OPCODES:
+        var d = fetch();
+        tStates = processOpcode(
+            InstructionContext.withPrefixAndDisplacement(fetch(), prefix, d),
+            iXYbitOpcodes);
+        break;
+
+      default:
+        tStates = processOpcode(
+            InstructionContext.withPrefix(opcode, prefix), iXYOpcodes);
+        break;
+    }
+
+    return tStates;
+  }
+
+  int processOpcode(
+      InstructionContext context, Z80Instructions z80Instructions) {
+    return z80Instructions.execute(context);
+  }
+
   int byte(int v) => v % 256;
 
   int word(int v) => v % 65536;
+
+  int getIXY(int prefix) => prefix == IX_PREFIX ? registers.IX : registers.IY;
+
+  void setIXY(int prefix, int w) =>
+      prefix == IX_PREFIX ? registers.IX = w : registers.IY = w;
 
   int r8Value(int r) =>
       r == Registers.R_MHL ? this.memory.peek(registers.HL) : registers[r];
@@ -315,60 +369,6 @@ class Z80a {
     setZeroAndSignFlagsOn8BitResult(result);
     registers.parityOverflowFlag = parity(result);
     return result;
-  }
-
-  int step() {
-    var tStates = 0;
-
-    final opcode = fetch();
-
-    switch (opcode) {
-      case IX_PREFIX:
-      case IY_PREFIX:
-        tStates = processIXYOpcodes(opcode);
-        break;
-
-      case EXTENDED_OPCODES:
-        tStates = processOpcode(InstructionContext(fetch()), extendedOpcodes);
-        break;
-
-      case BIT_OPCODES:
-        tStates = processOpcode(InstructionContext(fetch()), bitOpcodes);
-        break;
-
-      default:
-        tStates = processOpcode(InstructionContext(opcode), unPrefixedOpcodes);
-        break;
-    }
-
-    return tStates;
-  }
-
-  int processIXYOpcodes(int prefix) {
-    var tStates = 0;
-
-    final opcode = fetch();
-
-    switch (opcode) {
-      case BIT_OPCODES:
-        var d = fetch();
-        tStates = processOpcode(
-            InstructionContext.withPrefixAndDisplacement(fetch(), prefix, d),
-            iXYbitOpcodes);
-        break;
-
-      default:
-        tStates = processOpcode(
-            InstructionContext.withPrefix(opcode, prefix), iXYOpcodes);
-        break;
-    }
-
-    return tStates;
-  }
-
-  int processOpcode(
-      InstructionContext context, Z80Instructions z80Instructions) {
-    return z80Instructions.execute(context);
   }
 
   void bitNR8Op(int bit, int value) {
@@ -922,6 +922,48 @@ class Z80a {
     registers.SP = getIXY(context.prefix);
   }
 
+  void rlcMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var address = getIXY(context.prefix) + d;
+    this.memory.poke(address, rlc(this.memory.peek(address)));
+  }
+
+  void rrcMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var address = getIXY(context.prefix) + d;
+    this.memory.poke(address, rrc(this.memory.peek(address)));
+  }
+
+  void rlMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var address = getIXY(context.prefix) + d;
+    this.memory.poke(address, rl(this.memory.peek(address)));
+  }
+
+  void rrMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var address = getIXY(context.prefix) + d;
+    this.memory.poke(address, rr(this.memory.peek(address)));
+  }
+
+  void slaMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var address = getIXY(context.prefix) + d;
+    this.memory.poke(address, sla(this.memory.peek(address)));
+  }
+
+  void sraMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var address = getIXY(context.prefix) + d;
+    this.memory.poke(address, sra(this.memory.peek(address)));
+  }
+
+  void srlMIXYd(InstructionContext context) {
+    var d = context.displacement;
+    var address = getIXY(context.prefix) + d;
+    this.memory.poke(address, srl(this.memory.peek(address)));
+  }
+
   void bitnMIXYd(InstructionContext context) {
     var d = context.displacement;
     var bit = bit345(context.opcode);
@@ -986,10 +1028,10 @@ class Z80a {
     unPrefixedOpcodes.add(0x3F, "CCF", ccf, 4);
     unPrefixedOpcodes.addR16(0x09, "ADD HL, [r16]", addHLR16, 4,
         multiplier: 16);
-    unPrefixedOpcodes.add(0x0A, " LD A, (BC)", ldAmBC, 4);
-    unPrefixedOpcodes.add(0x1A, " LD A, (DE)", ldAmDE, 4);
+    unPrefixedOpcodes.add(0x0A, "LD A, (BC)", ldAmBC, 4);
+    unPrefixedOpcodes.add(0x1A, "LD A, (DE)", ldAmDE, 4);
     unPrefixedOpcodes.addR16(0x0B, "DEC [r16]", decR16, 4, multiplier: 16);
-    unPrefixedOpcodes.add(0x12, " LD (DE), A", ldmDEA, 4);
+    unPrefixedOpcodes.add(0x12, "LD (DE), A", ldmDEA, 4);
     unPrefixedOpcodes.add(0x22, "LD (nn), HL", ldmnnHL, 4);
     unPrefixedOpcodes.add(0x2A, "LD HL, (nn)", ldHLmnn, 4);
     unPrefixedOpcodes.add(0x32, "LD (nn), A", ldmnnA, 4);
@@ -1112,6 +1154,14 @@ class Z80a {
 
   void buildIXYBitOpcodes() {
     iXYbitOpcodes = Z80Instructions();
+
+    iXYbitOpcodes.add(0x06, "RLC (IXY + d)", rlcMIXYd, 23);
+    iXYbitOpcodes.add(0x0E, "RRC (IXY + d)", rrcMIXYd, 23);
+    iXYbitOpcodes.add(0x16, "RL (IXY + d)", rlMIXYd, 23);
+    iXYbitOpcodes.add(0x1E, "RR (IXY + d)", rrMIXYd, 23);
+    iXYbitOpcodes.add(0x26, "SLA (IXY + d)", slaMIXYd, 23);
+    iXYbitOpcodes.add(0x2E, "SRA (IXY + d)", sraMIXYd, 23);
+    iXYbitOpcodes.add(0x3E, "SRL (IXY + d)", srlMIXYd, 23);
 
     iXYbitOpcodes.addBit8(0x46, "BIT [bit], (IXY + d)", bitnMIXYd, 20,
         multiplier: 8);
