@@ -1,6 +1,9 @@
 import 'package:Z80a/Cpu/Registers.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Z80a/Cpu/Z80a.dart';
+import '../MemoryTest.dart';
+import '../PortsTest.dart';
+import '../Scenario.dart';
 import '../Scenarios.dart';
 
 var allScenarios = [
@@ -724,17 +727,25 @@ var allScenarios = [
 void main() {
   const runAll = true;
 
-  test('All Scenarios', () {
+  test("All Scenarios", () {
     allScenarios.forEach((scenario) {
       scenario.run();
     });
   }, skip: !runAll);
 
-  test('One Scenario', () {
+  test("One Scenario", () {
     print("RUNNING ONLY ONE SCENARIO");
     var scenarios = bit0R8(0x46, Registers.R_MIXd);
     scenarios.forEach((scenario) {
       scenario.run();
     });
   }, skip: runAll);
+
+  test("Instruction returns T states", () {
+    var z80a = Z80a(MemoryTest(size: 20), PortsTest());
+    z80a.registers.zeroFlag = true;
+    z80a.memory.poke(0, 0xC4);
+    var tStates = z80a.step();
+    expect(tStates, 10);
+  });
 }

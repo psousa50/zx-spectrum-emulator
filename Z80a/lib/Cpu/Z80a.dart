@@ -1177,7 +1177,7 @@ class Z80a {
     unPrefixedOpcodes.add(0xC9, "RET", ret, 4);
     unPrefixedOpcodes.add(0xC3, "JP", jp, 4);
 
-    unPrefixedOpcodes.addFlags(0xC4, "CALL [flag], nn", callccnn, 4,
+    unPrefixedOpcodes.addFlags(0xC4, "CALL [flag], nn", callccnn, 10,
         multiplier: 8);
     unPrefixedOpcodes.addFlags(0xC0, "RET [flag]", retcc, 4, multiplier: 8);
     unPrefixedOpcodes.addFlags(0xC2, "JP [flag], nn", jpccnn, 4, multiplier: 8);

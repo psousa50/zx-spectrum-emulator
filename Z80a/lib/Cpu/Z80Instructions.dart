@@ -1,5 +1,4 @@
 import 'InstructionContext.dart';
-import 'OpcodeHandler.dart';
 import 'Registers.dart';
 import 'Z80Instruction.dart';
 
@@ -126,6 +125,7 @@ class Z80Instructions {
     var instruction = instructions[context.opcode];
     if (instruction != null) {
       tStates = instruction.handler(context.withInstruction(instruction));
+      if (tStates == null) tStates = 1;
     }
     return tStates;
   }
