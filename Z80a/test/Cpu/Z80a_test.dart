@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:Z80a/Cpu/Z80a.dart';
 import '../MemoryTest.dart';
 import '../PortsTest.dart';
-import '../Scenario.dart';
 import '../Scenarios.dart';
 
 var allScenarios = [
@@ -744,8 +743,8 @@ void main() {
   test("Instruction returns T states", () {
     var z80a = Z80a(MemoryTest(size: 20), PortsTest());
     z80a.registers.zeroFlag = true;
-    z80a.memory.poke(0, 0xC4);
+    z80a.memory.poke(0, 0x7E);
     var tStates = z80a.step();
-    expect(tStates, 10);
+    expect(tStates, 7);
   });
 }

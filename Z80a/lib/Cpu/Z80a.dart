@@ -591,12 +591,6 @@ class Z80a {
     return context.instruction.tStates();
   }
 
-  int ldmHLR8(InstructionContext context) {
-    int r8 = Registers.rBit012(context.opcode);
-    this.memory.poke(registers.HL, r8Value(r8));
-    return context.instruction.tStates();
-  }
-
   int ldmnnHL(InstructionContext context) {
     this.memory.poke2(fetch2(), registers.HL);
     return context.instruction.tStates();
@@ -1124,169 +1118,166 @@ class Z80a {
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
 
-    unPrefixedOpcodes.add(0x00, "NOP", nop, 4);
-    unPrefixedOpcodes.addR16(0x01, "LD [r16], nn", ldR16nn, 4, multiplier: 16);
-    unPrefixedOpcodes.add(0x02, "LD (BC), A", ldmBCA, 4);
-    unPrefixedOpcodes.addR16(0x03, "INC [r16]", incR16, 4, multiplier: 16);
-    unPrefixedOpcodes.addR8(0x04, "INC [r8]", incR8, 4, multiplier: 8);
-    unPrefixedOpcodes.addR8(0x05, "DEC [r8]", decR8, 4, multiplier: 8);
-    unPrefixedOpcodes.addR8(0x06, "LD [r8], n", ldR8n, 4, multiplier: 8);
-    unPrefixedOpcodes.add(0x07, "RLCA", rlca, 4);
-    unPrefixedOpcodes.add(0x0F, "RRCA", rrca, 4);
+    unPrefixedOpcodes.build(0x00, "NOP", nop, 4);
+    unPrefixedOpcodes.build(0x01, "LD [r16], nn", ldR16nn, 4,
+        multiplier: 16, count: 4);
+    unPrefixedOpcodes.build(0x02, "LD (BC), A", ldmBCA, 4);
+    unPrefixedOpcodes.build(0x03, "INC [r16]", incR16, 4,
+        multiplier: 16, count: 4);
+    unPrefixedOpcodes.build(0x04, "INC [rb345]", incR8, 4,
+        multiplier: 8, count: 8);
+    unPrefixedOpcodes.buildM1C8(0x05, "DEC [rb345]", decR8, 4, multiplier: 8);
+    unPrefixedOpcodes.buildM1C8(0x06, "LD [rb345], n", ldR8n, 4, multiplier: 8);
+    unPrefixedOpcodes.build(0x07, "RLCA", rlca, 4);
+    unPrefixedOpcodes.build(0x0F, "RRCA", rrca, 4);
 
-    unPrefixedOpcodes.add(0x10, "DJNZ nn", djnz, 4);
-    unPrefixedOpcodes.add(0x18, "JR nn", jr, 4);
+    unPrefixedOpcodes.build(0x10, "DJNZ nn", djnz, 4);
+    unPrefixedOpcodes.build(0x18, "JR nn", jr, 4);
 
-    unPrefixedOpcodes.addFlags(0x20, "JR CC, nn", jrcc, 4,
-        multiplier: 8, count: 4);
+    unPrefixedOpcodes.buildM8C8(0x20, "JR CC, nn", jrcc, 4, count: 4);
 
-    unPrefixedOpcodes.add(0x17, "RLA", rla, 4);
-    unPrefixedOpcodes.add(0x1F, "RRA", rra, 4);
-    unPrefixedOpcodes.add(0x2F, "CPL", cpl, 4);
-    unPrefixedOpcodes.add(0x37, "SCF", scf, 4);
-    unPrefixedOpcodes.add(0x3F, "CCF", ccf, 4);
-    unPrefixedOpcodes.addR16(0x09, "ADD HL, [r16]", addHLR16, 4,
-        multiplier: 16);
-    unPrefixedOpcodes.add(0x0A, "LD A, (BC)", ldAmBC, 4);
-    unPrefixedOpcodes.add(0x1A, "LD A, (DE)", ldAmDE, 4);
-    unPrefixedOpcodes.addR16(0x0B, "DEC [r16]", decR16, 4, multiplier: 16);
-    unPrefixedOpcodes.add(0x12, "LD (DE), A", ldmDEA, 4);
-    unPrefixedOpcodes.add(0x22, "LD (nn), HL", ldmnnHL, 4);
-    unPrefixedOpcodes.add(0x2A, "LD HL, (nn)", ldHLmnn, 4);
-    unPrefixedOpcodes.add(0x32, "LD (nn), A", ldmnnA, 4);
-    unPrefixedOpcodes.add(0x3A, "LD A, (nn)", ldAmnn, 4);
-    unPrefixedOpcodes.add(0x36, "LD (HL), nn", ldmHLnn, 4);
-    unPrefixedOpcodes.addR8R8(0x40, "LD [rDest], [rSource]", ldR8R8, 4);
-    unPrefixedOpcodes.addR8(0x70, "LD (HL), [r8]", ldmHLR8, 4);
-    unPrefixedOpcodes.add(0x08, "EX AF, AF'", exAFAFq, 4);
-    unPrefixedOpcodes.addR8(0x80, "ADD A, [r8]", addAR8, 4);
-    unPrefixedOpcodes.addR8(0x88, "ADC A, [r8]", adcAR8, 4);
-    unPrefixedOpcodes.addR8(0x90, "SUB [r8]", subAR8, 4);
-    unPrefixedOpcodes.addR8(0x98, "SBC [r8]", sbcAR8, 4);
-    unPrefixedOpcodes.addR8(0xA0, "AND [r8]", andAR8, 4);
-    unPrefixedOpcodes.addR8(0xA8, "XOR [r8]", xorAR8, 4);
-    unPrefixedOpcodes.addR8(0xB0, "OR [r8]", orAR8, 4);
-    unPrefixedOpcodes.addR8(0xB8, "CP [r8]", cpAR8, 4);
+    unPrefixedOpcodes.build(0x17, "RLA", rla, 4);
+    unPrefixedOpcodes.build(0x1F, "RRA", rra, 4);
+    unPrefixedOpcodes.build(0x2F, "CPL", cpl, 4);
+    unPrefixedOpcodes.build(0x37, "SCF", scf, 4);
+    unPrefixedOpcodes.build(0x3F, "CCF", ccf, 4);
+    unPrefixedOpcodes.buildM16C4(0x09, "ADD HL, [r16]", addHLR16, 4);
+    unPrefixedOpcodes.build(0x0A, "LD A, (BC)", ldAmBC, 4);
+    unPrefixedOpcodes.build(0x1A, "LD A, (DE)", ldAmDE, 4);
+    unPrefixedOpcodes.buildM16C4(0x0B, "DEC [r16]", decR16, 4);
+    unPrefixedOpcodes.build(0x12, "LD (DE), A", ldmDEA, 4);
+    unPrefixedOpcodes.build(0x22, "LD (nn), HL", ldmnnHL, 4);
+    unPrefixedOpcodes.build(0x2A, "LD HL, (nn)", ldHLmnn, 4);
+    unPrefixedOpcodes.build(0x32, "LD (nn), A", ldmnnA, 4);
+    unPrefixedOpcodes.build(0x3A, "LD A, (nn)", ldAmnn, 4);
+    unPrefixedOpcodes.build(0x36, "LD (HL), nn", ldmHLnn, 4);
+    unPrefixedOpcodes.build(0x40, "LD [rb345], [rb012]", ldR8R8, 4, count: 64);
+    unPrefixedOpcodes.build(0x7E, "LD A, (HL)", ldR8R8, 7);
+    unPrefixedOpcodes.build(0x08, "EX AF, AF'", exAFAFq, 4);
+    unPrefixedOpcodes.buildM1C8(0x80, "ADD A, [rb012]", addAR8, 4);
+    unPrefixedOpcodes.buildM1C8(0x88, "ADC A, [rb012]", adcAR8, 4);
+    unPrefixedOpcodes.buildM1C8(0x90, "SUB [rb012]", subAR8, 4);
+    unPrefixedOpcodes.buildM1C8(0x98, "SBC [rb012]", sbcAR8, 4);
+    unPrefixedOpcodes.buildM1C8(0xA0, "AND [rb012]", andAR8, 4);
+    unPrefixedOpcodes.buildM1C8(0xA8, "XOR [rb012]", xorAR8, 4);
+    unPrefixedOpcodes.buildM1C8(0xB0, "OR [rb012]", orAR8, 4);
+    unPrefixedOpcodes.buildM1C8(0xB8, "CP [rb012]", cpAR8, 4);
 
-    unPrefixedOpcodes.addR16(0xC1, "POP [r16]", popR16, 4, multiplier: 16);
-    unPrefixedOpcodes.addR16(0xC5, "PUSH [r16]", pushR16, 4, multiplier: 16);
+    unPrefixedOpcodes.buildM16C4(0xC1, "POP [r16]", popR16, 4);
+    unPrefixedOpcodes.buildM16C4(0xC5, "PUSH [r16]", pushR16, 4);
 
-    unPrefixedOpcodes.addR8(0xC7, "RST", rstNN, 4, multiplier: 8);
+    unPrefixedOpcodes.buildM1C8(0xC7, "RST [rst]", rstNN, 4, multiplier: 8);
 
-    unPrefixedOpcodes.add(0xCD, "CALL nn", callnn, 4);
-    unPrefixedOpcodes.add(0xC9, "RET", ret, 4);
-    unPrefixedOpcodes.add(0xC3, "JP", jp, 4);
+    unPrefixedOpcodes.build(0xCD, "CALL nn", callnn, 4);
+    unPrefixedOpcodes.build(0xC9, "RET", ret, 4);
+    unPrefixedOpcodes.build(0xC3, "JP", jp, 4);
 
-    unPrefixedOpcodes.addFlags(0xC4, "CALL [flag], nn", callccnn, 10,
-        multiplier: 8);
-    unPrefixedOpcodes.addFlags(0xC0, "RET [flag]", retcc, 4, multiplier: 8);
-    unPrefixedOpcodes.addFlags(0xC2, "JP [flag], nn", jpccnn, 4, multiplier: 8);
+    unPrefixedOpcodes.buildM8C8(0xC4, "CALL [cc], nn", callccnn, 10);
+    unPrefixedOpcodes.buildM8C8(0xC0, "RET [cc]", retcc, 4);
+    unPrefixedOpcodes.buildM8C8(0xC2, "JP [cc], nn", jpccnn, 4);
 
-    unPrefixedOpcodes.add(0xD3, "OUT (N), A", outnA, 4);
-    unPrefixedOpcodes.add(0xDB, "IN A, (N)", inAn, 4);
+    unPrefixedOpcodes.build(0xD3, "OUT (N), A", outnA, 4);
+    unPrefixedOpcodes.build(0xDB, "IN A, (N)", inAn, 4);
 
-    unPrefixedOpcodes.add(0xD9, "EXX", exx, 4);
-    unPrefixedOpcodes.add(0xE3, "EX (SP), HL", exSPHL, 4);
+    unPrefixedOpcodes.build(0xD9, "EXX", exx, 4);
+    unPrefixedOpcodes.build(0xE3, "EX (SP), HL", exSPHL, 4);
 
-    unPrefixedOpcodes.add(0xE9, "JP (HL)", jpmHL, 4);
-    unPrefixedOpcodes.add(0xEB, "EX DE, HL", exDEHL, 4);
-    unPrefixedOpcodes.add(0xF9, "LD SP, HL", ldSPHL, 4);
+    unPrefixedOpcodes.build(0xE9, "JP (HL)", jpmHL, 4);
+    unPrefixedOpcodes.build(0xEB, "EX DE, HL", exDEHL, 4);
+    unPrefixedOpcodes.build(0xF9, "LD SP, HL", ldSPHL, 4);
 
-    unPrefixedOpcodes.add(0xC6, "ADD A, N", addAn, 4);
-    unPrefixedOpcodes.add(0xCE, "ADC A, N", adcAn, 4);
-    unPrefixedOpcodes.add(0xD6, "SUB N", subAn, 4);
-    unPrefixedOpcodes.add(0xDE, "SBC A, N", sbcAn, 4);
-    unPrefixedOpcodes.add(0xE6, "AND A, N", andAn, 4);
-    unPrefixedOpcodes.add(0xEE, "XOR N", xorAn, 4);
-    unPrefixedOpcodes.add(0xF6, "OR N", orAn, 4);
-    unPrefixedOpcodes.add(0xFE, "CP N", cpAn, 4);
+    unPrefixedOpcodes.build(0xC6, "ADD A, N", addAn, 4);
+    unPrefixedOpcodes.build(0xCE, "ADC A, N", adcAn, 4);
+    unPrefixedOpcodes.build(0xD6, "SUB N", subAn, 4);
+    unPrefixedOpcodes.build(0xDE, "SBC A, N", sbcAn, 4);
+    unPrefixedOpcodes.build(0xE6, "AND A, N", andAn, 4);
+    unPrefixedOpcodes.build(0xEE, "XOR N", xorAn, 4);
+    unPrefixedOpcodes.build(0xF6, "OR N", orAn, 4);
+    unPrefixedOpcodes.build(0xFE, "CP N", cpAn, 4);
   }
 
   void buildExtendedOpcodes() {
     extendedOpcodes = Z80Instructions();
-    extendedOpcodes.addR8(0x40, "IN [r8], C", inR8C, 12, multiplier: 8);
-    extendedOpcodes.addR8(0x41, "OUT C, [r8]", outCR8, 12, multiplier: 8);
-    extendedOpcodes.addR16(0x42, "SBC HL, [r16]", sbcHLR16, 15, multiplier: 16);
-    extendedOpcodes.addR16(0x4A, "ADC HL, [r16]", adcHLR16, 15, multiplier: 16);
-    extendedOpcodes.addR16(0x43, "LD (NN), [r16]", ldmnnR16, 20,
-        multiplier: 16);
-    extendedOpcodes.addR16(0x4B, "LD [r16], (nn)", ldR16mnn, 20,
-        multiplier: 16);
-    extendedOpcodes.addMultiple(0x44, 4, "NEG", neg, 8, multiplier: 16);
-    extendedOpcodes.addMultiple(0x4C, 4, "NEG", neg, 8, multiplier: 16);
+    extendedOpcodes.buildM1C8(0x40, "IN [rb345], C", inR8C, 12, multiplier: 8);
+    extendedOpcodes.buildM1C8(0x41, "OUT C, [rb345]", outCR8, 12,
+        multiplier: 8);
+    extendedOpcodes.buildM16C4(0x42, "SBC HL, [r16]", sbcHLR16, 15);
+    extendedOpcodes.buildM16C4(0x4A, "ADC HL, [r16]", adcHLR16, 15);
+    extendedOpcodes.buildM16C4(0x43, "LD (nn), [r16]", ldmnnR16, 20);
+    extendedOpcodes.buildM16C4(0x4B, "LD [r16], (nn)", ldR16mnn, 20);
+    extendedOpcodes.buildM16C4(0x44, "NEG", neg, 8);
+    extendedOpcodes.buildM16C4(0x4C, "NEG", neg, 8);
   }
 
   void buildIXYOpcodes() {
     iXYOpcodes = Z80Instructions();
 
-    iXYOpcodes.add(0x09, "ADD IXY, BC", addIXYR16, 15);
-    iXYOpcodes.add(0x19, "ADD IXY, DE", addIXYR16, 15);
-    iXYOpcodes.add(0x39, "ADD IXY, SP", addIXYR16, 15);
-    iXYOpcodes.add(0x29, "ADD IXY, IXY", addIXYIXY, 15);
+    iXYOpcodes.build(0x09, "ADD IXY, BC", addIXYR16, 15);
+    iXYOpcodes.build(0x19, "ADD IXY, DE", addIXYR16, 15);
+    iXYOpcodes.build(0x39, "ADD IXY, SP", addIXYR16, 15);
+    iXYOpcodes.build(0x29, "ADD IXY, IXY", addIXYIXY, 15);
 
-    iXYOpcodes.add(0x34, "INC (IXY + d)", incmIXY, 23);
-    iXYOpcodes.add(0x35, "DEC (IXY + d)", decmIXY, 23);
+    iXYOpcodes.build(0x34, "INC (IXY + d)", incmIXY, 23);
+    iXYOpcodes.build(0x35, "DEC (IXY + d)", decmIXY, 23);
 
-    iXYOpcodes.add(0x21, "LD IXY, nn", ldIXYnn, 23);
-    iXYOpcodes.add(0x22, "LD (nn), IXY", ldmnnIXY, 23);
-    iXYOpcodes.add(0x2A, "LD IXY, (nn)", ldIXYmnn, 23);
-    iXYOpcodes.add(0x23, "INC IXY", incIXY, 23);
-    iXYOpcodes.add(0x2B, "DEC IXY", decIXY, 23);
-    iXYOpcodes.add(0x36, "LD (IXY + d), n", ldmIXYdn, 23);
+    iXYOpcodes.build(0x21, "LD IXY, nn", ldIXYnn, 23);
+    iXYOpcodes.build(0x22, "LD (nn), IXY", ldmnnIXY, 23);
+    iXYOpcodes.build(0x2A, "LD IXY, (nn)", ldIXYmnn, 23);
+    iXYOpcodes.build(0x23, "INC IXY", incIXY, 23);
+    iXYOpcodes.build(0x2B, "DEC IXY", decIXY, 23);
+    iXYOpcodes.build(0x36, "LD (IXY + d), n", ldmIXYdn, 23);
 
-    iXYOpcodes.addR8(0x46, "LD [r8], (IXY + d)", ldR8mIXYd, 19, multiplier: 8);
-    iXYOpcodes.addR8(0x70, "LD (IXY + d), [r8]", ldmIXYdR8, 19);
+    iXYOpcodes.buildM1C8(0x46, "LD [rb345], (IXY + d)", ldR8mIXYd, 19,
+        multiplier: 8);
+    iXYOpcodes.buildM1C8(0x70, "LD (IXY + d), [rb345]", ldmIXYdR8, 19);
 
-    iXYOpcodes.add(0x36, "LD (IXY + d), n", ldmIXYdn, 23);
+    iXYOpcodes.build(0x36, "LD (IXY + d), n", ldmIXYdn, 23);
 
-    iXYOpcodes.add(0x86, "ADD A, (IXY + d)", addAIXYd, 19);
-    iXYOpcodes.add(0x8E, "ADC A, (IXY + d)", adcAIXYd, 19);
-    iXYOpcodes.add(0x96, "SUB (IXY + d)", subAIXYd, 19);
-    iXYOpcodes.add(0x9E, "SBC A, (IXY + d)", sbcAIXYd, 19);
-    iXYOpcodes.add(0xA6, "AND (IXY + d)", andAIXYd, 19);
-    iXYOpcodes.add(0xAE, "XOR (IXY + d)", xorAIXYd, 19);
-    iXYOpcodes.add(0xB6, "OR (IXY + d)", orAIXYd, 19);
-    iXYOpcodes.add(0xBE, "CP (IXY + d)", cpAIXYd, 19);
+    iXYOpcodes.build(0x86, "ADD A, (IXY + d)", addAIXYd, 19);
+    iXYOpcodes.build(0x8E, "ADC A, (IXY + d)", adcAIXYd, 19);
+    iXYOpcodes.build(0x96, "SUB (IXY + d)", subAIXYd, 19);
+    iXYOpcodes.build(0x9E, "SBC A, (IXY + d)", sbcAIXYd, 19);
+    iXYOpcodes.build(0xA6, "AND (IXY + d)", andAIXYd, 19);
+    iXYOpcodes.build(0xAE, "XOR (IXY + d)", xorAIXYd, 19);
+    iXYOpcodes.build(0xB6, "OR (IXY + d)", orAIXYd, 19);
+    iXYOpcodes.build(0xBE, "CP (IXY + d)", cpAIXYd, 19);
 
-    iXYOpcodes.add(0xE1, "POP IXY", popIXY, 19);
-    iXYOpcodes.add(0xE5, "PUSH IXY", pushIXY, 19);
-    iXYOpcodes.add(0xE9, "JP (IXY)", jpmIXY, 19);
-    iXYOpcodes.add(0xE3, "EX (SP)", exmSPIXY, 19);
-    iXYOpcodes.add(0xF9, "LD SP, IXY", ldSPIXY, 19);
+    iXYOpcodes.build(0xE1, "POP IXY", popIXY, 19);
+    iXYOpcodes.build(0xE5, "PUSH IXY", pushIXY, 19);
+    iXYOpcodes.build(0xE9, "JP (IXY)", jpmIXY, 19);
+    iXYOpcodes.build(0xE3, "EX (SP)", exmSPIXY, 19);
+    iXYOpcodes.build(0xF9, "LD SP, IXY", ldSPIXY, 19);
   }
 
   void buildBitOpcodes() {
     bitOpcodes = Z80Instructions();
 
-    bitOpcodes.addR8(0x00, "RLC [r8]", rlcR8, 8);
-    bitOpcodes.addR8(0x08, "RRC [r8]", rrcR8, 8);
-    bitOpcodes.addR8(0x10, "RL [r8]", rlR8, 8);
-    bitOpcodes.addR8(0x18, "RR [r8]", rrR8, 8);
-    bitOpcodes.addR8(0x20, "SLA [r8]", slaR8, 8);
-    bitOpcodes.addR8(0x28, "SRA [r8]", sraR8, 8);
-    bitOpcodes.addR8(0x38, "SRL [r8]", srlR8, 8);
+    bitOpcodes.buildM1C8(0x00, "RLC [rb012]", rlcR8, 8);
+    bitOpcodes.buildM1C8(0x08, "RRC [rb012]", rrcR8, 8);
+    bitOpcodes.buildM1C8(0x10, "RL [rb012]", rlR8, 8);
+    bitOpcodes.buildM1C8(0x18, "RR [rb012]", rrR8, 8);
+    bitOpcodes.buildM1C8(0x20, "SLA [rb012]", slaR8, 8);
+    bitOpcodes.buildM1C8(0x28, "SRA [rb012]", sraR8, 8);
+    bitOpcodes.buildM1C8(0x38, "SRL [rb012]", srlR8, 8);
 
-    bitOpcodes.addBit8R8(0x40, "BIT [bit], [r8]", bitnR8, 8);
-    bitOpcodes.addBit8R8(0x80, "RES [bit], [r8]", resnR8, 8);
-    bitOpcodes.addBit8R8(0xC0, "SET [bit], [r8]", setnR8, 8);
+    bitOpcodes.build(0x40, "BIT [bit], [rb012]", bitnR8, 8, count: 128);
+    bitOpcodes.build(0x80, "RES [bit], [rb012]", resnR8, 8, count: 128);
+    bitOpcodes.build(0xC0, "SET [bit], [rb012]", setnR8, 8, count: 128);
   }
 
   void buildIXYBitOpcodes() {
     iXYbitOpcodes = Z80Instructions();
 
-    iXYbitOpcodes.add(0x06, "RLC (IXY + d)", rlcMIXYd, 23);
-    iXYbitOpcodes.add(0x0E, "RRC (IXY + d)", rrcMIXYd, 23);
-    iXYbitOpcodes.add(0x16, "RL (IXY + d)", rlMIXYd, 23);
-    iXYbitOpcodes.add(0x1E, "RR (IXY + d)", rrMIXYd, 23);
-    iXYbitOpcodes.add(0x26, "SLA (IXY + d)", slaMIXYd, 23);
-    iXYbitOpcodes.add(0x2E, "SRA (IXY + d)", sraMIXYd, 23);
-    iXYbitOpcodes.add(0x3E, "SRL (IXY + d)", srlMIXYd, 23);
+    iXYbitOpcodes.build(0x06, "RLC (IXY + d)", rlcMIXYd, 23);
+    iXYbitOpcodes.build(0x0E, "RRC (IXY + d)", rrcMIXYd, 23);
+    iXYbitOpcodes.build(0x16, "RL (IXY + d)", rlMIXYd, 23);
+    iXYbitOpcodes.build(0x1E, "RR (IXY + d)", rrMIXYd, 23);
+    iXYbitOpcodes.build(0x26, "SLA (IXY + d)", slaMIXYd, 23);
+    iXYbitOpcodes.build(0x2E, "SRA (IXY + d)", sraMIXYd, 23);
+    iXYbitOpcodes.build(0x3E, "SRL (IXY + d)", srlMIXYd, 23);
 
-    iXYbitOpcodes.addBit8(0x46, "BIT [bit], (IXY + d)", bitnMIXYd, 20,
-        multiplier: 8);
-    iXYbitOpcodes.addBit8(0x86, "RES [bit], (IXY + d)", resnMIXYd, 20,
-        multiplier: 8);
-    iXYbitOpcodes.addBit8(0xC6, "RES [bit], (IXY + d)", setnMIXYd, 20,
-        multiplier: 8);
+    iXYbitOpcodes.buildM8C8(0x46, "BIT [bit], (IXY + d)", bitnMIXYd, 20);
+    iXYbitOpcodes.buildM8C8(0x86, "RES [bit], (IXY + d)", resnMIXYd, 20);
+    iXYbitOpcodes.buildM8C8(0xC6, "RES [bit], (IXY + d)", setnMIXYd, 20);
   }
 }

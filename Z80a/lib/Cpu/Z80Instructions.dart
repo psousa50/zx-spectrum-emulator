@@ -17,12 +17,29 @@ class Z80Instructions {
     );
   }
 
-  void addMultiple(
-      int opcode, int count, String name, OpcodeHandler handler, int tStates,
-      {int multiplier = 1}) {
+  void build(
+      int opcodeStart, String namePattern, OpcodeHandler handler, int tStates,
+      {int multiplier = 1, int count: 1}) {
+    var flags = ["NZ", "Z", "NC", "C", "PO", "PE", "P", "M"];
+
     for (var i = 0; i < count; i++) {
+      var opcode = opcodeStart + i * multiplier;
+      var rb012 = Registers.rBit012(opcode);
+      var rb345 = Registers.rBit345(opcode);
+      var r16 = i < 4 ? Registers.r16SPTable[i] : 0;
+      var flag = i < 8 ? flags[i] : "";
+      var bit = i % 0x07;
+      var rst = opcode & 0x38;
+      var name = namePattern
+          .replaceAll("[cc]", flag)
+          .replaceAll("[rb012]", Registers.r8Names[rb012])
+          .replaceAll("[rb345]", Registers.r8Names[rb345])
+          .replaceAll("[r8]", Registers.r8Names[rb345])
+          .replaceAll("[r16]", Registers.r16Names[r16])
+          .replaceAll("[rst]", rst.toString())
+          .replaceAll("[bit]", bit.toString());
       add(
-        opcode + i * multiplier,
+        opcode,
         name,
         handler,
         tStates,
@@ -30,95 +47,22 @@ class Z80Instructions {
     }
   }
 
+  void buildM1C8(int opcodeStart, String namePattern, OpcodeHandler handler,
+          int tStates, {multiplier: 1}) =>
+      build(opcodeStart, namePattern, handler, tStates,
+          multiplier: multiplier, count: 8);
+
+  void buildM8C8(int opcodeStart, String namePattern, OpcodeHandler handler,
+          int tStates, {count: 8}) =>
+      build(opcodeStart, namePattern, handler, tStates,
+          multiplier: 8, count: count);
+
+  void buildM16C4(int opcodeStart, String namePattern, OpcodeHandler handler,
+          int tStates) =>
+      build(opcodeStart, namePattern, handler, tStates,
+          multiplier: 16, count: 4);
+
   Z80Instruction operator [](int i) => instructions[i];
-
-  void addFlags(int opcode, String name, OpcodeHandler handler, int tStates,
-      {int multiplier = 1, int count = 8}) {
-    var flags = ["NZ", "Z", "NC", "C", "PO", "PE", "P", "M"];
-    for (var i = 0; i < count; i++) {
-      var flag = flags[i];
-      add(
-        opcode + i * multiplier,
-        name.replaceAll("[flag]", flag),
-        handler,
-        tStates,
-      );
-    }
-  }
-
-  void addBit8R8(int opcode, String name, OpcodeHandler handler, int tStates) {
-    for (var b = 0; b < 8; b++) {
-      for (var i = 0; i < 8; i++) {
-        var r8 = Registers.r8Table[i];
-        add(
-          opcode + b * 8 + i,
-          name
-              .replaceAll("[bit]", b.toString())
-              .replaceAll("[r8]", Registers.r8Names[r8]),
-          handler,
-          tStates,
-        );
-      }
-    }
-  }
-
-  void addBit8(int opcode, String name, OpcodeHandler handler, int tStates,
-      {int multiplier = 1, int count = 8}) {
-    for (var i = 0; i < count; i++) {
-      add(
-        opcode + i * multiplier,
-        name.replaceAll("[bit]", i.toString()),
-        handler,
-        tStates,
-      );
-    }
-  }
-
-  void addR8(int opcode, String name, OpcodeHandler handler, int tStates,
-      {int multiplier = 1}) {
-    for (var i = 0; i < 8; i++) {
-      var r8 = Registers.r8Table[i];
-      add(
-        opcode + i * multiplier,
-        name
-            .replaceAll("[r8]", Registers.r8Names[r8])
-            .replaceAll("[bit]", i.toString()),
-        handler,
-        tStates + (r8 == Registers.R_MHL ? 3 : 0),
-      );
-    }
-  }
-
-  void addR8R8(int opcode, String name, OpcodeHandler handler, int tStates) {
-    for (var r1 = 0; r1 < 8; r1++) {
-      var rSource = Registers.r8Table[r1];
-      for (var r2 = 0; r2 < 8; r2++) {
-        var rDest = Registers.r8Table[r2];
-        add(
-          opcode + r1 * 8 + r2,
-          name
-              .replaceAll("[rDest]", Registers.r8Names[rDest])
-              .replaceAll("[rSource]", Registers.r8Names[rSource]),
-          handler,
-          tStates +
-              (rSource == Registers.R_MHL || rDest == Registers.R_MHL ? 3 : 0),
-        );
-      }
-    }
-  }
-
-  void addR16(int opcode, String name, OpcodeHandler handler, int tStates,
-      {int multiplier = 1}) {
-    for (var i = 0; i < 4; i++) {
-      var r16 = Registers.r16SPTable[i];
-      add(
-        opcode + i * multiplier,
-        name.replaceAll("[r16]", Registers.r16Names[r16]),
-        handler,
-        tStates,
-      );
-    }
-  }
 
   int execute(InstructionContext context) {
     var tStates = 0;
