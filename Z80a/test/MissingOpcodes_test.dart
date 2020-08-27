@@ -1,3 +1,5 @@
+import 'package:Z80a/Cpu/Z80Instructions.dart';
+import 'package:Z80a/Util.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Z80a/Cpu/Z80a.dart';
@@ -24,7 +26,7 @@ void main() {
         z80a.PC = 0;
         z80a.registers.SP = 9;
         if (z80a.step() == 0) {
-          print('Opcode ${opcode.toRadixString(16)} not processed');
+          print('Opcode ${toHex(opcode)} not processed');
         }
       }
     }
@@ -38,55 +40,64 @@ void main() {
           z80a.PC = 0;
           z80a.registers.SP = 9;
           if (z80a.step() == 0) {
-            print('Opcode ${opcode.toRadixString(16)} not processed');
+            print('Opcode ${toHex(opcode)} not processed');
           }
         }
       }
     }
   }, skip: true);
 
+  void printOpcode(int opcode, Z80Instruction instruction,
+      {bool printIfNotDefined = false}) {
+    if (instruction != null || printIfNotDefined) {
+      var name = instruction != null
+          ? instruction.name
+          : "(-------------- NOT DEFINED)";
+      print("${toHex(opcode)} => $name");
+    }
+  }
+
   test('Show opcodes', () {
     var z80a = Z80a(MemoryTest(size: 20), PortsTest());
 
+    print("********* Unprefixed *********");
     for (var opcode = 0; opcode < 256; opcode++) {
       if (![
         Z80a.IX_PREFIX,
         Z80a.IY_PREFIX,
         Z80a.EXTENDED_OPCODES,
       ].contains(opcode)) {
-        var instruction = z80a.unPrefixedOpcodes[opcode];
-        var name =
-            instruction != null ? instruction.name : "(*** NOT DEFINED ***)";
-        print("${opcode.toRadixString(16)} => $name");
+        printOpcode(opcode, z80a.unPrefixedOpcodes[opcode],
+            printIfNotDefined: true);
       }
     }
 
+    print("********* Bit *********");
+    for (var opcode = 0; opcode < 256; opcode++) {
+      printOpcode(opcode, z80a.bitOpcodes[opcode], printIfNotDefined: true);
+    }
+
+    print("********* Extended *********");
+    for (var opcode = 0; opcode < 256; opcode++) {
+      if (opcode >= 0x40 && opcode < 0x80 || opcode >= 0xA0 && opcode < 0xC0)
+        printOpcode(opcode, z80a.extendedOpcodes[opcode]);
+    }
+
+    print("********* IXY *********");
     for (var opcode = 0; opcode < 256; opcode++) {
       if (![
         Z80a.BIT_OPCODES,
       ].contains(opcode)) {
-        var instruction = z80a.iXYOpcodes[opcode];
-        var name =
-            instruction != null ? instruction.name : "(*** NOT DEFINED ***)";
-        print("${opcode.toRadixString(16)} => $name");
+        printOpcode(opcode, z80a.iXYOpcodes[opcode]);
       }
     }
 
+    print("********* IXY Bit *********");
     for (var opcode = 0; opcode < 256; opcode++) {
-      var o = opcode.toRadixString(16);
-      if (o[o.length - 1] == "6" || o[o.length - 1] == "e") {
-        var instruction = z80a.iXYbitOpcodes[opcode];
-        var name =
-            instruction != null ? instruction.name : "(*** NOT DEFINED ***)";
-        print("${opcode.toRadixString(16)} => $name");
+      var o = toHex(opcode);
+      if (o[o.length - 1] == "6" || o[o.length - 1] == "E") {
+        printOpcode(opcode, z80a.iXYbitOpcodes[opcode]);
       }
-    }
-
-    for (var opcode = 0; opcode < 256; opcode++) {
-      var instruction = z80a.bitOpcodes[opcode];
-      var name =
-          instruction != null ? instruction.name : "(*** NOT DEFINED ***)";
-      print("${opcode.toRadixString(16)} => $name");
     }
   });
 }

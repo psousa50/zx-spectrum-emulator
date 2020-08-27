@@ -9,6 +9,9 @@ String toBinary8(int b) {
   return result;
 }
 
+String toHex(int value) =>
+    "${value < 16 ? "0" : ''}${value.toRadixString(16).toUpperCase()}";
+
 int lo(int w) => w % 256;
 int hi(int w) => w ~/ 256;
 int w(int lo, int hi) => lo + 256 * hi;

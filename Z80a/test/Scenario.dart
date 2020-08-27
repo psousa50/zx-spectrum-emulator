@@ -45,8 +45,7 @@ class Scenario {
 
   Scenario(this.name, this.opcodes, {this.initialState, this.expectedState});
 
-  String opcodesToString(List<int> opcodes) =>
-      '${opcodes.map((e) => e.toRadixString(16))}';
+  String opcodesToString(List<int> opcodes) => '${opcodes.map(toHex)}';
 
   String scenarioName(List<int> opcodes) =>
       '${this.name} <=> ${opcodesToString(opcodes)}';
