@@ -6,6 +6,8 @@ import 'package:Z80a/Ports.dart';
 import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Util.dart';
 
+import 'InstructionContext.dart';
+
 // ignore_for_file: non_constant_identifier_names
 
 class Z80a {
@@ -388,280 +390,340 @@ class Z80a {
     return value | mask;
   }
 
-  void nop(InstructionContext context) {}
-
-  void rlca(InstructionContext context) {
-    registers.A = rlcOp(registers.A);
+  int nop(InstructionContext context) {
+    return context.instruction.tStates();
   }
 
-  void rlcR8(InstructionContext context) {
+  int rlca(InstructionContext context) {
+    registers.A = rlcOp(registers.A);
+    return context.instruction.tStates();
+  }
+
+  int rlcR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, rlc(r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void rrcR8(InstructionContext context) {
+  int rrcR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, rrc(r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void rlR8(InstructionContext context) {
+  int rlR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, rl(r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void rrR8(InstructionContext context) {
+  int rrR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, rr(r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void slaR8(InstructionContext context) {
+  int slaR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, sla(r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void sraR8(InstructionContext context) {
+  int sraR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, sra(r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void srlR8(InstructionContext context) {
+  int srlR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, srl(r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void rrca(InstructionContext context) {
+  int rrca(InstructionContext context) {
     registers.A = rrcOp(registers.A);
+    return context.instruction.tStates();
   }
 
-  void rla(InstructionContext context) {
+  int rla(InstructionContext context) {
     registers.A = rlOp(registers.A);
+    return context.instruction.tStates();
   }
 
-  void rra(InstructionContext context) {
+  int rra(InstructionContext context) {
     registers.A = rrOp(registers.A);
+    return context.instruction.tStates();
   }
 
-  void cpl(InstructionContext context) {
+  int cpl(InstructionContext context) {
     registers.A = registers.A ^ 255;
+    return context.instruction.tStates();
   }
 
-  void scf(InstructionContext context) {
+  int scf(InstructionContext context) {
     registers.F = registers.F & ~Registers.F_ADD_SUB | Registers.F_CARRY;
+    return context.instruction.tStates();
   }
 
-  void ccf(InstructionContext context) {
+  int ccf(InstructionContext context) {
     registers.F = registers.F & ~Registers.F_ADD_SUB ^ Registers.F_CARRY;
+    return context.instruction.tStates();
   }
 
-  void djnz(InstructionContext context) {
+  int djnz(InstructionContext context) {
     var d = fetch();
     registers.B = byte(registers.B - 1);
-    if (registers.B == 0) {
+    bool cond = registers.B == 0;
+    if (cond) {
       this.PC = this.PC + d;
     }
+    return context.instruction.tStates(cond: cond);
   }
 
-  void jr(InstructionContext context) {
+  int jr(InstructionContext context) {
     var d = fetch();
     this.PC = this.PC + d;
+    return context.instruction.tStates();
   }
 
-  void jrcc(InstructionContext context) {
+  int jrcc(InstructionContext context) {
     var d = fetch();
     var cond = getFlagCondition(bit345(context.opcode) - 4);
     if (cond) {
       this.PC = this.PC + d;
     }
+    return context.instruction.tStates(cond: cond);
   }
 
-  void ldmBCA(InstructionContext context) {
+  int ldmBCA(InstructionContext context) {
     this.memory.poke(registers.BC, registers.A);
+    return context.instruction.tStates();
   }
 
-  void ldAmBC(InstructionContext context) {
+  int ldAmBC(InstructionContext context) {
     registers.A = this.memory.peek(registers.BC);
+    return context.instruction.tStates();
   }
 
-  void ldAmDE(InstructionContext context) {
+  int ldAmDE(InstructionContext context) {
     registers.A = this.memory.peek(registers.DE);
+    return context.instruction.tStates();
   }
 
-  void ldmDEA(InstructionContext context) {
+  int ldmDEA(InstructionContext context) {
     this.memory.poke(registers.DE, registers.A);
+    return context.instruction.tStates();
   }
 
-  void exAFAFq(InstructionContext context) {
+  int exAFAFq(InstructionContext context) {
     final af = registers.AF;
     registers.AF = registers.AFt;
     registers.AFt = af;
+    return context.instruction.tStates();
   }
 
-  void incR8(InstructionContext context) {
+  int incR8(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
     setR8Value(r8, incR8Value(this.r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void incmIXY(InstructionContext context) {
+  int incmIXY(InstructionContext context) {
     var d = fetch();
     this.memory.poke(getIXY(context.prefix) + d,
         incR8Value(this.memory.peek(getIXY(context.prefix) + d)));
+    return context.instruction.tStates();
   }
 
-  void decmIXY(InstructionContext context) {
+  int decmIXY(InstructionContext context) {
     var d = fetch();
     this.memory.poke(getIXY(context.prefix) + d,
         decR8Value(this.memory.peek(getIXY(context.prefix) + d)));
+    return context.instruction.tStates();
   }
 
-  void addIXYR16(InstructionContext context) {
+  int addIXYR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     setIXY(context.prefix, addWord(getIXY(context.prefix), r16Value(r16)));
+    return context.instruction.tStates();
   }
 
-  void addIXYIXY(InstructionContext context) {
+  int addIXYIXY(InstructionContext context) {
     setIXY(context.prefix,
         addWord(getIXY(context.prefix), getIXY(context.prefix)));
+    return context.instruction.tStates();
   }
 
-  void decR8(InstructionContext context) {
+  int decR8(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
     setR8Value(r8, decR8Value(this.r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void incR16(InstructionContext context) {
+  int incR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     setR16Value(r16, word(r16Value(r16) + 1));
+    return context.instruction.tStates();
   }
 
-  void decR16(InstructionContext context) {
+  int decR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     setR16Value(r16, word(r16Value(r16) - 1));
+    return context.instruction.tStates();
   }
 
-  void addHLR16(InstructionContext context) {
+  int addHLR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     registers.HL = addWord(registers.HL, r16Value(r16));
+    return context.instruction.tStates();
   }
 
-  void ldR8n(InstructionContext context) {
+  int ldR8n(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
     setR8Value(r8, fetch());
+    return context.instruction.tStates();
   }
 
-  void ldR8mHL(InstructionContext context) {
+  int ldR8mHL(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
     setR8Value(r8, this.memory.peek(registers.HL));
+    return context.instruction.tStates();
   }
 
-  void ldmHLR8(InstructionContext context) {
+  int ldmHLR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     this.memory.poke(registers.HL, r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void ldmnnHL(InstructionContext context) {
+  int ldmnnHL(InstructionContext context) {
     this.memory.poke2(fetch2(), registers.HL);
+    return context.instruction.tStates();
   }
 
-  void ldHLmnn(InstructionContext context) {
+  int ldHLmnn(InstructionContext context) {
     registers.HL = this.memory.peek2(fetch2());
+    return context.instruction.tStates();
   }
 
-  void ldmnnA(InstructionContext context) {
+  int ldmnnA(InstructionContext context) {
     this.memory.poke(fetch2(), registers.A);
+    return context.instruction.tStates();
   }
 
-  void ldAmnn(InstructionContext context) {
+  int ldAmnn(InstructionContext context) {
     registers.A = this.memory.peek(fetch2());
+    return context.instruction.tStates();
   }
 
-  void ldmHLnn(InstructionContext context) {
+  int ldmHLnn(InstructionContext context) {
     this.memory.poke(registers.HL, fetch());
+    return context.instruction.tStates();
   }
 
-  void addAR8(InstructionContext context) {
+  int addAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     registers.A = addA(r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void adcAR8(InstructionContext context) {
+  int adcAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     registers.A = adcA(r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void subAR8(InstructionContext context) {
+  int subAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     registers.A = subA(r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void sbcAR8(InstructionContext context) {
+  int sbcAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     registers.A = sbcA(r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void andAR8(InstructionContext context) {
+  int andAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     registers.A = andA(r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void xorAR8(InstructionContext context) {
+  int xorAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     registers.A = xorA(r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void orAR8(InstructionContext context) {
+  int orAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     registers.A = orA(r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void cpAR8(InstructionContext context) {
+  int cpAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     subA(r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void addAn(InstructionContext context) {
+  int addAn(InstructionContext context) {
     registers.A = addA(fetch());
+    return context.instruction.tStates();
   }
 
-  void adcAn(InstructionContext context) {
+  int adcAn(InstructionContext context) {
     registers.A = adcA(fetch());
+    return context.instruction.tStates();
   }
 
-  void subAn(InstructionContext context) {
+  int subAn(InstructionContext context) {
     registers.A = subA(fetch());
+    return context.instruction.tStates();
   }
 
-  void sbcAn(InstructionContext context) {
+  int sbcAn(InstructionContext context) {
     registers.A = sbcA(fetch());
+    return context.instruction.tStates();
   }
 
-  void andAn(InstructionContext context) {
+  int andAn(InstructionContext context) {
     registers.A = andA(fetch());
+    return context.instruction.tStates();
   }
 
-  void xorAn(InstructionContext context) {
+  int xorAn(InstructionContext context) {
     registers.A = xorA(fetch());
+    return context.instruction.tStates();
   }
 
-  void orAn(InstructionContext context) {
+  int orAn(InstructionContext context) {
     registers.A = orA(fetch());
+    return context.instruction.tStates();
   }
 
-  void cpAn(InstructionContext context) {
+  int cpAn(InstructionContext context) {
     cpA(fetch());
+    return context.instruction.tStates();
   }
 
-  void ldR8R8(InstructionContext context) {
+  int ldR8R8(InstructionContext context) {
     int r8Dest = Registers.rBit345(context.opcode);
     int r8Source = Registers.rBit012(context.opcode);
     this.setR8Value(r8Dest, r8Value(r8Source));
+    return context.instruction.tStates();
   }
 
-  void ldR16nn(InstructionContext context) {
+  int ldR16nn(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     setR16Value(r16, fetch2());
+    return context.instruction.tStates();
   }
 
-  void inR8C(InstructionContext context) {
+  int inR8C(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
     var result = this.ports.inPort(registers.C);
     setR8Value(r8, result);
@@ -669,14 +731,16 @@ class Z80a {
     registers.parityOverflowFlag = parity(result);
     registers.addSubtractFlag = false;
     registers.halfCarryFlag = false;
+    return context.instruction.tStates();
   }
 
-  void outCR8(InstructionContext context) {
+  int outCR8(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
     this.ports.outPort(registers.C, r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void sbcHLR16(InstructionContext context) {
+  int sbcHLR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     int value = r16Value(r16);
     int cf = (registers.carryFlag ? 1 : 0);
@@ -690,9 +754,10 @@ class Z80a {
     registers.addSubtractFlag = true;
     registers.HL = word(result);
     setZeroAndSignFlagsOn16BitResult(registers.HL);
+    return context.instruction.tStates();
   }
 
-  void adcHLR16(InstructionContext context) {
+  int adcHLR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     int value = r16Value(r16);
     int cf = (registers.carryFlag ? 1 : 0);
@@ -706,20 +771,23 @@ class Z80a {
     registers.addSubtractFlag = false;
     registers.HL = word(result);
     setZeroAndSignFlagsOn16BitResult(registers.HL);
+    return context.instruction.tStates();
   }
 
-  void ldmnnR16(InstructionContext context) {
+  int ldmnnR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     this.memory.poke2(fetch2(), r16Value(r16));
+    return context.instruction.tStates();
   }
 
-  void ldR16mnn(InstructionContext context) {
+  int ldR16mnn(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     var a = fetch2();
     setR16Value(r16, this.memory.peek2(a));
+    return context.instruction.tStates();
   }
 
-  void neg(InstructionContext context) {
+  int neg(InstructionContext context) {
     registers.carryFlag = registers.A != 0;
     registers.parityOverflowFlag = registers.A == 0x80;
     registers.halfCarryFlag = registers.A != 0;
@@ -727,54 +795,63 @@ class Z80a {
     var result = byte(0 - registers.A);
     registers.A = result;
     setZeroAndSignFlagsOn8BitResult(result);
+    return context.instruction.tStates();
   }
 
-  void callnn(InstructionContext context) {
+  int callnn(InstructionContext context) {
     var address = fetch2();
     push2(PC);
     this.PC = address;
+    return context.instruction.tStates();
   }
 
-  void ret(InstructionContext context) {
+  int ret(InstructionContext context) {
     this.PC = pop2();
+    return context.instruction.tStates();
   }
 
-  void jp(InstructionContext context) {
+  int jp(InstructionContext context) {
     this.PC = fetch2();
+    return context.instruction.tStates();
   }
 
-  void callccnn(InstructionContext context) {
+  int callccnn(InstructionContext context) {
     var cond = getFlagCondition(bit345(context.opcode));
     var address = fetch2();
     if (cond) {
       push2(PC);
       this.PC = address;
     }
+    return context.instruction.tStates(cond: cond);
   }
 
-  void retcc(InstructionContext context) {
+  int retcc(InstructionContext context) {
     var cond = getFlagCondition(bit345(context.opcode));
     if (cond) {
       this.PC = pop2();
     }
+    return context.instruction.tStates(cond: cond);
   }
 
-  void jpccnn(InstructionContext context) {
+  int jpccnn(InstructionContext context) {
     var cond = getFlagCondition(bit345(context.opcode));
     if (cond) {
       this.PC = fetch2();
     }
+    return context.instruction.tStates(cond: cond);
   }
 
-  void outnA(InstructionContext context) {
+  int outnA(InstructionContext context) {
     this.ports.outPort(fetch(), registers.A);
+    return context.instruction.tStates();
   }
 
-  void inAn(InstructionContext context) {
+  int inAn(InstructionContext context) {
     registers.A = this.ports.inPort(fetch());
+    return context.instruction.tStates();
   }
 
-  void exx(InstructionContext context) {
+  int exx(InstructionContext context) {
     var bc = registers.BC;
     var de = registers.DE;
     var hl = registers.HL;
@@ -784,222 +861,264 @@ class Z80a {
     registers.BCt = bc;
     registers.DEt = de;
     registers.HLt = hl;
+    return context.instruction.tStates();
   }
 
-  void exSPHL(InstructionContext context) {
+  int exSPHL(InstructionContext context) {
     var msp = this.memory.peek2(registers.SP);
     this.memory.poke2(registers.SP, registers.HL);
     registers.HL = msp;
+    return context.instruction.tStates();
   }
 
-  void jpmHL(InstructionContext context) {
+  int jpmHL(InstructionContext context) {
     this.PC = this.memory.peek2(registers.HL);
+    return context.instruction.tStates();
   }
 
-  void exDEHL(InstructionContext context) {
+  int exDEHL(InstructionContext context) {
     var de = registers.DE;
     registers.DE = registers.HL;
     registers.HL = de;
+    return context.instruction.tStates();
   }
 
-  void ldSPHL(InstructionContext context) {
+  int ldSPHL(InstructionContext context) {
     registers.SP = registers.HL;
+    return context.instruction.tStates();
   }
 
-  void pushR16(InstructionContext context) {
+  int pushR16(InstructionContext context) {
     int r16 = Registers.r16AFTable[bit45(context.opcode)];
     push2(r16Value(r16));
+    return context.instruction.tStates();
   }
 
-  void popR16(InstructionContext context) {
+  int popR16(InstructionContext context) {
     int r16 = Registers.r16AFTable[bit45(context.opcode)];
     setR16Value(r16, pop2());
+    return context.instruction.tStates();
   }
 
-  void rstNN(InstructionContext context) {
+  int rstNN(InstructionContext context) {
     var rst = context.opcode & 0x38;
     push2(this.PC);
     this.PC = rst;
+    return context.instruction.tStates();
   }
 
-  void ldIXYnn(InstructionContext context) {
+  int ldIXYnn(InstructionContext context) {
     setIXY(context.prefix, fetch2());
+    return context.instruction.tStates();
   }
 
-  void ldmnnIXY(InstructionContext context) {
+  int ldmnnIXY(InstructionContext context) {
     this.memory.poke2(fetch2(), getIXY(context.prefix));
+    return context.instruction.tStates();
   }
 
-  void ldIXYmnn(InstructionContext context) {
+  int ldIXYmnn(InstructionContext context) {
     setIXY(context.prefix, this.memory.peek2(fetch2()));
+    return context.instruction.tStates();
   }
 
-  void incIXY(InstructionContext context) {
+  int incIXY(InstructionContext context) {
     setIXY(context.prefix, word(getIXY(context.prefix) + 1));
+    return context.instruction.tStates();
   }
 
-  void decIXY(InstructionContext context) {
+  int decIXY(InstructionContext context) {
     setIXY(context.prefix, word(getIXY(context.prefix) - 1));
+    return context.instruction.tStates();
   }
 
-  void ldmIXYdn(InstructionContext context) {
+  int ldmIXYdn(InstructionContext context) {
     var d = fetch();
     var value = fetch();
     this.memory.poke(getIXY(context.prefix) + d, value);
+    return context.instruction.tStates();
   }
 
-  void ldR8mIXYd(InstructionContext context) {
+  int ldR8mIXYd(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
     int d = fetch();
     setR8Value(r8, this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void ldmIXYdR8(InstructionContext context) {
+  int ldmIXYdR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     int d = fetch();
     this.memory.poke(getIXY(context.prefix) + d, r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void addAIXYd(InstructionContext context) {
+  int addAIXYd(InstructionContext context) {
     var d = fetch();
     registers.A = addA(this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void adcAIXYd(InstructionContext context) {
+  int adcAIXYd(InstructionContext context) {
     var d = fetch();
     registers.A = adcA(this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void subAIXYd(InstructionContext context) {
+  int subAIXYd(InstructionContext context) {
     var d = fetch();
     registers.A = subA(this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void sbcAIXYd(InstructionContext context) {
+  int sbcAIXYd(InstructionContext context) {
     var d = fetch();
     registers.A = sbcA(this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void andAIXYd(InstructionContext context) {
+  int andAIXYd(InstructionContext context) {
     var d = fetch();
     registers.A = andA(this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void xorAIXYd(InstructionContext context) {
+  int xorAIXYd(InstructionContext context) {
     var d = fetch();
     registers.A = xorA(this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void orAIXYd(InstructionContext context) {
+  int orAIXYd(InstructionContext context) {
     var d = fetch();
     registers.A = orA(this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void cpAIXYd(InstructionContext context) {
+  int cpAIXYd(InstructionContext context) {
     var d = fetch();
     cpA(this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void popIXY(InstructionContext context) {
+  int popIXY(InstructionContext context) {
     setIXY(context.prefix, pop2());
+    return context.instruction.tStates();
   }
 
-  void pushIXY(InstructionContext context) {
+  int pushIXY(InstructionContext context) {
     push2(getIXY(context.prefix));
+    return context.instruction.tStates();
   }
 
-  void jpmIXY(InstructionContext context) {
+  int jpmIXY(InstructionContext context) {
     this.PC = this.memory.peek2(getIXY(context.prefix));
+    return context.instruction.tStates();
   }
 
-  void exmSPIXY(InstructionContext context) {
+  int exmSPIXY(InstructionContext context) {
     var msp = this.memory.peek2(registers.SP);
     this.memory.poke2(registers.SP, getIXY(context.prefix));
     setIXY(context.prefix, msp);
+    return context.instruction.tStates();
   }
 
-  void ldSPIXY(InstructionContext context) {
+  int ldSPIXY(InstructionContext context) {
     registers.SP = getIXY(context.prefix);
+    return context.instruction.tStates();
   }
 
-  void rlcMIXYd(InstructionContext context) {
+  int rlcMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = getIXY(context.prefix) + d;
     this.memory.poke(address, rlc(this.memory.peek(address)));
+    return context.instruction.tStates();
   }
 
-  void rrcMIXYd(InstructionContext context) {
+  int rrcMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = getIXY(context.prefix) + d;
     this.memory.poke(address, rrc(this.memory.peek(address)));
+    return context.instruction.tStates();
   }
 
-  void rlMIXYd(InstructionContext context) {
+  int rlMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = getIXY(context.prefix) + d;
     this.memory.poke(address, rl(this.memory.peek(address)));
+    return context.instruction.tStates();
   }
 
-  void rrMIXYd(InstructionContext context) {
+  int rrMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = getIXY(context.prefix) + d;
     this.memory.poke(address, rr(this.memory.peek(address)));
+    return context.instruction.tStates();
   }
 
-  void slaMIXYd(InstructionContext context) {
+  int slaMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = getIXY(context.prefix) + d;
     this.memory.poke(address, sla(this.memory.peek(address)));
+    return context.instruction.tStates();
   }
 
-  void sraMIXYd(InstructionContext context) {
+  int sraMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = getIXY(context.prefix) + d;
     this.memory.poke(address, sra(this.memory.peek(address)));
+    return context.instruction.tStates();
   }
 
-  void srlMIXYd(InstructionContext context) {
+  int srlMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = getIXY(context.prefix) + d;
     this.memory.poke(address, srl(this.memory.peek(address)));
+    return context.instruction.tStates();
   }
 
-  void bitnMIXYd(InstructionContext context) {
+  int bitnMIXYd(InstructionContext context) {
     var d = context.displacement;
     var bit = bit345(context.opcode);
     bitNR8Op(bit, this.memory.peek(getIXY(context.prefix) + d));
+    return context.instruction.tStates();
   }
 
-  void resnMIXYd(InstructionContext context) {
+  int resnMIXYd(InstructionContext context) {
     var d = context.displacement;
     var bit = bit345(context.opcode);
     var address = getIXY(context.prefix) + d;
     this.memory.poke(address, resNR8Op(bit, this.memory.peek(address)));
+    return context.instruction.tStates();
   }
 
-  void setnMIXYd(InstructionContext context) {
+  int setnMIXYd(InstructionContext context) {
     var d = context.displacement;
     var bit = bit345(context.opcode);
     var address = getIXY(context.prefix) + d;
     this.memory.poke(address, setNR8Op(bit, this.memory.peek(address)));
+    return context.instruction.tStates();
   }
 
-  void bitnR8(InstructionContext context) {
+  int bitnR8(InstructionContext context) {
     var bit = bit345(context.opcode);
     int r8 = Registers.rBit012(context.opcode);
     bitNR8Op(bit, r8Value(r8));
+    return context.instruction.tStates();
   }
 
-  void resnR8(InstructionContext context) {
+  int resnR8(InstructionContext context) {
     var bit = bit345(context.opcode);
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, resNR8Op(bit, r8Value(r8)));
+    return context.instruction.tStates();
   }
 
-  void setnR8(InstructionContext context) {
+  int setnR8(InstructionContext context) {
     var bit = bit345(context.opcode);
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, setNR8Op(bit, r8Value(r8)));
+    return context.instruction.tStates();
   }
 
   void buildUnprefixedOpcodes() {

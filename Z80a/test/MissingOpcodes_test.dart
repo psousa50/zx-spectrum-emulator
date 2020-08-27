@@ -1,4 +1,4 @@
-import 'package:Z80a/Cpu/Z80Instructions.dart';
+import 'package:Z80a/Cpu/Z80Instruction.dart';
 import 'package:Z80a/Util.dart';
 import 'package:flutter_test/flutter_test.dart';
 

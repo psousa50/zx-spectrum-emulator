@@ -1,25 +1,7 @@
-import 'package:Z80a/Cpu/Registers.dart';
-
-class InstructionContext {
-  int opcode;
-  int prefix;
-  int displacement;
-
-  InstructionContext(this.opcode);
-  InstructionContext.withPrefix(this.opcode, this.prefix);
-  InstructionContext.withPrefixAndDisplacement(
-      this.opcode, this.prefix, this.displacement);
-}
-
-typedef void OpcodeHandler(InstructionContext context);
-
-class Z80Instruction {
-  String name;
-  OpcodeHandler handler;
-  int tStates;
-
-  Z80Instruction(this.name, this.handler, this.tStates);
-}
+import 'InstructionContext.dart';
+import 'OpcodeHandler.dart';
+import 'Registers.dart';
+import 'Z80Instruction.dart';
 
 class Z80Instructions {
   Map<int, Z80Instruction> instructions;
@@ -143,8 +125,7 @@ class Z80Instructions {
     var tStates = 0;
     var instruction = instructions[context.opcode];
     if (instruction != null) {
-      instruction.handler(context);
-      tStates = instruction.tStates;
+      tStates = instruction.handler(context.withInstruction(instruction));
     }
     return tStates;
   }
