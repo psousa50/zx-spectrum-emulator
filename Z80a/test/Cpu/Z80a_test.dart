@@ -1,4 +1,5 @@
 import 'package:Z80a/Cpu/Registers.dart';
+import 'package:Z80a/Cpu/Z80Assembler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Z80a/Cpu/Z80a.dart';
 import '../MemoryTest.dart';
@@ -723,6 +724,8 @@ var allScenarios = [
   ...set7R8(0xFF, Registers.R_A),
 ];
 
+Z80a newCPU() => Z80a(MemoryTest(size: 20), PortsTest());
+
 void main() {
   const runAll = true;
 
@@ -745,12 +748,13 @@ void main() {
     var tStates = 0;
 
     z80a.PC = 0;
-    z80a.memory.poke(0, 0x7D); // LD A, L
+    z80a.memory.setRange(0, Z80Assembler.ldR8R8(Registers.R_A, Registers.R_L));
     tStates = z80a.step();
     expect(tStates, 4, reason: "LD A, L => T states should be 4");
 
     z80a.PC = 0;
-    z80a.memory.poke(0, 0x7E); // LD A, (HL)
+    z80a.memory
+        .setRange(0, Z80Assembler.ldR8R8(Registers.R_A, Registers.R_MHL));
     tStates = z80a.step();
     expect(tStates, 7, reason: "LD A, (HL) => T states should be 7");
 
@@ -767,4 +771,31 @@ void main() {
     tStates = z80a.step();
     expect(tStates, 17, reason: "CALL NZ => On call T states should be 17");
   }, skip: false);
+
+  test("Interrupt mode 0", () {
+    var z80a = newCPU();
+    z80a.memory.setRange(0, Z80Assembler.im0());
+    z80a.step();
+    expect(z80a.interruptMode, InterruptMode.im0);
+  });
+
+  test("Interrupt mode 1", () {
+    var z80a = newCPU();
+    z80a.memory.setRange(0, Z80Assembler.im1());
+    z80a.step();
+    expect(z80a.interruptMode, InterruptMode.im1);
+  });
+
+  test("Interrupt mode 2", () {
+    var z80a = newCPU();
+    z80a.memory.setRange(0, Z80Assembler.im2());
+    z80a.step();
+    expect(z80a.interruptMode, InterruptMode.im2);
+  });
+
+  // test("Maskable interrupts", () {
+  //   var z80a = newCPU();
+  //   z80a.maskableInterrupt();
+
+  // });
 }

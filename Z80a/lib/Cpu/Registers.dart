@@ -111,6 +111,17 @@ class Registers {
     7: R_A,
   };
 
+  static const r8TableBack = {
+    R_B: 0,
+    R_C: 1,
+    R_D: 2,
+    R_E: 3,
+    R_H: 4,
+    R_L: 5,
+    R_MHL: 6,
+    R_A: 7,
+  };
+
   static const r16SPTable = {
     0: R_BC,
     1: R_DE,

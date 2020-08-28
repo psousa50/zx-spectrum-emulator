@@ -10,9 +10,19 @@ import 'InstructionContext.dart';
 
 // ignore_for_file: non_constant_identifier_names
 
+enum InterruptMode {
+  im0,
+  im1,
+  im2,
+}
+
 class Z80a {
   final Memory memory;
   final Ports ports;
+
+  InterruptMode _interruptMode;
+  var registers = Registers();
+  var PC = 0;
 
   Z80Instructions unPrefixedOpcodes;
   Z80Instructions extendedOpcodes;
@@ -36,8 +46,7 @@ class Z80a {
     buildIXYBitOpcodes();
   }
 
-  var registers = Registers();
-  var PC = 0;
+  InterruptMode get interruptMode => _interruptMode;
 
   int fetch() {
     final v = this.memory.peek(this.PC);
@@ -1115,6 +1124,21 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int im0(InstructionContext context) {
+    this._interruptMode = InterruptMode.im0;
+    return context.instruction.tStates();
+  }
+
+  int im1(InstructionContext context) {
+    this._interruptMode = InterruptMode.im1;
+    return context.instruction.tStates();
+  }
+
+  int im2(InstructionContext context) {
+    this._interruptMode = InterruptMode.im2;
+    return context.instruction.tStates();
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
     var unPrefixed = unPrefixedOpcodes;
@@ -1205,6 +1229,15 @@ class Z80a {
     extendedOpcodes.buildM16C4(0x4A, "ADC HL, [r16]", adcHLR16, 15);
     extendedOpcodes.buildM16C4(0x4B, "LD [r16], (nn)", ldR16mnn, 20);
     extendedOpcodes.buildM16C4(0x4C, "NEG", neg, 8);
+
+    extendedOpcodes.buildM16C4(0x46, "IM 0", im0, 8);
+    extendedOpcodes.buildM16C4(0x66, "IM 0", im0, 8);
+
+    extendedOpcodes.buildM16C4(0x56, "IM 1", im1, 8);
+    extendedOpcodes.buildM16C4(0x66, "IM 1", im1, 8);
+
+    extendedOpcodes.buildM16C4(0x5E, "IM 1", im2, 8);
+    extendedOpcodes.buildM16C4(0x6E, "IM 1", im2, 8);
   }
 
   void buildIXYOpcodes() {

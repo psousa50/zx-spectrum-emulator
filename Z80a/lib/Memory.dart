@@ -6,6 +6,7 @@ abstract class Memory {
 
   void poke(int address, int b);
   void poke2(int address, int w);
+  void setRange(int address, Uint8List bytes);
 
   Uint8List range(int start, {int end});
 }
