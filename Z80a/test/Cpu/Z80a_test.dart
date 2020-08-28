@@ -725,7 +725,7 @@ var allScenarios = [
 ];
 
 Z80a newCPU() {
-  var z80a = Z80a(MemoryTest(size: 256), PortsTest());
+  var z80a = Z80a(MemoryTest(size: 1024), PortsTest());
   z80a.registers.SP = 256;
   return z80a;
 }
@@ -797,13 +797,30 @@ void main() {
     expect(z80a.interruptMode, InterruptMode.im2);
   });
 
-  test("Maskable interrupts", () {
+  test("Maskable interrupts - mode 1", () {
     var z80a = newCPU();
-    z80a.PC = 1234;
+    z80a.PC = 400;
     z80a.registers.SP = 128;
-    z80a.memory.setRange(0, Z80Assembler.im1());
+    z80a.memory.setRange(z80a.PC, Z80Assembler.im1());
+    z80a.step();
     z80a.maskableInterrupt();
-    expect(z80a.memory.peek2(126), 1234);
+    expect(z80a.memory.peek2(128 - 2), 400 + 2);
+    expect(z80a.registers.SP, 128 - 2);
     expect(z80a.PC, 0x38);
+  });
+
+  test("Maskable interrupts - mode 2", () {
+    var z80a = newCPU();
+    z80a.PC = 400;
+    z80a.registers.SP = 128;
+    z80a.registers.I = 2;
+    var address = 256 * z80a.registers.I + 254;
+    z80a.memory.poke2(address, 12345);
+    z80a.memory.setRange(z80a.PC, Z80Assembler.im2());
+    z80a.step();
+    z80a.maskableInterrupt();
+    expect(z80a.memory.peek2(128 - 2), 400 + 2);
+    expect(z80a.registers.SP, 128 - 2);
+    expect(z80a.PC, 12345);
   });
 }

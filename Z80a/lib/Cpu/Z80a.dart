@@ -1312,7 +1312,19 @@ class Z80a {
   }
 
   void maskableInterrupt() {
-    push2(this.PC);
-    this.PC = 0x38;
+    switch (interruptMode) {
+      case InterruptMode.im1:
+        push2(this.PC);
+        this.PC = 0x38;
+        break;
+
+      case InterruptMode.im2:
+        push2(this.PC);
+        this.PC = this.memory.peek2(this.registers.I * 256 + 254);
+        break;
+
+      default:
+        break;
+    }
   }
 }

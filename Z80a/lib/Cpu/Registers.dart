@@ -74,8 +74,10 @@ class Registers {
   static const R_Et = 19;
   static const R_Ht = 20;
   static const R_Lt = 21;
+  static const R_I = 22;
+  static const R_R = 23;
 
-  static const R_COUNT = 22;
+  static const R_COUNT = 24;
 
   static const R_MHL = 1000;
   static const R_MIXd = 2000;
@@ -165,6 +167,8 @@ class Registers {
   int get IX_H => registers[R_IX_H];
   int get IY_L => registers[R_IY_L];
   int get IY_H => registers[R_IY_H];
+  int get I => registers[R_I];
+  int get R => registers[R_R];
 
   set A(int b) => registers[R_A] = b;
   set F(int b) => registers[R_F] = b;
@@ -180,6 +184,8 @@ class Registers {
   set IX_L(int b) => registers[R_IX_L] = b;
   set IY_H(int b) => registers[R_IY_H] = b;
   set IY_L(int b) => registers[R_IY_L] = b;
+  set I(int b) => registers[R_I] = b;
+  set R(int b) => registers[R_R] = b;
 
   int get AF => gw(R_A);
   int get BC => gw(R_B);
