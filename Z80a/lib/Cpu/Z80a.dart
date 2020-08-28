@@ -1310,4 +1310,9 @@ class Z80a {
     iXYbitOpcodes.buildM8C8(0x86, "RES [bit], (IXY + d)", resnMIXYd, 20);
     iXYbitOpcodes.buildM8C8(0xC6, "RES [bit], (IXY + d)", setnMIXYd, 20);
   }
+
+  void maskableInterrupt() {
+    push2(this.PC);
+    this.PC = 0x38;
+  }
 }

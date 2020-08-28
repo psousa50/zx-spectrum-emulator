@@ -724,7 +724,11 @@ var allScenarios = [
   ...set7R8(0xFF, Registers.R_A),
 ];
 
-Z80a newCPU() => Z80a(MemoryTest(size: 20), PortsTest());
+Z80a newCPU() {
+  var z80a = Z80a(MemoryTest(size: 256), PortsTest());
+  z80a.registers.SP = 256;
+  return z80a;
+}
 
 void main() {
   const runAll = true;
@@ -793,9 +797,13 @@ void main() {
     expect(z80a.interruptMode, InterruptMode.im2);
   });
 
-  // test("Maskable interrupts", () {
-  //   var z80a = newCPU();
-  //   z80a.maskableInterrupt();
-
-  // });
+  test("Maskable interrupts", () {
+    var z80a = newCPU();
+    z80a.PC = 1234;
+    z80a.registers.SP = 128;
+    z80a.memory.setRange(0, Z80Assembler.im1());
+    z80a.maskableInterrupt();
+    expect(z80a.memory.peek2(126), 1234);
+    expect(z80a.PC, 0x38);
+  });
 }
