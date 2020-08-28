@@ -1117,95 +1117,93 @@ class Z80a {
 
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
+    var unPrefixed = unPrefixedOpcodes;
 
-    unPrefixedOpcodes.build(0x00, "NOP", nop, 4);
-    unPrefixedOpcodes.build(0x01, "LD [r16], nn", ldR16nn, 4,
-        multiplier: 16, count: 4);
-    unPrefixedOpcodes.build(0x02, "LD (BC), A", ldmBCA, 4);
-    unPrefixedOpcodes.build(0x03, "INC [r16]", incR16, 4,
-        multiplier: 16, count: 4);
-    unPrefixedOpcodes.build(0x04, "INC [rb345]", incR8, 4,
-        multiplier: 8, count: 8);
-    unPrefixedOpcodes.buildM1C8(0x05, "DEC [rb345]", decR8, 4, multiplier: 8);
-    unPrefixedOpcodes.buildM1C8(0x06, "LD [rb345], n", ldR8n, 4, multiplier: 8);
-    unPrefixedOpcodes.build(0x07, "RLCA", rlca, 4);
-    unPrefixedOpcodes.build(0x0F, "RRCA", rrca, 4);
+    unPrefixed.build(0x00, "NOP", nop, 4);
+    unPrefixed.buildM16C4(0x01, "LD [r16], nn", ldR16nn, 10);
+    unPrefixed.build(0x02, "LD (BC), A", ldmBCA, 7);
+    unPrefixed.buildM16C4(0x03, "INC [r16]", incR16, 6);
+    unPrefixed.buildM8C8(0x04, "INC [rb345]", incR8, 4);
+    unPrefixed.buildM8C8(0x05, "DEC [rb345]", decR8, 4);
+    unPrefixed.buildM8C8(0x06, "LD [rb345], n", ldR8n, 7);
+    unPrefixed.build(0x07, "RLCA", rlca, 4);
+    unPrefixed.build(0x08, "EX AF, AF'", exAFAFq, 4);
+    unPrefixed.buildM16C4(0x09, "ADD HL, [r16]", addHLR16, 11);
+    unPrefixed.build(0x0A, "LD A, (BC)", ldAmBC, 4);
+    unPrefixed.buildM16C4(0x0B, "DEC [r16]", decR16, 6);
+    unPrefixed.build(0x0F, "RRCA", rrca, 4);
 
-    unPrefixedOpcodes.build(0x10, "DJNZ nn", djnz, 4);
-    unPrefixedOpcodes.build(0x18, "JR nn", jr, 4);
+    unPrefixed.build(0x10, "DJNZ nn", djnz, 8, tStatesOnTrueCond: 13);
+    unPrefixed.build(0x12, "LD (DE), A", ldmDEA, 7);
+    unPrefixed.build(0x17, "RLA", rla, 4);
+    unPrefixed.build(0x18, "JR nn", jr, 12);
+    unPrefixed.build(0x1A, "LD A, (DE)", ldAmDE, 7);
+    unPrefixed.build(0x1F, "RRA", rra, 4);
 
-    unPrefixedOpcodes.buildM8C8(0x20, "JR CC, nn", jrcc, 4, count: 4);
+    unPrefixed.buildM8C8(0x20, "JR [cc], nn", jrcc, 7,
+        tStatesOnTrueCond: 12, count: 4);
+    unPrefixed.build(0x22, "LD (nn), HL", ldmnnHL, 16);
+    unPrefixed.build(0x2A, "LD HL, (nn)", ldHLmnn, 16);
+    unPrefixed.build(0x2F, "CPL", cpl, 4);
 
-    unPrefixedOpcodes.build(0x17, "RLA", rla, 4);
-    unPrefixedOpcodes.build(0x1F, "RRA", rra, 4);
-    unPrefixedOpcodes.build(0x2F, "CPL", cpl, 4);
-    unPrefixedOpcodes.build(0x37, "SCF", scf, 4);
-    unPrefixedOpcodes.build(0x3F, "CCF", ccf, 4);
-    unPrefixedOpcodes.buildM16C4(0x09, "ADD HL, [r16]", addHLR16, 4);
-    unPrefixedOpcodes.build(0x0A, "LD A, (BC)", ldAmBC, 4);
-    unPrefixedOpcodes.build(0x1A, "LD A, (DE)", ldAmDE, 4);
-    unPrefixedOpcodes.buildM16C4(0x0B, "DEC [r16]", decR16, 4);
-    unPrefixedOpcodes.build(0x12, "LD (DE), A", ldmDEA, 4);
-    unPrefixedOpcodes.build(0x22, "LD (nn), HL", ldmnnHL, 4);
-    unPrefixedOpcodes.build(0x2A, "LD HL, (nn)", ldHLmnn, 4);
-    unPrefixedOpcodes.build(0x32, "LD (nn), A", ldmnnA, 4);
-    unPrefixedOpcodes.build(0x3A, "LD A, (nn)", ldAmnn, 4);
-    unPrefixedOpcodes.build(0x36, "LD (HL), nn", ldmHLnn, 4);
-    unPrefixedOpcodes.build(0x40, "LD [rb345], [rb012]", ldR8R8, 4, count: 64);
-    unPrefixedOpcodes.build(0x7E, "LD A, (HL)", ldR8R8, 7);
-    unPrefixedOpcodes.build(0x08, "EX AF, AF'", exAFAFq, 4);
-    unPrefixedOpcodes.buildM1C8(0x80, "ADD A, [rb012]", addAR8, 4);
-    unPrefixedOpcodes.buildM1C8(0x88, "ADC A, [rb012]", adcAR8, 4);
-    unPrefixedOpcodes.buildM1C8(0x90, "SUB [rb012]", subAR8, 4);
-    unPrefixedOpcodes.buildM1C8(0x98, "SBC [rb012]", sbcAR8, 4);
-    unPrefixedOpcodes.buildM1C8(0xA0, "AND [rb012]", andAR8, 4);
-    unPrefixedOpcodes.buildM1C8(0xA8, "XOR [rb012]", xorAR8, 4);
-    unPrefixedOpcodes.buildM1C8(0xB0, "OR [rb012]", orAR8, 4);
-    unPrefixedOpcodes.buildM1C8(0xB8, "CP [rb012]", cpAR8, 4);
+    unPrefixed.build(0x32, "LD (nn), A", ldmnnA, 10);
+    unPrefixed.build(0x36, "LD (HL), nn", ldmHLnn, 10);
+    unPrefixed.build(0x37, "SCF", scf, 4);
+    unPrefixed.build(0x3A, "LD A, (nn)", ldAmnn, 13);
+    unPrefixed.build(0x3F, "CCF", ccf, 4);
 
-    unPrefixedOpcodes.buildM16C4(0xC1, "POP [r16]", popR16, 4);
-    unPrefixedOpcodes.buildM16C4(0xC5, "PUSH [r16]", pushR16, 4);
+    unPrefixed.build(0x40, "LD [rb345], [rb012]", ldR8R8, 4, count: 64);
+    unPrefixed.buildM8C8(0x46, "LD [rb345], (HL)", ldR8R8, 7);
 
-    unPrefixedOpcodes.buildM1C8(0xC7, "RST [rst]", rstNN, 4, multiplier: 8);
+    unPrefixed.buildM1C8(0x70, "LD (HL), [rb012]", ldR8R8, 7);
+    unPrefixed.buildM1C8(0x80, "ADD A, [rb012]", addAR8, 4);
+    unPrefixed.buildM1C8(0x88, "ADC A, [rb012]", adcAR8, 4);
+    unPrefixed.buildM1C8(0x90, "SUB [rb012]", subAR8, 4);
+    unPrefixed.buildM1C8(0x98, "SBC [rb012]", sbcAR8, 4);
+    unPrefixed.buildM1C8(0xA0, "AND [rb012]", andAR8, 4);
+    unPrefixed.buildM1C8(0xA8, "XOR [rb012]", xorAR8, 4);
+    unPrefixed.buildM1C8(0xB0, "OR [rb012]", orAR8, 4);
+    unPrefixed.buildM1C8(0xB8, "CP [rb012]", cpAR8, 4);
 
-    unPrefixedOpcodes.build(0xCD, "CALL nn", callnn, 4);
-    unPrefixedOpcodes.build(0xC9, "RET", ret, 4);
-    unPrefixedOpcodes.build(0xC3, "JP", jp, 4);
+    unPrefixed.buildM8C8(0xC0, "RET [cc]", retcc, 5, tStatesOnTrueCond: 11);
+    unPrefixed.buildM16C4(0xC1, "POP [r16]", popR16, 10);
+    unPrefixed.buildM8C8(0xC2, "JP [cc], nn", jpccnn, 10);
+    unPrefixed.build(0xC3, "JP", jp, 10);
+    unPrefixed.buildM8C8(0xC4, "CALL [cc], nn", callccnn, 10,
+        tStatesOnTrueCond: 17);
+    unPrefixed.buildM16C4(0xC5, "PUSH [r16]", pushR16, 11);
+    unPrefixed.build(0xC6, "ADD A, N", addAn, 7);
+    unPrefixed.buildM8C8(0xC7, "RST [rst]", rstNN, 11);
+    unPrefixed.build(0xC9, "RET", ret, 10);
+    unPrefixed.build(0xCD, "CALL nn", callnn, 17);
+    unPrefixed.build(0xCE, "ADC A, N", adcAn, 7);
 
-    unPrefixedOpcodes.buildM8C8(0xC4, "CALL [cc], nn", callccnn, 10);
-    unPrefixedOpcodes.buildM8C8(0xC0, "RET [cc]", retcc, 4);
-    unPrefixedOpcodes.buildM8C8(0xC2, "JP [cc], nn", jpccnn, 4);
+    unPrefixed.build(0xD3, "OUT (N), A", outnA, 11);
+    unPrefixed.build(0xD6, "SUB N", subAn, 7);
+    unPrefixed.build(0xD9, "EXX", exx, 4);
+    unPrefixed.build(0xDB, "IN A, (N)", inAn, 11);
+    unPrefixed.build(0xDE, "SBC A, N", sbcAn, 7);
 
-    unPrefixedOpcodes.build(0xD3, "OUT (N), A", outnA, 4);
-    unPrefixedOpcodes.build(0xDB, "IN A, (N)", inAn, 4);
+    unPrefixed.build(0xE3, "EX (SP), HL", exSPHL, 19);
+    unPrefixed.build(0xE6, "AND A, N", andAn, 7);
+    unPrefixed.build(0xE9, "JP (HL)", jpmHL, 4);
+    unPrefixed.build(0xEB, "EX DE, HL", exDEHL, 4);
+    unPrefixed.build(0xEE, "XOR N", xorAn, 7);
 
-    unPrefixedOpcodes.build(0xD9, "EXX", exx, 4);
-    unPrefixedOpcodes.build(0xE3, "EX (SP), HL", exSPHL, 4);
-
-    unPrefixedOpcodes.build(0xE9, "JP (HL)", jpmHL, 4);
-    unPrefixedOpcodes.build(0xEB, "EX DE, HL", exDEHL, 4);
-    unPrefixedOpcodes.build(0xF9, "LD SP, HL", ldSPHL, 4);
-
-    unPrefixedOpcodes.build(0xC6, "ADD A, N", addAn, 4);
-    unPrefixedOpcodes.build(0xCE, "ADC A, N", adcAn, 4);
-    unPrefixedOpcodes.build(0xD6, "SUB N", subAn, 4);
-    unPrefixedOpcodes.build(0xDE, "SBC A, N", sbcAn, 4);
-    unPrefixedOpcodes.build(0xE6, "AND A, N", andAn, 4);
-    unPrefixedOpcodes.build(0xEE, "XOR N", xorAn, 4);
-    unPrefixedOpcodes.build(0xF6, "OR N", orAn, 4);
-    unPrefixedOpcodes.build(0xFE, "CP N", cpAn, 4);
+    unPrefixed.build(0xF6, "OR N", orAn, 7);
+    unPrefixed.build(0xF9, "LD SP, HL", ldSPHL, 6);
+    unPrefixed.build(0xFE, "CP N", cpAn, 7);
   }
 
   void buildExtendedOpcodes() {
     extendedOpcodes = Z80Instructions();
-    extendedOpcodes.buildM1C8(0x40, "IN [rb345], C", inR8C, 12, multiplier: 8);
-    extendedOpcodes.buildM1C8(0x41, "OUT C, [rb345]", outCR8, 12,
-        multiplier: 8);
+    extendedOpcodes.buildM8C8(0x40, "IN [rb345], C", inR8C, 12);
+    extendedOpcodes.buildM8C8(0x41, "OUT C, [rb345]", outCR8, 12);
     extendedOpcodes.buildM16C4(0x42, "SBC HL, [r16]", sbcHLR16, 15);
-    extendedOpcodes.buildM16C4(0x4A, "ADC HL, [r16]", adcHLR16, 15);
     extendedOpcodes.buildM16C4(0x43, "LD (nn), [r16]", ldmnnR16, 20);
-    extendedOpcodes.buildM16C4(0x4B, "LD [r16], (nn)", ldR16mnn, 20);
     extendedOpcodes.buildM16C4(0x44, "NEG", neg, 8);
+    extendedOpcodes.buildM16C4(0x4A, "ADC HL, [r16]", adcHLR16, 15);
+    extendedOpcodes.buildM16C4(0x4B, "LD [r16], (nn)", ldR16mnn, 20);
     extendedOpcodes.buildM16C4(0x4C, "NEG", neg, 8);
   }
 
@@ -1227,8 +1225,7 @@ class Z80a {
     iXYOpcodes.build(0x2B, "DEC IXY", decIXY, 23);
     iXYOpcodes.build(0x36, "LD (IXY + d), n", ldmIXYdn, 23);
 
-    iXYOpcodes.buildM1C8(0x46, "LD [rb345], (IXY + d)", ldR8mIXYd, 19,
-        multiplier: 8);
+    iXYOpcodes.buildM8C8(0x46, "LD [rb345], (IXY + d)", ldR8mIXYd, 19);
     iXYOpcodes.buildM1C8(0x70, "LD (IXY + d), [rb345]", ldmIXYdR8, 19);
 
     iXYOpcodes.build(0x36, "LD (IXY + d), n", ldmIXYdn, 23);

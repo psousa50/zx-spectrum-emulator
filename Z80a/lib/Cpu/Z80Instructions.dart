@@ -9,17 +9,9 @@ class Z80Instructions {
     instructions = Map<int, Z80Instruction>();
   }
 
-  void add(int opcode, String name, OpcodeHandler handler, int tStates) {
-    instructions[opcode] = Z80Instruction(
-      name,
-      handler,
-      tStates,
-    );
-  }
-
-  void build(
-      int opcodeStart, String namePattern, OpcodeHandler handler, int tStates,
-      {int multiplier = 1, int count: 1}) {
+  void build(int opcodeStart, String namePattern, OpcodeHandler handler,
+      int tStatesOnFalseCond,
+      {int multiplier = 1, int count: 1, int tStatesOnTrueCond}) {
     var flags = ["NZ", "Z", "NC", "C", "PO", "PE", "P", "M"];
 
     for (var i = 0; i < count; i++) {
@@ -38,11 +30,13 @@ class Z80Instructions {
           .replaceAll("[r16]", Registers.r16Names[r16])
           .replaceAll("[rst]", rst.toString())
           .replaceAll("[bit]", bit.toString());
-      add(
+
+      instructions[opcode] = Z80Instruction(
         opcode,
         name,
         handler,
-        tStates,
+        tStatesOnFalseCond,
+        tStatesOnTrueCond: tStatesOnTrueCond,
       );
     }
   }
@@ -53,9 +47,9 @@ class Z80Instructions {
           multiplier: multiplier, count: 8);
 
   void buildM8C8(int opcodeStart, String namePattern, OpcodeHandler handler,
-          int tStates, {count: 8}) =>
+          int tStates, {count: 8, int tStatesOnTrueCond}) =>
       build(opcodeStart, namePattern, handler, tStates,
-          multiplier: 8, count: count);
+          multiplier: 8, tStatesOnTrueCond: tStatesOnTrueCond, count: count);
 
   void buildM16C4(int opcodeStart, String namePattern, OpcodeHandler handler,
           int tStates) =>

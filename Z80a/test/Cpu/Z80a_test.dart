@@ -726,11 +726,11 @@ var allScenarios = [
 void main() {
   const runAll = true;
 
-  test("All Scenarios", () {
-    allScenarios.forEach((scenario) {
-      scenario.run();
-    });
-  }, skip: !runAll);
+  // test("All Scenarios", () {
+  //   allScenarios.forEach((scenario) {
+  //     scenario.run();
+  //   });
+  // }, skip: !runAll);
 
   test("One Scenario", () {
     print("RUNNING ONLY ONE SCENARIO");
@@ -742,9 +742,29 @@ void main() {
 
   test("Instruction returns T states", () {
     var z80a = Z80a(MemoryTest(size: 20), PortsTest());
+    var tStates = 0;
+
+    z80a.PC = 0;
+    z80a.memory.poke(0, 0x7D); // LD A, L
+    tStates = z80a.step();
+    expect(tStates, 4, reason: "LD A, L => T states should be 4");
+
+    z80a.PC = 0;
+    z80a.memory.poke(0, 0x7E); // LD A, (HL)
+    tStates = z80a.step();
+    expect(tStates, 7, reason: "LD A, (HL) => T states should be 7");
+
+    z80a.PC = 0;
+    z80a.registers.zeroFlag = false;
+    z80a.memory.poke(0, 0xCC); // CALL Z
+    tStates = z80a.step();
+    expect(tStates, 10, reason: "CALL NZ => On no call T states should be 10");
+
+    z80a.PC = 0;
+    z80a.registers.SP = 10;
     z80a.registers.zeroFlag = true;
-    z80a.memory.poke(0, 0x7E);
-    var tStates = z80a.step();
-    expect(tStates, 7);
-  });
+    z80a.memory.poke(0, 0xCC); // CALL Z
+    tStates = z80a.step();
+    expect(tStates, 17, reason: "CALL NZ => On call T states should be 17");
+  }, skip: false);
 }

@@ -50,10 +50,15 @@ void main() {
   void printOpcode(int opcode, Z80Instruction instruction,
       {bool printIfNotDefined = false}) {
     if (instruction != null || printIfNotDefined) {
-      var name = instruction != null
-          ? instruction.name
-          : "(-------------- NOT DEFINED)";
-      print("${toHex(opcode)} => $name");
+      if (instruction != null) {
+        var tsFalse = instruction.tStates(cond: false);
+        var tsTrue = instruction.tStates(cond: true);
+        var ts = "$tsFalse${tsTrue != null ? ' $tsTrue' : ''}";
+        var hex = toHex(opcode);
+        var s = " " * (40 - hex.length - instruction.name.length);
+        print("$hex => ${instruction.name}$s($ts)");
+      } else
+        print("(-------------- NOT DEFINED)");
     }
   }
 
@@ -99,5 +104,5 @@ void main() {
         printOpcode(opcode, z80a.iXYbitOpcodes[opcode]);
       }
     }
-  });
+  }, skip: true);
 }
