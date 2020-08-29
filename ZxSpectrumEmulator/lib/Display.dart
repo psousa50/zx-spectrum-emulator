@@ -1,36 +1,16 @@
 import 'dart:typed_data';
-
-import 'package:ZxSpectrumEmulator/ula.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-class Display extends StatefulWidget {
-  @override
-  _DisplayState createState() => _DisplayState();
-}
+class Display extends StatelessWidget {
+  final Uint8List screen;
 
-class _DisplayState extends State<Display> {
-  ByteData screen;
-
-  void getScreen() async {
-    var s = await rootBundle.load('assets/google.scr');
-    setState(() {
-      screen = s;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getScreen();
-  }
+  Display(this.screen);
 
   @override
   Widget build(BuildContext context) {
     if (screen == null) {
       return Text("No Screen!");
     }
-    var bitmap = Ula.buildImage(screen.buffer.asUint8List());
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -40,7 +20,7 @@ class _DisplayState extends State<Display> {
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Image.memory(
-        bitmap,
+        screen,
         width: 256,
         height: 192,
         gaplessPlayback: true,
