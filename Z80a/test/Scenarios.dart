@@ -1651,7 +1651,14 @@ Scenario cpidSpec(String name, int opcode, int inc, int a, int value, int bc,
 
 List<Scenario> cpi(int opcode) => [
       cpidSpec("CPI", opcode, 1, 10, 2, 4, "~S ~Z ~H P ~N ~C"),
-      cpidSpec("CPI", opcode, 1, 129, 2, 3, "~S ~Z ~H P ~N ~C"),
+      cpidSpec("CPI", opcode, 1, 129, 2, 3, "~S ~Z H P ~N ~C"),
       cpidSpec("CPI", opcode, 1, 255, 254, 2, "~S ~Z ~H P ~N ~C"),
-      cpidSpec("CPI", opcode, 1, 3, 5, 1, "S ~Z ~H ~P ~N C"),
+      cpidSpec("CPI", opcode, 1, 3, 5, 1, "S ~Z H ~P ~N C"),
+    ];
+
+List<Scenario> cpd(int opcode) => [
+      cpidSpec("CPD", opcode, -1, 10, 2, 4, "~S ~Z ~H P ~N ~C"),
+      cpidSpec("CPD", opcode, -1, 129, 2, 3, "~S ~Z H P ~N ~C"),
+      cpidSpec("CPD", opcode, -1, 255, 254, 2, "~S ~Z ~H P ~N ~C"),
+      cpidSpec("CPD", opcode, -1, 3, 5, 1, "S ~Z H ~P ~N C"),
     ];

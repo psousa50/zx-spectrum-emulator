@@ -1222,7 +1222,15 @@ class Z80a {
     subA(this.memory.peek(this.registers.HL));
     this.registers.HL = this.registers.HL + 1;
     this.registers.BC = this.registers.BC - 1;
-    this.registers.halfCarryFlag = false;
+    this.registers.addSubtractFlag = false;
+    this.registers.parityOverflowFlag = this.registers.BC != 0;
+    return context.instruction.tStates();
+  }
+
+  int cpd(InstructionContext context) {
+    subA(this.memory.peek(this.registers.HL));
+    this.registers.HL = this.registers.HL - 1;
+    this.registers.BC = this.registers.BC - 1;
     this.registers.addSubtractFlag = false;
     this.registers.parityOverflowFlag = this.registers.BC != 0;
     return context.instruction.tStates();
@@ -1342,6 +1350,7 @@ class Z80a {
     extendedOpcodes.build(0xA0, "LDI", ldi, 16);
     extendedOpcodes.build(0xA1, "CPI", cpi, 16);
     extendedOpcodes.build(0xA8, "LDD", ldd, 16);
+    extendedOpcodes.build(0xA9, "CPD", cpd, 16);
   }
 
   void buildIXYOpcodes() {
