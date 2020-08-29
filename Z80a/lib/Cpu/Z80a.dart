@@ -1267,10 +1267,11 @@ class Z80a {
     extendedOpcodes.buildM16C4(0x42, "SBC HL, [r16]", sbcHLR16, 15);
     extendedOpcodes.buildM16C4(0x43, "LD (nn), [r16]", ldmnnR16, 20);
     extendedOpcodes.buildM16C4(0x44, "NEG", neg, 8);
-    extendedOpcodes.buildM16C4(0x45, "RETN", retn, 8);
+    extendedOpcodes.buildM16C4(0x45, "RETN", retn, 14);
     extendedOpcodes.buildM16C4(0x4A, "ADC HL, [r16]", adcHLR16, 15);
     extendedOpcodes.buildM16C4(0x4B, "LD [r16], (nn)", ldR16mnn, 20);
     extendedOpcodes.buildM16C4(0x4C, "NEG", neg, 8);
+    extendedOpcodes.buildM16C4(0x4D, "RETI", retn, 14);
 
     extendedOpcodes.buildM16C4(0x46, "IM 0", im0, 8);
     extendedOpcodes.buildM16C4(0x66, "IM 0", im0, 8);

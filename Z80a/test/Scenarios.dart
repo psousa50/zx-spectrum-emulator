@@ -599,6 +599,8 @@ Scenario retSpec(String name, int opcode, {int prefix}) => Scenario(
 List<Scenario> ret(int opcode) => [retSpec("RET", opcode)];
 List<Scenario> retn(int opcode) =>
     [retSpec("RETN", opcode, prefix: Z80a.EXTENDED_OPCODES)];
+List<Scenario> reti(int opcode) =>
+    [retSpec("RETI", opcode, prefix: Z80a.EXTENDED_OPCODES)];
 
 Scenario callCCNNJump(int opcode, String flag) => Scenario(
       "CALL $flag, NN",

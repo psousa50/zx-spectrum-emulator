@@ -382,6 +382,10 @@ var allScenarios = [
   ...retn(0x55),
   ...retn(0x65),
   ...retn(0x75),
+  ...reti(0x4D),
+  ...reti(0x5D),
+  ...reti(0x6D),
+  ...reti(0x7D),
 
   // CB
 
