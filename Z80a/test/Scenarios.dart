@@ -1593,7 +1593,7 @@ List<Scenario> ldAR(int opcode) => [
       )
     ];
 
-Scenario ldidSpec(String name, int opcode, int inc, int bc, String flags) =>
+Scenario ldIncDecSpec(String name, int opcode, int inc, int bc, String flags) =>
     Scenario(
       name,
       [Z80a.EXTENDED_OPCODES, opcode],
@@ -1617,17 +1617,17 @@ Scenario ldidSpec(String name, int opcode, int inc, int bc, String flags) =>
     );
 
 List<Scenario> ldi(int opcode) => [
-      ldidSpec("LDI", opcode, 1, 10, "~H P ~N"),
-      ldidSpec("LDI", opcode, 1, 1, "~H ~P ~N"),
+      ldIncDecSpec("LDI", opcode, 1, 10, "~H P ~N"),
+      ldIncDecSpec("LDI", opcode, 1, 1, "~H ~P ~N"),
     ];
 
 List<Scenario> ldd(int opcode) => [
-      ldidSpec("LDD", opcode, -1, 10, "~H P ~N"),
-      ldidSpec("LDD", opcode, -1, 1, "~H ~P ~N"),
+      ldIncDecSpec("LDD", opcode, -1, 10, "~H P ~N"),
+      ldIncDecSpec("LDD", opcode, -1, 1, "~H ~P ~N"),
     ];
 
-Scenario cpidSpec(String name, int opcode, int inc, int a, int value, int bc,
-        String flags) =>
+Scenario cpIncDecSpec(String name, int opcode, int inc, int a, int value,
+        int bc, String flags) =>
     Scenario(
       name,
       [Z80a.EXTENDED_OPCODES, opcode],
@@ -1650,20 +1650,20 @@ Scenario cpidSpec(String name, int opcode, int inc, int a, int value, int bc,
     );
 
 List<Scenario> cpi(int opcode) => [
-      cpidSpec("CPI", opcode, 1, 10, 2, 4, "~S ~Z ~H P ~N ~C"),
-      cpidSpec("CPI", opcode, 1, 129, 2, 3, "~S ~Z H P ~N ~C"),
-      cpidSpec("CPI", opcode, 1, 255, 254, 2, "~S ~Z ~H P ~N ~C"),
-      cpidSpec("CPI", opcode, 1, 3, 5, 1, "S ~Z H ~P ~N C"),
+      cpIncDecSpec("CPI", opcode, 1, 10, 2, 4, "~S ~Z ~H P ~N ~C"),
+      cpIncDecSpec("CPI", opcode, 1, 129, 2, 3, "~S ~Z H P ~N ~C"),
+      cpIncDecSpec("CPI", opcode, 1, 255, 254, 2, "~S ~Z ~H P ~N ~C"),
+      cpIncDecSpec("CPI", opcode, 1, 3, 5, 1, "S ~Z H ~P ~N C"),
     ];
 
 List<Scenario> cpd(int opcode) => [
-      cpidSpec("CPD", opcode, -1, 10, 2, 4, "~S ~Z ~H P ~N ~C"),
-      cpidSpec("CPD", opcode, -1, 129, 2, 3, "~S ~Z H P ~N ~C"),
-      cpidSpec("CPD", opcode, -1, 255, 254, 2, "~S ~Z ~H P ~N ~C"),
-      cpidSpec("CPD", opcode, -1, 3, 5, 1, "S ~Z H ~P ~N C"),
+      cpIncDecSpec("CPD", opcode, -1, 10, 2, 4, "~S ~Z ~H P ~N ~C"),
+      cpIncDecSpec("CPD", opcode, -1, 129, 2, 3, "~S ~Z H P ~N ~C"),
+      cpIncDecSpec("CPD", opcode, -1, 255, 254, 2, "~S ~Z ~H P ~N ~C"),
+      cpIncDecSpec("CPD", opcode, -1, 3, 5, 1, "S ~Z H ~P ~N C"),
     ];
 
-Scenario inidSpec(String name, int opcode, int inc, int b, String flags) =>
+Scenario inIncDecSpec(String name, int opcode, int inc, int b, String flags) =>
     Scenario(
       name,
       [Z80a.EXTENDED_OPCODES, opcode],
@@ -1682,16 +1682,16 @@ Scenario inidSpec(String name, int opcode, int inc, int b, String flags) =>
     );
 
 List<Scenario> ini(int opcode) => [
-      inidSpec("INI", opcode, 1, 5, "~Z N"),
-      inidSpec("INI", opcode, 1, 1, "Z N"),
+      inIncDecSpec("INI", opcode, 1, 5, "~Z N"),
+      inIncDecSpec("INI", opcode, 1, 1, "Z N"),
     ];
 
 List<Scenario> ind(int opcode) => [
-      inidSpec("IND", opcode, -1, 5, "~Z N"),
-      inidSpec("IND", opcode, -1, 1, "Z N"),
+      inIncDecSpec("IND", opcode, -1, 5, "~Z N"),
+      inIncDecSpec("IND", opcode, -1, 1, "Z N"),
     ];
 
-Scenario outidSpec(String name, int opcode, int inc, int b, String flags) =>
+Scenario outIncDecSpec(String name, int opcode, int inc, int b, String flags) =>
     Scenario(
       name,
       [Z80a.EXTENDED_OPCODES, opcode],
@@ -1710,11 +1710,11 @@ Scenario outidSpec(String name, int opcode, int inc, int b, String flags) =>
     );
 
 List<Scenario> outi(int opcode) => [
-      outidSpec("OUTI", opcode, 1, 5, "~Z N"),
-      outidSpec("OUTI", opcode, 1, 1, "Z N"),
+      outIncDecSpec("OUTI", opcode, 1, 5, "~Z N"),
+      outIncDecSpec("OUTI", opcode, 1, 1, "Z N"),
     ];
 
 List<Scenario> outd(int opcode) => [
-      outidSpec("OUTD", opcode, -1, 5, "~Z N"),
-      outidSpec("OUTD", opcode, -1, 1, "Z N"),
+      outIncDecSpec("OUTD", opcode, -1, 5, "~Z N"),
+      outIncDecSpec("OUTD", opcode, -1, 1, "Z N"),
     ];
