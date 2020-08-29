@@ -1713,3 +1713,8 @@ List<Scenario> outi(int opcode) => [
       outidSpec("OUTI", opcode, 1, 5, "~Z N"),
       outidSpec("OUTI", opcode, 1, 1, "Z N"),
     ];
+
+List<Scenario> outd(int opcode) => [
+      outidSpec("OUTD", opcode, -1, 5, "~Z N"),
+      outidSpec("OUTD", opcode, -1, 1, "Z N"),
+    ];
