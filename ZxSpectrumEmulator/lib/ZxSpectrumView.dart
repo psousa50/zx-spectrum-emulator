@@ -1,11 +1,11 @@
 import 'dart:typed_data';
+import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Cpu/Z80Assembler.dart';
 import 'Display.dart';
-import 'ZxSpectrum/ZxSpectrum.dart';
 
 class ZxSpectrumView extends StatefulWidget {
   @override

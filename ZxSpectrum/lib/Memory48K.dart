@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:Z80a/Memory.dart';
-import '../Util.dart';
+
+import 'Util.dart';
 
 class Memory48K extends Memory {
   Uint8List bytes;
