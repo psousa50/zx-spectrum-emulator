@@ -63,7 +63,6 @@ class Z80Instructions {
     var instruction = instructions[context.opcode];
     if (instruction != null) {
       tStates = instruction.handler(context.withInstruction(instruction));
-      if (tStates == null) tStates = 1;
     }
     return tStates;
   }

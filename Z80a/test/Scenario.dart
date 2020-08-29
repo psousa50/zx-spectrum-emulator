@@ -91,7 +91,7 @@ class Scenario {
 
     var tStates = z80a.step();
 
-    expect(tStates > 0, true,
+    expect(tStates != null, true,
         reason: "Opcode not processed => ${opcodesToString(opcodes)}");
 
     Map<int, int> actualRegisterValues = getZ80Registers(z80a);

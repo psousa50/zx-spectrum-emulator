@@ -780,6 +780,18 @@ void main() {
     expect(z80a.interruptsEnabled, false);
   }, skip: false);
 
+  test("Halt", () {
+    var z80a = newCPU();
+    z80a.memory.poke(0, 0x00);
+    z80a.step();
+    expect(z80a.PC, 0x01);
+    z80a.memory.poke(1, 0x76);
+    z80a.memory.poke(2, 0x00);
+    z80a.step();
+    z80a.step();
+    expect(z80a.PC, 0x02);
+  }, skip: false);
+
   test("Instruction returns T states", () {
     var z80a = Z80a(MemoryTest(size: 20), PortsTest());
     var tStates = 0;

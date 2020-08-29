@@ -22,6 +22,7 @@ class Z80a {
 
   InterruptMode _interruptMode;
   bool interruptsEnabled = false;
+  bool halted = false;
   var registers = Registers();
   var PC = 0;
 
@@ -63,6 +64,8 @@ class Z80a {
 
   int step() {
     var tStates = 0;
+
+    if (halted) return 0;
 
     final opcode = fetch();
 
@@ -1165,6 +1168,11 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int halt(InstructionContext context) {
+    this.halted = true;
+    return context.instruction.tStates();
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
     var unPrefixed = unPrefixedOpcodes;
@@ -1207,6 +1215,7 @@ class Z80a {
     unPrefixed.buildM8C8(0x46, "LD [rb345], (HL)", ldR8R8, 7);
 
     unPrefixed.buildM1C8(0x70, "LD (HL), [rb012]", ldR8R8, 7);
+    unPrefixed.build(0x76, "HALT", halt, 4);
     unPrefixed.buildM1C8(0x80, "ADD A, [rb012]", addAR8, 4);
     unPrefixed.buildM1C8(0x88, "ADC A, [rb012]", adcAR8, 4);
     unPrefixed.buildM1C8(0x90, "SUB [rb012]", subAR8, 4);
@@ -1218,7 +1227,8 @@ class Z80a {
 
     unPrefixed.buildM8C8(0xC0, "RET [cc]", retcc, 5, tStatesOnTrueCond: 11);
     unPrefixed.buildM16C4(0xC1, "POP [r16]", popR16, 10);
-    unPrefixed.buildM8C8(0xC2, "JP [cc], nn", jpccnn, 10);
+    unPrefixed.buildM8C8(0xC2, "JP [cc], nn", jpccnn, 10,
+        tStatesOnTrueCond: 10);
     unPrefixed.build(0xC3, "JP", jp, 10);
     unPrefixed.buildM8C8(0xC4, "CALL [cc], nn", callccnn, 10,
         tStatesOnTrueCond: 17);
