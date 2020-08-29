@@ -1593,8 +1593,9 @@ List<Scenario> ldAR(int opcode) => [
       )
     ];
 
-Scenario ldidSpec(int opcode, int inc, int bc, String flags) => Scenario(
-      'LDI',
+Scenario ldidSpec(String name, int opcode, int inc, int bc, String flags) =>
+    Scenario(
+      name,
       [Z80a.EXTENDED_OPCODES, opcode],
       initialState: State(
         register16Values: {
@@ -1616,11 +1617,41 @@ Scenario ldidSpec(int opcode, int inc, int bc, String flags) => Scenario(
     );
 
 List<Scenario> ldi(int opcode) => [
-      ldidSpec(opcode, 1, 10, "~H P ~N"),
-      ldidSpec(opcode, 1, 1, "~H ~P ~N"),
+      ldidSpec("LDI", opcode, 1, 10, "~H P ~N"),
+      ldidSpec("LDI", opcode, 1, 1, "~H ~P ~N"),
     ];
 
 List<Scenario> ldd(int opcode) => [
-      ldidSpec(opcode, -1, 10, "~H P ~N"),
-      ldidSpec(opcode, -1, 1, "~H ~P ~N"),
+      ldidSpec("LDD", opcode, -1, 10, "~H P ~N"),
+      ldidSpec("LDD", opcode, -1, 1, "~H ~P ~N"),
+    ];
+
+Scenario cpidSpec(String name, int opcode, int inc, int a, int value, int bc,
+        String flags) =>
+    Scenario(
+      name,
+      [Z80a.EXTENDED_OPCODES, opcode],
+      initialState: State(
+        register8Values: {Registers.R_A: a},
+        register16Values: {
+          Registers.R_HL: Scenario.RAM_START + 1,
+          Registers.R_BC: bc,
+        },
+        ram: [0, value],
+      ),
+      expectedState: State(
+        register16Values: {
+          Registers.R_HL: Scenario.RAM_START + 1 + inc,
+          Registers.R_BC: bc - 1,
+        },
+        ram: [0, value],
+        flags: flags,
+      ),
+    );
+
+List<Scenario> cpi(int opcode) => [
+      cpidSpec("CPI", opcode, 1, 10, 2, 4, "~S ~Z ~H P ~N ~C"),
+      cpidSpec("CPI", opcode, 1, 129, 2, 3, "~S ~Z ~H P ~N ~C"),
+      cpidSpec("CPI", opcode, 1, 255, 254, 2, "~S ~Z ~H P ~N ~C"),
+      cpidSpec("CPI", opcode, 1, 3, 5, 1, "S ~Z ~H ~P ~N C"),
     ];
