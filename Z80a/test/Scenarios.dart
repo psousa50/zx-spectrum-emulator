@@ -583,20 +583,22 @@ List<Scenario> callNN(int opcode) => [
       )
     ];
 
-List<Scenario> ret(int opcode) => [
-      Scenario(
-        "RET",
-        [opcode],
-        initialState: State(
-          register16Values: {Registers.R_SP: Scenario.RAM_START + 0},
+Scenario retSpec(String name, int opcode, {int prefix}) => Scenario(
+      name,
+      [if (prefix != null) prefix, opcode],
+      initialState: State(
+        register16Values: {Registers.R_SP: Scenario.RAM_START + 0},
+        ram: [lo(12345), hi(12345), 0],
+      ),
+      expectedState: State(
+          register16Values: {Registers.R_SP: Scenario.RAM_START + 2},
           ram: [lo(12345), hi(12345), 0],
-        ),
-        expectedState: State(
-            register16Values: {Registers.R_SP: Scenario.RAM_START + 2},
-            ram: [lo(12345), hi(12345), 0],
-            pc: 12345),
-      )
-    ];
+          pc: 12345),
+    );
+
+List<Scenario> ret(int opcode) => [retSpec("RET", opcode)];
+List<Scenario> retn(int opcode) =>
+    [retSpec("RETN", opcode, prefix: Z80a.EXTENDED_OPCODES)];
 
 Scenario callCCNNJump(int opcode, String flag) => Scenario(
       "CALL $flag, NN",

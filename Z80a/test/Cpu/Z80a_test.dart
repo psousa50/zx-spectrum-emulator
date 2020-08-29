@@ -378,6 +378,10 @@ var allScenarios = [
   ...neg(0x5C),
   ...neg(0x6C),
   ...neg(0x7C),
+  ...retn(0x45),
+  ...retn(0x55),
+  ...retn(0x65),
+  ...retn(0x75),
 
   // CB
 
