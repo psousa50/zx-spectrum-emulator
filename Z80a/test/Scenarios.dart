@@ -1662,3 +1662,26 @@ List<Scenario> cpd(int opcode) => [
       cpidSpec("CPD", opcode, -1, 255, 254, 2, "~S ~Z ~H P ~N ~C"),
       cpidSpec("CPD", opcode, -1, 3, 5, 1, "S ~Z H ~P ~N C"),
     ];
+
+Scenario inidSpec(String name, int opcode, int inc, int b, String flags) =>
+    Scenario(
+      name,
+      [Z80a.EXTENDED_OPCODES, opcode],
+      initialState: State(
+        register8Values: {Registers.R_B: b, Registers.R_C: 254},
+        register16Values: {Registers.R_HL: Scenario.RAM_START + 1},
+        ports: {254: 12},
+        ram: [0, 0],
+      ),
+      expectedState: State(
+        register8Values: {Registers.R_B: b - 1},
+        register16Values: {Registers.R_HL: Scenario.RAM_START + 1 + inc},
+        ram: [0, 12],
+        flags: flags,
+      ),
+    );
+
+List<Scenario> ini(int opcode) => [
+      inidSpec("INI", opcode, 1, 5, "~Z N"),
+      inidSpec("INI", opcode, 1, 1, "Z N"),
+    ];

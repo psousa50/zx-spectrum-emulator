@@ -394,6 +394,7 @@ var allScenarios = [
   ...ldd(0xA8),
   ...cpi(0xA1),
   ...cpd(0xA9),
+  ...ini(0xA2),
 
   // CB
 

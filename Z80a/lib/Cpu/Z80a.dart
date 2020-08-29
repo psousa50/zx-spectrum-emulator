@@ -1236,6 +1236,15 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int ini(InstructionContext context) {
+    this.memory.poke(this.registers.HL, this.ports.inPort(registers.C));
+    this.registers.HL = this.registers.HL + 1;
+    this.registers.B = this.registers.B - 1;
+    this.registers.addSubtractFlag = true;
+    this.registers.zeroFlag = this.registers.B == 0;
+    return context.instruction.tStates();
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
     var unPrefixed = unPrefixedOpcodes;
@@ -1349,6 +1358,7 @@ class Z80a {
 
     extendedOpcodes.build(0xA0, "LDI", ldi, 16);
     extendedOpcodes.build(0xA1, "CPI", cpi, 16);
+    extendedOpcodes.build(0xA2, "INI", ini, 16);
     extendedOpcodes.build(0xA8, "LDD", ldd, 16);
     extendedOpcodes.build(0xA9, "CPD", cpd, 16);
   }
