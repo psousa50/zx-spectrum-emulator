@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:Z80a/Memory.dart';
+
 const SpectrumColors = [
   0x000000,
   0x0000D7,
@@ -21,14 +23,23 @@ const SpectrumColors = [
 ];
 
 class Ula {
+  static Uint8List palette;
+
+  Uint8List screen;
+  Memory memory;
+
   static const screenWidth = 256;
   static const screenHeight = 192;
   static const paletteSize = 256 * 4;
   static const bmpHeaderSize = 54;
 
-  static Uint8List palette;
+  Ula(this.memory);
 
-  static Uint8List buildImage(Uint8List zxScreen) {
+  void refreshScreen() {
+    screen = buildImage(memory.range(16384, end: 16384 + 6912));
+  }
+
+  Uint8List buildImage(Uint8List zxScreen) {
     if (palette == null) {
       palette = Uint8List(paletteSize);
       int p = 0;
