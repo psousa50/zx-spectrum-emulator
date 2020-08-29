@@ -56,7 +56,23 @@ void main() {
           0x70,
           0x71,
           0x74,
-          0x7C
+          0x7C,
+          0xA4,
+          0xA5,
+          0xA6,
+          0xA7,
+          0xAC,
+          0xAD,
+          0xAE,
+          0xAF,
+          0xB4,
+          0xB5,
+          0xB6,
+          0xB7,
+          0xBC,
+          0xBD,
+          0xBE,
+          0xBF,
         ].contains(opcode)) {
           z80a.memory.poke(0, Z80a.EXTENDED_OPCODES);
           z80a.memory.poke(1, opcode);

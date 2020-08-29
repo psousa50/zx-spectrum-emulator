@@ -1592,3 +1592,30 @@ List<Scenario> ldAR(int opcode) => [
         ),
       )
     ];
+
+Scenario ldiSpec(int opcode, int bc, String flags) => Scenario(
+      'LDI',
+      [Z80a.EXTENDED_OPCODES, opcode],
+      initialState: State(
+        register16Values: {
+          Registers.R_HL: Scenario.RAM_START + 2,
+          Registers.R_DE: Scenario.RAM_START + 6,
+          Registers.R_BC: bc,
+        },
+        ram: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      ),
+      expectedState: State(
+        register16Values: {
+          Registers.R_HL: Scenario.RAM_START + 3,
+          Registers.R_DE: Scenario.RAM_START + 7,
+          Registers.R_BC: bc - 1,
+        },
+        ram: [0, 1, 2, 3, 4, 5, 2, 7, 8, 9],
+        flags: flags,
+      ),
+    );
+
+List<Scenario> ldi(int opcode) => [
+      ldiSpec(opcode, 10, "~H P ~N"),
+      ldiSpec(opcode, 1, "~H ~P ~N"),
+    ];

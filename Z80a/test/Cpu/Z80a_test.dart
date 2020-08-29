@@ -390,6 +390,7 @@ var allScenarios = [
   ...ldAI(0x57),
   ...ldRA(0x4F),
   ...ldAR(0x5F),
+  ...ldi(0xA0),
 
   // CB
 
