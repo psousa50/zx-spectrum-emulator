@@ -398,6 +398,7 @@ var allScenarios = [
   ...ind(0xAA),
   ...outi(0xA3),
   ...outd(0xAB),
+  ...ldir(0xB0),
 
   // CB
 

@@ -131,8 +131,9 @@ class Scenario {
             expectedRegisterValues[Registers.R_SP + 1],
         reason: '${scenarioName(opcodes)}\nReason: SP is wrong');
 
-    var expectedPC =
-        expectedState.pc == null ? opcodes.length : expectedState.pc;
+    var expectedPC = expectedState.pc == null
+        ? initialState.pc + opcodes.length
+        : expectedState.pc;
     expect(z80a.PC, expectedPC,
         reason: '${scenarioName(opcodes)}\nReason: PC is wrong');
   }

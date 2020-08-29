@@ -1272,6 +1272,13 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int ldir(InstructionContext context) {
+    ldi(context);
+    var cond = this.registers.BC == 0;
+    if (!cond) this.PC = this.PC - 2;
+    return context.instruction.tStates(cond: cond);
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
     var unPrefixed = unPrefixedOpcodes;
@@ -1391,6 +1398,7 @@ class Z80a {
     extendedOpcodes.build(0xA9, "CPD", cpd, 16);
     extendedOpcodes.build(0xAA, "IND", ind, 16);
     extendedOpcodes.build(0xAB, "OUTD", outd, 16);
+    extendedOpcodes.build(0xB0, "LDIR", ldir, 21, tStatesOnTrueCond: 16);
   }
 
   void buildIXYOpcodes() {
