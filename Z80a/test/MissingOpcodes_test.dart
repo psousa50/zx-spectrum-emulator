@@ -39,6 +39,35 @@ void main() {
         }
       }
     }
+
+    for (var opcode = 0; opcode < 256; opcode++) {
+      var z80a = Z80a(MemoryTest(size: 20), PortsTest());
+      if (opcode >= 0x40 && opcode < 0x80 || opcode >= 0xA0 && opcode < 0xC0) {
+        if (![
+          0x4C,
+          0x4E,
+          0x54,
+          0x5C,
+          0x63,
+          0x64,
+          0x6B,
+          0x6C,
+          0x6E,
+          0x70,
+          0x71,
+          0x74,
+          0x7C
+        ].contains(opcode)) {
+          z80a.memory.poke(0, Z80a.EXTENDED_OPCODES);
+          z80a.memory.poke(1, opcode);
+          z80a.PC = 0;
+          z80a.registers.SP = 9;
+          if (z80a.step() == 0) {
+            print('Opcode ${toHex(opcode)} not processed');
+          }
+        }
+      }
+    }
   }, skip: false);
 
   void printOpcode(int opcode, Z80Instruction instruction,

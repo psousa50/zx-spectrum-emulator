@@ -1186,6 +1186,16 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int ldAR(InstructionContext context) {
+    this.registers.A = this.registers.R;
+    return context.instruction.tStates();
+  }
+
+  int ldRA(InstructionContext context) {
+    this.registers.R = this.registers.A;
+    return context.instruction.tStates();
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
     var unPrefixed = unPrefixedOpcodes;
@@ -1286,10 +1296,12 @@ class Z80a {
 
     extendedOpcodes.buildM16C4(0x46, "IM 0", im0, 8);
     extendedOpcodes.buildM16C4(0x47, "LD I, A", ldIA, 9);
+    extendedOpcodes.buildM16C4(0x4F, "LD R, A", ldRA, 9);
     extendedOpcodes.buildM16C4(0x66, "IM 0", im0, 8);
 
     extendedOpcodes.buildM16C4(0x56, "IM 1", im1, 8);
     extendedOpcodes.buildM16C4(0x57, "LD A, I", ldAI, 9);
+    extendedOpcodes.buildM16C4(0x5F, "LD A, R", ldAR, 9);
     extendedOpcodes.buildM16C4(0x66, "IM 1", im1, 8);
 
     extendedOpcodes.buildM16C4(0x5E, "IM 1", im2, 8);

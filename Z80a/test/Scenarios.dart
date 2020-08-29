@@ -1566,3 +1566,29 @@ List<Scenario> ldAI(int opcode) => [
         ),
       )
     ];
+
+List<Scenario> ldRA(int opcode) => [
+      Scenario(
+        'LD R, A',
+        [Z80a.EXTENDED_OPCODES, opcode],
+        initialState: State(
+          register8Values: {Registers.R_A: 12},
+        ),
+        expectedState: State(
+          register8Values: {Registers.R_R: 12},
+        ),
+      )
+    ];
+
+List<Scenario> ldAR(int opcode) => [
+      Scenario(
+        'LD A, R',
+        [Z80a.EXTENDED_OPCODES, opcode],
+        initialState: State(
+          register8Values: {Registers.R_R: 12},
+        ),
+        expectedState: State(
+          register8Values: {Registers.R_A: 12},
+        ),
+      )
+    ];
