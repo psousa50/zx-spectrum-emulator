@@ -1540,3 +1540,29 @@ List<Scenario> set4R8(int opcode, int r8) => setNR8(opcode, 4, r8);
 List<Scenario> set5R8(int opcode, int r8) => setNR8(opcode, 5, r8);
 List<Scenario> set6R8(int opcode, int r8) => setNR8(opcode, 6, r8);
 List<Scenario> set7R8(int opcode, int r8) => setNR8(opcode, 7, r8);
+
+List<Scenario> ldIA(int opcode) => [
+      Scenario(
+        'LD I, A',
+        [Z80a.EXTENDED_OPCODES, opcode],
+        initialState: State(
+          register8Values: {Registers.R_A: 12},
+        ),
+        expectedState: State(
+          register8Values: {Registers.R_I: 12},
+        ),
+      )
+    ];
+
+List<Scenario> ldAI(int opcode) => [
+      Scenario(
+        'LD A, I',
+        [Z80a.EXTENDED_OPCODES, opcode],
+        initialState: State(
+          register8Values: {Registers.R_I: 12},
+        ),
+        expectedState: State(
+          register8Values: {Registers.R_A: 12},
+        ),
+      )
+    ];

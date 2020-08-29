@@ -833,6 +833,7 @@ class Z80a {
   }
 
   int retn(InstructionContext context) => ret(context);
+  int reti(InstructionContext context) => ret(context);
 
   int jp(InstructionContext context) {
     this.PC = fetch2();
@@ -1175,6 +1176,16 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int ldAI(InstructionContext context) {
+    this.registers.A = this.registers.I;
+    return context.instruction.tStates();
+  }
+
+  int ldIA(InstructionContext context) {
+    this.registers.I = this.registers.A;
+    return context.instruction.tStates();
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
     var unPrefixed = unPrefixedOpcodes;
@@ -1271,12 +1282,14 @@ class Z80a {
     extendedOpcodes.buildM16C4(0x4A, "ADC HL, [r16]", adcHLR16, 15);
     extendedOpcodes.buildM16C4(0x4B, "LD [r16], (nn)", ldR16mnn, 20);
     extendedOpcodes.buildM16C4(0x4C, "NEG", neg, 8);
-    extendedOpcodes.buildM16C4(0x4D, "RETI", retn, 14);
+    extendedOpcodes.buildM16C4(0x4D, "RETI", reti, 14);
 
     extendedOpcodes.buildM16C4(0x46, "IM 0", im0, 8);
+    extendedOpcodes.buildM16C4(0x47, "LD I, A", ldIA, 9);
     extendedOpcodes.buildM16C4(0x66, "IM 0", im0, 8);
 
     extendedOpcodes.buildM16C4(0x56, "IM 1", im1, 8);
+    extendedOpcodes.buildM16C4(0x57, "LD A, I", ldAI, 9);
     extendedOpcodes.buildM16C4(0x66, "IM 1", im1, 8);
 
     extendedOpcodes.buildM16C4(0x5E, "IM 1", im2, 8);
