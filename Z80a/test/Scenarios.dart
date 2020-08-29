@@ -783,11 +783,11 @@ Scenario djnzJumpSpec(int opcode, int jump, int initialPC, int finalPC) =>
       "DJNZ n",
       [opcode, jump],
       initialState: State(
-        register8Values: {Registers.R_B: 1},
+        register8Values: {Registers.R_B: 5},
         pc: initialPC,
       ),
       expectedState: State(
-        register8Values: {Registers.R_B: 0},
+        register8Values: {Registers.R_B: 4},
         pc: finalPC,
       ),
     );
@@ -801,10 +801,10 @@ Scenario djnzNoJump(int opcode) => Scenario(
       "DJNZ n",
       [opcode, 10],
       initialState: State(
-        register8Values: {Registers.R_B: 5},
+        register8Values: {Registers.R_B: 1},
       ),
       expectedState: State(
-        register8Values: {Registers.R_B: 4},
+        register8Values: {Registers.R_B: 0},
       ),
     );
 

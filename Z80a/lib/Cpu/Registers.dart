@@ -131,6 +131,13 @@ class Registers {
     3: R_SP,
   };
 
+  static const r16SPTableBack = {
+    R_BC: 0,
+    R_DE: 1,
+    R_HL: 2,
+    R_SP: 3,
+  };
+
   static const r16AFTable = {
     0: R_BC,
     1: R_DE,

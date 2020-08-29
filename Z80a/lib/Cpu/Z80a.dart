@@ -488,10 +488,9 @@ class Z80a {
   int djnz(InstructionContext context) {
     var d = fetch();
     registers.B = byte(registers.B - 1);
-    bool cond = registers.B == 0;
+    bool cond = registers.B != 0;
     if (cond) {
       this.PC = this.PC + signedByte(d);
-      ;
     }
     return context.instruction.tStates(cond: cond);
   }
