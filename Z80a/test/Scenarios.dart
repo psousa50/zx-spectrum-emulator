@@ -1770,3 +1770,8 @@ List<Scenario> ldir(int opcode) => [
       ldIncDecNoRepeatSpec("LDIR", opcode, 1),
       ldIncDecRepeatSpec("LDIR", opcode, 1),
     ];
+
+List<Scenario> lddr(int opcode) => [
+      ldIncDecNoRepeatSpec("LDDR", opcode, -1),
+      ldIncDecRepeatSpec("LDDR", opcode, -1),
+    ];

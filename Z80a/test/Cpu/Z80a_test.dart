@@ -399,6 +399,7 @@ var allScenarios = [
   ...outi(0xA3),
   ...outd(0xAB),
   ...ldir(0xB0),
+  ...lddr(0xB8),
 
   // CB
 
