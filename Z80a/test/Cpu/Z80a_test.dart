@@ -395,6 +395,7 @@ var allScenarios = [
   ...cpi(0xA1),
   ...cpd(0xA9),
   ...ini(0xA2),
+  ...ind(0xAA),
 
   // CB
 

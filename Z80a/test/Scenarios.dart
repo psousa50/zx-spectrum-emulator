@@ -1685,3 +1685,8 @@ List<Scenario> ini(int opcode) => [
       inidSpec("INI", opcode, 1, 5, "~Z N"),
       inidSpec("INI", opcode, 1, 1, "Z N"),
     ];
+
+List<Scenario> ind(int opcode) => [
+      inidSpec("IND", opcode, -1, 5, "~Z N"),
+      inidSpec("IND", opcode, -1, 1, "Z N"),
+    ];
