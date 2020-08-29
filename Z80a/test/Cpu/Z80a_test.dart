@@ -1,5 +1,6 @@
 import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Cpu/Z80Assembler.dart';
+import 'package:Z80a/Util.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Z80a/Cpu/Z80a.dart';
 import '../MemoryTest.dart';
@@ -746,6 +747,27 @@ void main() {
       scenario.run();
     });
   }, skip: runAll);
+
+  void testDAA(String op, int a, int n, int result) {
+    var z80a = newCPU();
+    z80a.registers.A = a;
+    var opcode = op == "ADD" ? 0xC6 : 0xD6;
+    z80a.memory.poke(0, opcode);
+    z80a.memory.poke(1, n);
+    z80a.memory.poke(2, 0x27);
+    z80a.step();
+    z80a.step();
+    expect(z80a.registers.A, result,
+        reason:
+            "A has wrong value after DAA (${toHex(a)} + ${toHex(n)} = ${toHex(result)})");
+  }
+
+  test("DAA", () {
+    testDAA("ADD", 0x15, 0x13, 0x28);
+    testDAA("ADD", 0x15, 0x27, 0x42);
+    testDAA("SUB", 0x28, 0x13, 0x15);
+    testDAA("SUB", 0x42, 0x27, 0x15);
+  }, skip: false);
 
   test("Instruction returns T states", () {
     var z80a = Z80a(MemoryTest(size: 20), PortsTest());

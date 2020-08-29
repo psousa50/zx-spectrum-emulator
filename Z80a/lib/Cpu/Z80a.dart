@@ -408,6 +408,16 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int daa(InstructionContext context) {
+    var sign = registers.addSubtractFlag ? -1 : 1;
+    if (registers.halfCarryFlag || (registers.A & 0x0F > 0x09))
+      registers.A = addA(0x06 * sign);
+    if (registers.carryFlag || (registers.A & 0xF0 > 0x90))
+      registers.A = addA(0x60 * sign);
+
+    return context.instruction.tStates();
+  }
+
   int rlca(InstructionContext context) {
     registers.A = rlcOp(registers.A);
     return context.instruction.tStates();
@@ -1172,6 +1182,7 @@ class Z80a {
     unPrefixed.buildM8C8(0x20, "JR [cc], nn", jrcc, 7,
         tStatesOnTrueCond: 12, count: 4);
     unPrefixed.build(0x22, "LD (nn), HL", ldmnnHL, 16);
+    unPrefixed.build(0x27, "DAA", daa, 4);
     unPrefixed.build(0x2A, "LD HL, (nn)", ldHLmnn, 16);
     unPrefixed.build(0x2F, "CPL", cpl, 4);
 
