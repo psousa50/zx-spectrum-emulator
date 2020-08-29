@@ -778,19 +778,26 @@ List<Scenario> rstNN(int opcode, int rst) => [
       )
     ];
 
-Scenario djnzNJump(int opcode) => Scenario(
+Scenario djnzJumpSpec(int opcode, int jump, int initialPC, int finalPC) =>
+    Scenario(
       "DJNZ n",
-      [opcode, 10],
+      [opcode, jump],
       initialState: State(
         register8Values: {Registers.R_B: 1},
+        pc: initialPC,
       ),
       expectedState: State(
         register8Values: {Registers.R_B: 0},
-        pc: 12,
+        pc: finalPC,
       ),
     );
 
-Scenario djnzNNotJump(int opcode) => Scenario(
+List<Scenario> djnzJump(int opcode) => [
+      djnzJumpSpec(opcode, 3, 6, 11),
+      djnzJumpSpec(opcode, 253, 6, 5),
+    ];
+
+Scenario djnzNoJump(int opcode) => Scenario(
       "DJNZ n",
       [opcode, 10],
       initialState: State(
@@ -802,38 +809,44 @@ Scenario djnzNNotJump(int opcode) => Scenario(
     );
 
 List<Scenario> djnzN(int opcode) => [
-      djnzNJump(opcode),
-      djnzNNotJump(opcode),
+      ...djnzJump(opcode),
+      djnzNoJump(opcode),
     ];
 
-List<Scenario> jrN(int opcode) => [
-      Scenario(
-        "JR n",
-        [opcode, 10],
-        initialState: State(),
-        expectedState: State(
-          pc: 12,
-        ),
-      )
-    ];
-
-Scenario jrCCNJump(int opcode, String flag) => Scenario(
-      "JR $flag, NN",
-      [opcode, 10],
-      initialState: State(flags: flag),
-      expectedState: State(pc: 12),
+Scenario jrNSpec(String name, int opcode, String flag, int jump, int initialPC,
+        int finalPC) =>
+    Scenario(
+      name,
+      [opcode, jump],
+      initialState: State(
+        flags: flag,
+        pc: initialPC,
+      ),
+      expectedState: State(
+        pc: finalPC,
+      ),
     );
 
-Scenario jrCCNNotJump(int opcode, String flag) => Scenario(
-      "JR $flag, NN",
+List<Scenario> jrN(int opcode) => [
+      jrNSpec("JR n", opcode, "", 3, 6, 11),
+      jrNSpec("JR n", opcode, "", 253, 6, 5),
+    ];
+
+List<Scenario> jrCCNJump(int opcode, String flag) => [
+      jrNSpec("JR $flag, nn", opcode, flag, 3, 6, 11),
+      jrNSpec("JR $flag, nn", opcode, flag, 253, 6, 5),
+    ];
+
+Scenario jrCCNNoJump(int opcode, String flag) => Scenario(
+      "JR $flag, nn",
       [opcode, 10],
       initialState: State(flags: flag),
       expectedState: State(),
     );
 
 List<Scenario> jrCCNN(int opcode, String flag, bool jumpIfSet) => [
-      jrCCNJump(opcode, jumpIfSet ? flag : '~$flag'),
-      jrCCNNotJump(opcode, jumpIfSet ? '~$flag' : flag),
+      ...jrCCNJump(opcode, jumpIfSet ? flag : '~$flag'),
+      jrCCNNoJump(opcode, jumpIfSet ? '~$flag' : flag),
     ];
 
 Scenario cplN(int opcode, int value, int result) => Scenario("CPL", [opcode],

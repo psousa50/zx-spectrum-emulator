@@ -116,6 +116,11 @@ class Z80a {
 
   int byte(int v) => v % 256;
 
+  int signedByte(int b) {
+    var sb = byte(b);
+    return (sb < 128) ? sb : sb - 256;
+  }
+
   int word(int v) => v % 65536;
 
   int getIXY(int prefix) => prefix == IX_PREFIX ? registers.IX : registers.IY;
@@ -485,14 +490,15 @@ class Z80a {
     registers.B = byte(registers.B - 1);
     bool cond = registers.B == 0;
     if (cond) {
-      this.PC = this.PC + d;
+      this.PC = this.PC + signedByte(d);
+      ;
     }
     return context.instruction.tStates(cond: cond);
   }
 
   int jr(InstructionContext context) {
     var d = fetch();
-    this.PC = this.PC + d;
+    this.PC = this.PC + signedByte(d);
     return context.instruction.tStates();
   }
 
@@ -500,7 +506,7 @@ class Z80a {
     var d = fetch();
     var cond = getFlagCondition(bit345(context.opcode) - 4);
     if (cond) {
-      this.PC = this.PC + d;
+      this.PC = this.PC + signedByte(d);
     }
     return context.instruction.tStates(cond: cond);
   }

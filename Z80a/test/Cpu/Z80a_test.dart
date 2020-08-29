@@ -733,15 +733,15 @@ Z80a newCPU() {
 void main() {
   const runAll = true;
 
-  // test("All Scenarios", () {
-  //   allScenarios.forEach((scenario) {
-  //     scenario.run();
-  //   });
-  // }, skip: !runAll);
+  test("All Scenarios", () {
+    allScenarios.forEach((scenario) {
+      scenario.run();
+    });
+  }, skip: !runAll);
 
   test("One Scenario", () {
     print("RUNNING ONLY ONE SCENARIO");
-    var scenarios = bit0R8(0x46, Registers.R_MIXd);
+    var scenarios = jrCCNN(0x20, "Z", false);
     scenarios.forEach((scenario) {
       scenario.run();
     });
