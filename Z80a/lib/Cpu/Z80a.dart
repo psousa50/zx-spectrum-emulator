@@ -1207,6 +1207,17 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int ldd(InstructionContext context) {
+    this.memory.poke(this.registers.DE, this.memory.peek(this.registers.HL));
+    this.registers.HL = this.registers.HL - 1;
+    this.registers.DE = this.registers.DE - 1;
+    this.registers.BC = this.registers.BC - 1;
+    this.registers.halfCarryFlag = false;
+    this.registers.addSubtractFlag = false;
+    this.registers.parityOverflowFlag = this.registers.BC != 0;
+    return context.instruction.tStates();
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
     var unPrefixed = unPrefixedOpcodes;
@@ -1318,7 +1329,8 @@ class Z80a {
     extendedOpcodes.buildM16C4(0x5E, "IM 1", im2, 8);
     extendedOpcodes.buildM16C4(0x6E, "IM 1", im2, 8);
 
-    extendedOpcodes.build(0xA0, "LDI", ldi, 8);
+    extendedOpcodes.build(0xA0, "LDI", ldi, 16);
+    extendedOpcodes.build(0xA8, "LDD", ldd, 16);
   }
 
   void buildIXYOpcodes() {
