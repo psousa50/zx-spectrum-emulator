@@ -769,6 +769,17 @@ void main() {
     testDAA("SUB", 0x42, 0x27, 0x15);
   }, skip: false);
 
+  test("DI, EI", () {
+    var z80a = newCPU();
+    expect(z80a.interruptsEnabled, false);
+    z80a.memory.poke(0, 0xFB);
+    z80a.step();
+    expect(z80a.interruptsEnabled, true);
+    z80a.memory.poke(1, 0xF3);
+    z80a.step();
+    expect(z80a.interruptsEnabled, false);
+  }, skip: false);
+
   test("Instruction returns T states", () {
     var z80a = Z80a(MemoryTest(size: 20), PortsTest());
     var tStates = 0;

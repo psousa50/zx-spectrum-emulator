@@ -21,6 +21,7 @@ class Z80a {
   final Ports ports;
 
   InterruptMode _interruptMode;
+  bool interruptsEnabled = false;
   var registers = Registers();
   var PC = 0;
 
@@ -1154,6 +1155,16 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int di(InstructionContext context) {
+    this.interruptsEnabled = false;
+    return context.instruction.tStates();
+  }
+
+  int ei(InstructionContext context) {
+    this.interruptsEnabled = true;
+    return context.instruction.tStates();
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
     var unPrefixed = unPrefixedOpcodes;
@@ -1230,8 +1241,10 @@ class Z80a {
     unPrefixed.build(0xEB, "EX DE, HL", exDEHL, 4);
     unPrefixed.build(0xEE, "XOR N", xorAn, 7);
 
+    unPrefixed.build(0xF3, "DI", di, 4);
     unPrefixed.build(0xF6, "OR N", orAn, 7);
     unPrefixed.build(0xF9, "LD SP, HL", ldSPHL, 6);
+    unPrefixed.build(0xFB, "EI", ei, 4);
     unPrefixed.build(0xFE, "CP N", cpAn, 7);
   }
 
