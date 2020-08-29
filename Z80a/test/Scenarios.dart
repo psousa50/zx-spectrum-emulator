@@ -1362,7 +1362,7 @@ List<Scenario> inR8C(int opcode, int r8) => [
 List<Scenario> outCR8(int opcode, int r8) => [
       Scenario(
         'OUT (C) ${Registers.r8Names[r8]}',
-        [0xED, opcode],
+        [Z80a.EXTENDED_OPCODES, opcode],
         initialState: State(
           register8Values: {
             Registers.R_C: 254,
@@ -1405,54 +1405,54 @@ List<Scenario> sbcHLR16(int opcode, int r16) => r16 == Registers.R_HL
     ? [
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000, 0,
             "~S Z ~H ~P N ~C",
-            inFlags: "~C", prefix: 0xED),
+            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000,
             65535, "S ~Z H P N C",
-            inFlags: "C", prefix: 0xED),
+            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
       ]
     : [
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 12000,
             18000, "~S ~Z H ~P N ~C",
-            inFlags: "~C", prefix: 0xED),
+            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000, 0,
             "~S Z ~H ~P N ~C",
-            inFlags: "~C", prefix: 0xED),
+            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 40000,
             55536, "S ~Z H ~P N C",
-            inFlags: "~C", prefix: 0xED),
+            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 12000,
             17999, "~S ~Z H ~P N ~C",
-            inFlags: "C", prefix: 0xED),
+            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000,
             65535, "S ~Z H P N C",
-            inFlags: "C", prefix: 0xED),
+            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
       ];
 
 List<Scenario> adcHLR16(int opcode, int r16) => r16 == Registers.R_HL
     ? [
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 40000, 40000,
             14464, "~S ~Z H P ~N C",
-            inFlags: "~C", prefix: 0xED),
+            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 32768, 32768, 0,
             "~S Z ~H P ~N C",
-            inFlags: "~C", prefix: 0xED),
+            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 10000, 10000,
             20001, "~S ~Z ~H ~P ~N ~C",
-            inFlags: "C", prefix: 0xED),
+            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
       ]
     : [
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 20000, 12000,
             32000, "~S ~Z H ~P ~N ~C",
-            inFlags: "~C", prefix: 0xED),
+            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 30000, 20000,
             50000, "S ~Z H P ~N ~C",
-            inFlags: "~C", prefix: 0xED),
+            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 30000, 42000, 6464,
             "~S ~Z ~H ~P ~N C",
-            inFlags: "~C", prefix: 0xED),
+            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 30000, 42000, 6465,
             "~S ~Z ~H ~P ~N C",
-            inFlags: "C", prefix: 0xED),
+            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
       ];
 
 List<Scenario> neg(int opcode) => [
@@ -1689,4 +1689,27 @@ List<Scenario> ini(int opcode) => [
 List<Scenario> ind(int opcode) => [
       inidSpec("IND", opcode, -1, 5, "~Z N"),
       inidSpec("IND", opcode, -1, 1, "Z N"),
+    ];
+
+Scenario outidSpec(String name, int opcode, int inc, int b, String flags) =>
+    Scenario(
+      name,
+      [Z80a.EXTENDED_OPCODES, opcode],
+      initialState: State(
+        register8Values: {Registers.R_B: b, Registers.R_C: 254},
+        register16Values: {Registers.R_HL: Scenario.RAM_START + 1},
+        ram: [0, 12],
+      ),
+      expectedState: State(
+        register8Values: {Registers.R_B: b - 1},
+        register16Values: {Registers.R_HL: Scenario.RAM_START + 1 + inc},
+        ram: [0, 12],
+        ports: {254: 12},
+        flags: flags,
+      ),
+    );
+
+List<Scenario> outi(int opcode) => [
+      outidSpec("OUTI", opcode, 1, 5, "~Z N"),
+      outidSpec("OUTI", opcode, 1, 1, "Z N"),
     ];
