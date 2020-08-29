@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:Z80a/Cpu/Z80a.dart';
-import 'package:ZxSpectrumEmulator/Memory48K.dart';
+import 'package:ZxSpectrumEmulator/ZxSpectrum/Memory48K.dart';
 
 import 'Ula.dart';
 import 'ZxSpectrumPorts.dart';

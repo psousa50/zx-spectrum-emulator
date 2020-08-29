@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Cpu/Z80Assembler.dart';
 import 'Display.dart';
-import 'ZxSpectrum.dart';
+import 'ZxSpectrum/ZxSpectrum.dart';
 
 class ZxSpectrumView extends StatefulWidget {
   @override
@@ -39,13 +39,6 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     getScreen();
     zxSpectrum.start();
   }
-
-  // 0 1 2 ld hl, 16384
-  // 3 4 ld b, 0
-  // 5 dec(hl)
-  // 6 inc hl
-  // 7 8 djnz -4
-  // 9 10 jr -11
 
   void refreshScreen() {
     setState(() {
