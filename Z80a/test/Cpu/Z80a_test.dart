@@ -401,6 +401,7 @@ var allScenarios = [
   ...ldir(0xB0),
   ...lddr(0xB8),
   ...cpir(0xB1),
+  ...cpdr(0xB9),
 
   // CB
 

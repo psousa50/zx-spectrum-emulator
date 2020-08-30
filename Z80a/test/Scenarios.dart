@@ -1743,3 +1743,14 @@ List<Scenario> cpir(int opcode) => [
       cpIncDecSpec("CPIR", opcode, 1, 10, 10, 4, "~S Z ~H P ~N ~C"),
       cpIncDecSpec("CPIR", opcode, 1, 3, 5, 1, "S ~Z H ~P ~N C"),
     ];
+
+List<Scenario> cpdr(int opcode) => [
+      cpIncDecSpec("CPDR", opcode, -1, 10, 2, 4, "~S ~Z ~H P ~N ~C",
+          finalPC: 0),
+      cpIncDecSpec("CPDR", opcode, -1, 129, 2, 3, "~S ~Z H P ~N ~C",
+          finalPC: 0),
+      cpIncDecSpec("CPDR", opcode, -1, 255, 254, 2, "~S ~Z ~H P ~N ~C",
+          finalPC: 0),
+      cpIncDecSpec("CPDR", opcode, -1, 3, 5, 1, "S ~Z H ~P ~N C"),
+      cpIncDecSpec("CPDR", opcode, -1, 10, 10, 4, "~S Z ~H P ~N ~C"),
+    ];
