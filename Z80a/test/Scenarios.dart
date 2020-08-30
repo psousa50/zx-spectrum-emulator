@@ -1667,7 +1667,8 @@ List<Scenario> cpd(int opcode) => [
       cpIncDecSpec("CPD", opcode, -1, 3, 5, 1, "S ~Z H ~P ~N C"),
     ];
 
-Scenario inIncDecSpec(String name, int opcode, int inc, int b, String flags) =>
+Scenario inIncDecSpec(String name, int opcode, int inc, int b, String flags,
+        {int finalPC}) =>
     Scenario(
       name,
       [Z80a.EXTENDED_OPCODES, opcode],
@@ -1682,6 +1683,7 @@ Scenario inIncDecSpec(String name, int opcode, int inc, int b, String flags) =>
         register16Values: {Registers.R_HL: Scenario.RAM_START + 1 + inc},
         ram: [0, 12],
         flags: flags,
+        pc: finalPC,
       ),
     );
 
@@ -1753,4 +1755,9 @@ List<Scenario> cpdr(int opcode) => [
           finalPC: 0),
       cpIncDecSpec("CPDR", opcode, -1, 3, 5, 1, "S ~Z H ~P ~N C"),
       cpIncDecSpec("CPDR", opcode, -1, 10, 10, 4, "~S Z ~H P ~N ~C"),
+    ];
+
+List<Scenario> inir(int opcode) => [
+      inIncDecSpec("INIR", opcode, 1, 5, "Z N", finalPC: 0),
+      inIncDecSpec("INIR", opcode, 1, 1, "Z N"),
     ];
