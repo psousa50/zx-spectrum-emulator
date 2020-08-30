@@ -1316,6 +1316,14 @@ class Z80a {
     return context.instruction.tStates(cond: cond);
   }
 
+  int otdr(InstructionContext context) {
+    outd(context);
+    this.registers.zeroFlag = true;
+    var cond = this.registers.B == 0;
+    if (!cond) this.PC = this.PC - 2;
+    return context.instruction.tStates(cond: cond);
+  }
+
   void buildUnprefixedOpcodes() {
     unPrefixedOpcodes = Z80Instructions();
     var unPrefixed = unPrefixedOpcodes;
@@ -1441,6 +1449,7 @@ class Z80a {
     extendedOpcodes.build(0xB3, "OTIR", otir, 21, tStatesOnTrueCond: 16);
     extendedOpcodes.build(0xB8, "LDDR", lddr, 21, tStatesOnTrueCond: 16);
     extendedOpcodes.build(0xB9, "CPDR", cpdr, 21, tStatesOnTrueCond: 16);
+    extendedOpcodes.build(0xBB, "OTDR", otdr, 21, tStatesOnTrueCond: 16);
   }
 
   void buildIXYOpcodes() {

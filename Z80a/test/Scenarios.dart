@@ -1768,3 +1768,8 @@ List<Scenario> otir(int opcode) => [
       outIncDecSpec("OUTI", opcode, 1, 5, "Z N", finalPC: 0),
       outIncDecSpec("OUTI", opcode, 1, 1, "Z N"),
     ];
+
+List<Scenario> otdr(int opcode) => [
+      outIncDecSpec("OUTI", opcode, -1, 5, "Z N", finalPC: 0),
+      outIncDecSpec("OUTI", opcode, -1, 1, "Z N"),
+    ];
