@@ -1697,7 +1697,8 @@ List<Scenario> ind(int opcode) => [
       inIncDecSpec("IND", opcode, -1, 1, "Z N"),
     ];
 
-Scenario outIncDecSpec(String name, int opcode, int inc, int b, String flags) =>
+Scenario outIncDecSpec(String name, int opcode, int inc, int b, String flags,
+        {int finalPC}) =>
     Scenario(
       name,
       [Z80a.EXTENDED_OPCODES, opcode],
@@ -1712,6 +1713,7 @@ Scenario outIncDecSpec(String name, int opcode, int inc, int b, String flags) =>
         ram: [0, 12],
         ports: {254: 12},
         flags: flags,
+        pc: finalPC,
       ),
     );
 
@@ -1760,4 +1762,9 @@ List<Scenario> cpdr(int opcode) => [
 List<Scenario> inir(int opcode) => [
       inIncDecSpec("INIR", opcode, 1, 5, "Z N", finalPC: 0),
       inIncDecSpec("INIR", opcode, 1, 1, "Z N"),
+    ];
+
+List<Scenario> otir(int opcode) => [
+      outIncDecSpec("OUTI", opcode, 1, 5, "Z N", finalPC: 0),
+      outIncDecSpec("OUTI", opcode, 1, 1, "Z N"),
     ];
