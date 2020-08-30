@@ -9,7 +9,6 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    print("Main");
     return MaterialApp(
       title: 'Zx Spectrum Emulator',
       theme: ThemeData(

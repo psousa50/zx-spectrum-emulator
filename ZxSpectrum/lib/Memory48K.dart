@@ -10,7 +10,7 @@ class Memory48K extends Memory {
   Memory48K.fromBytes(this.bytes);
 
   Memory48K() {
-    this.bytes = Uint8List.fromList(List.filled(49152, 0));
+    this.bytes = Uint8List.fromList(List.filled(65536, 0));
   }
 
   int normalize(int address) => address % 65536;
@@ -24,13 +24,17 @@ class Memory48K extends Memory {
 
   @override
   poke(int address, int b) {
-    this.bytes[normalize(address)] = b;
+    if (address >= 0x4000 && address <= 0xFFFF) {
+      this.bytes[normalize(address)] = b;
+    }
   }
 
   @override
   poke2(int address, int b) {
-    this.bytes[normalize(address)] = lo(b);
-    this.bytes[normalize(address + 1)] = hi(b);
+    if (address >= 0x4000 && address <= 0xFFFF) {
+      this.bytes[normalize(address)] = lo(b);
+      this.bytes[normalize(address + 1)] = hi(b);
+    }
   }
 
   @override

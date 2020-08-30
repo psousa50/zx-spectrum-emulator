@@ -75,7 +75,6 @@ class Ula {
 
     p = p + paletteSize;
 
-    print(zxScreen.length);
     for (int y = 0; y < 192; y++) {
       var lineAddress =
           ((y & 0x07) << 8) | ((y & 0x38) << 2) | ((y & 0xC0) << 5);
