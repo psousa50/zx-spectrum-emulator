@@ -1196,13 +1196,11 @@ List<Scenario> jpMHL(int opcode, int rhxy) => [
         [...ixyPrefix(rhxy), opcode],
         initialState: State(
           register16Values: {
-            rhxy: Scenario.RAM_START,
+            rhxy: 12345,
           },
-          ram: [12, 34],
         ),
         expectedState: State(
-          ram: [12, 34],
-          pc: w(12, 34),
+          pc: 12345,
         ),
       )
     ];

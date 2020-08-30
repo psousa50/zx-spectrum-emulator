@@ -897,7 +897,7 @@ class Z80a {
   }
 
   int jpmHL(InstructionContext context) {
-    this.PC = this.memory.peek2(registers.HL);
+    this.PC = registers.HL;
     return context.instruction.tStates();
   }
 
@@ -1037,7 +1037,7 @@ class Z80a {
   }
 
   int jpmIXY(InstructionContext context) {
-    this.PC = this.memory.peek2(getIXY(context.prefix));
+    this.PC = getIXY(context.prefix);
     return context.instruction.tStates();
   }
 
