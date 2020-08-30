@@ -1593,7 +1593,8 @@ List<Scenario> ldAR(int opcode) => [
       )
     ];
 
-Scenario ldIncDecSpec(String name, int opcode, int inc, int bc, String flags) =>
+Scenario ldIncDecSpec(String name, int opcode, int inc, int bc, String flags,
+        {int finalPC}) =>
     Scenario(
       name,
       [Z80a.EXTENDED_OPCODES, opcode],
@@ -1613,6 +1614,7 @@ Scenario ldIncDecSpec(String name, int opcode, int inc, int bc, String flags) =>
         },
         ram: [0, 1, 2, 3, 4, 5, 2, 7, 8, 9],
         flags: flags,
+        pc: finalPC,
       ),
     );
 
@@ -1627,7 +1629,8 @@ List<Scenario> ldd(int opcode) => [
     ];
 
 Scenario cpIncDecSpec(String name, int opcode, int inc, int a, int value,
-        int bc, String flags) =>
+        int bc, String flags,
+        {int finalPC}) =>
     Scenario(
       name,
       [Z80a.EXTENDED_OPCODES, opcode],
@@ -1646,6 +1649,7 @@ Scenario cpIncDecSpec(String name, int opcode, int inc, int a, int value,
         },
         ram: [0, value],
         flags: flags,
+        pc: finalPC,
       ),
     );
 
@@ -1719,59 +1723,23 @@ List<Scenario> outd(int opcode) => [
       outIncDecSpec("OUTD", opcode, -1, 1, "Z N"),
     ];
 
-Scenario ldIncDecNoRepeatSpec(String name, int opcode, int inc) => Scenario(
-      name,
-      [Z80a.EXTENDED_OPCODES, opcode],
-      initialState: State(
-        register16Values: {
-          Registers.R_HL: Scenario.RAM_START + 2,
-          Registers.R_DE: Scenario.RAM_START + 6,
-          Registers.R_BC: 5,
-        },
-        ram: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        pc: 1,
-      ),
-      expectedState: State(
-        register16Values: {
-          Registers.R_HL: Scenario.RAM_START + 2 + inc,
-          Registers.R_DE: Scenario.RAM_START + 6 + inc,
-          Registers.R_BC: 4,
-        },
-        ram: [0, 1, 2, 3, 4, 5, 2, 7, 8, 9],
-        pc: 1, // PC stays at the some address for next repeat
-        flags: "~H P ~N",
-      ),
-    );
-
-Scenario ldIncDecRepeatSpec(String name, int opcode, int inc) => Scenario(
-      name,
-      [Z80a.EXTENDED_OPCODES, opcode],
-      initialState: State(
-        register16Values: {
-          Registers.R_HL: Scenario.RAM_START + 2,
-          Registers.R_DE: Scenario.RAM_START + 6,
-          Registers.R_BC: 1,
-        },
-        ram: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        pc: 1,
-      ),
-      expectedState: State(
-        register16Values: {
-          Registers.R_HL: Scenario.RAM_START + 2 + inc,
-          Registers.R_DE: Scenario.RAM_START + 6 + inc,
-          Registers.R_BC: 0,
-        },
-        ram: [0, 1, 2, 3, 4, 5, 2, 7, 8, 9],
-        flags: "~H ~P ~N",
-      ),
-    );
-
 List<Scenario> ldir(int opcode) => [
-      ldIncDecNoRepeatSpec("LDIR", opcode, 1),
-      ldIncDecRepeatSpec("LDIR", opcode, 1),
+      ldIncDecSpec("LDIR", opcode, 1, 5, "~H P ~N",
+          finalPC: 0), //PC does not move
+      ldIncDecSpec("LDIR", opcode, 1, 1, "~H ~P ~N"),
     ];
 
 List<Scenario> lddr(int opcode) => [
-      ldIncDecNoRepeatSpec("LDDR", opcode, -1),
-      ldIncDecRepeatSpec("LDDR", opcode, -1),
+      ldIncDecSpec("LDDR", opcode, -1, 5, "~H P ~N",
+          finalPC: 0), //PC does not move
+      ldIncDecSpec("LDDR", opcode, -1, 1, "~H ~P ~N"),
+    ];
+
+List<Scenario> cpir(int opcode) => [
+      cpIncDecSpec("CPIR", opcode, 1, 10, 2, 4, "~S ~Z ~H P ~N ~C", finalPC: 0),
+      cpIncDecSpec("CPIR", opcode, 1, 129, 2, 3, "~S ~Z H P ~N ~C", finalPC: 0),
+      cpIncDecSpec("CPIR", opcode, 1, 255, 254, 2, "~S ~Z ~H P ~N ~C",
+          finalPC: 0),
+      cpIncDecSpec("CPIR", opcode, 1, 10, 10, 4, "~S Z ~H P ~N ~C"),
+      cpIncDecSpec("CPIR", opcode, 1, 3, 5, 1, "S ~Z H ~P ~N C"),
     ];

@@ -400,6 +400,7 @@ var allScenarios = [
   ...outd(0xAB),
   ...ldir(0xB0),
   ...lddr(0xB8),
+  ...cpir(0xB1),
 
   // CB
 
