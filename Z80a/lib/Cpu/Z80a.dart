@@ -1308,6 +1308,14 @@ class Z80a {
     return context.instruction.tStates(cond: cond);
   }
 
+  int indr(InstructionContext context) {
+    ind(context);
+    this.registers.zeroFlag = true;
+    var cond = this.registers.B == 0;
+    if (!cond) this.PC = this.PC - 2;
+    return context.instruction.tStates(cond: cond);
+  }
+
   int otir(InstructionContext context) {
     outi(context);
     this.registers.zeroFlag = true;
@@ -1450,6 +1458,7 @@ class Z80a {
     extendedOpcodes.build(0xB8, "LDDR", lddr, 21, tStatesOnTrueCond: 16);
     extendedOpcodes.build(0xB9, "CPDR", cpdr, 21, tStatesOnTrueCond: 16);
     extendedOpcodes.build(0xBB, "OTDR", otdr, 21, tStatesOnTrueCond: 16);
+    extendedOpcodes.build(0xBA, "INDR", indr, 21, tStatesOnTrueCond: 16);
   }
 
   void buildIXYOpcodes() {

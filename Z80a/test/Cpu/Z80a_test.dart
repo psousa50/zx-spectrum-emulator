@@ -403,6 +403,7 @@ var allScenarios = [
   ...cpir(0xB1),
   ...cpdr(0xB9),
   ...inir(0xB2),
+  ...indr(0xBA),
   ...otir(0xB3),
   ...otdr(0xBB),
 

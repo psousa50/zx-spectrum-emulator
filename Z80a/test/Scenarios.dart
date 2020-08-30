@@ -1764,6 +1764,11 @@ List<Scenario> inir(int opcode) => [
       inIncDecSpec("INIR", opcode, 1, 1, "Z N"),
     ];
 
+List<Scenario> indr(int opcode) => [
+      inIncDecSpec("INIR", opcode, -1, 5, "Z N", finalPC: 0),
+      inIncDecSpec("INIR", opcode, -1, 1, "Z N"),
+    ];
+
 List<Scenario> otir(int opcode) => [
       outIncDecSpec("OUTI", opcode, 1, 5, "Z N", finalPC: 0),
       outIncDecSpec("OUTI", opcode, 1, 1, "Z N"),
