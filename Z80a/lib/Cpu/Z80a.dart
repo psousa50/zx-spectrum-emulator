@@ -7,6 +7,7 @@ import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Util.dart';
 
 import 'InstructionContext.dart';
+import 'Z80Instruction.dart';
 
 // ignore_for_file: non_constant_identifier_names
 
@@ -63,6 +64,19 @@ class Z80a {
   }
 
   int step() {
+    // if (PC >= 0x028E && PC < 0x02BF) {
+    //   print("PC: ${toHex(PC)}");
+    //   print("A: ${toHex(registers.A)}");
+    //   print("C: ${toHex(registers.C)}");
+    //   print("D: ${toHex(registers.D)}");
+    //   print("E: ${toHex(registers.E)}");
+    //   print("port: ${toHex(ports.inPort(0xDF))}");
+    // }
+
+    if (PC == 0x0296 && this.ports.inPort(0xDFFE) == 1) {
+      print("stop");
+    }
+
     var tStates = 0;
 
     if (halted) return 0;
@@ -89,6 +103,43 @@ class Z80a {
     }
 
     return tStates;
+  }
+
+  Z80Instruction getInstruction() {
+    Z80Instruction i;
+
+    var d0 = this.memory.peek(this.PC + 0);
+    var d1 = this.memory.peek(this.PC + 1);
+    var d2 = this.memory.peek(this.PC + 2);
+    var d3 = this.memory.peek(this.PC + 3);
+    switch (d0) {
+      case IX_PREFIX:
+      case IY_PREFIX:
+        switch (d1) {
+          case BIT_OPCODES:
+            i = iXYbitOpcodes[d3];
+            break;
+
+          default:
+            i = iXYOpcodes[d1];
+            break;
+        }
+        break;
+
+      case EXTENDED_OPCODES:
+        i = extendedOpcodes[d1];
+        break;
+
+      case BIT_OPCODES:
+        i = bitOpcodes[d1];
+        break;
+
+      default:
+        i = unPrefixedOpcodes[d0];
+        break;
+    }
+
+    return i;
   }
 
   int processIXYOpcodes(int prefix) {
@@ -747,7 +798,7 @@ class Z80a {
 
   int inR8C(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
-    var result = this.ports.inPort(registers.C);
+    var result = this.ports.inPort(registers.BC);
     setR8Value(r8, result);
     setZeroAndSignFlagsOn8BitResult(result);
     registers.parityOverflowFlag = parity(result);
@@ -1533,13 +1584,17 @@ class Z80a {
   }
 
   void maskableInterrupt() {
+    if (!interruptsEnabled) return;
+
     switch (interruptMode) {
       case InterruptMode.im1:
+        interruptsEnabled = false;
         push2(this.PC);
         this.PC = 0x38;
         break;
 
       case InterruptMode.im2:
+        interruptsEnabled = false;
         push2(this.PC);
         this.PC = this.memory.peek2(this.registers.I * 256 + 254);
         break;

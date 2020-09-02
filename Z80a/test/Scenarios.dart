@@ -1342,8 +1342,8 @@ Scenario inR8CSpec(int opcode, int r8, int value, String flags) => Scenario(
       'IN ${Registers.r8Names[r8]}, (C) => ($value)',
       [Z80a.EXTENDED_OPCODES, opcode],
       initialState: State(
-        register8Values: {Registers.R_C: 254},
-        ports: {254: value},
+        register16Values: {Registers.R_BC: 12345},
+        inPorts: {12345: value},
       ),
       expectedState: State(
         register8Values: {r8: value},
@@ -1368,7 +1368,7 @@ List<Scenario> outCR8(int opcode, int r8) => [
           },
         ),
         expectedState: State(
-          ports: {254: r8 == Registers.R_C ? 254 : 12},
+          outPorts: {254: r8 == Registers.R_C ? 254 : 12},
         ),
       )
     ];
@@ -1381,7 +1381,7 @@ List<Scenario> outNA(int opcode) => [
           register8Values: {Registers.R_A: 12},
         ),
         expectedState: State(
-          ports: {253: 12},
+          outPorts: {253: 12},
         ),
       )
     ];
@@ -1391,7 +1391,7 @@ List<Scenario> inAN(int opcode) => [
         'IN A, (N)',
         [opcode, 253],
         initialState: State(
-          ports: {253: 12},
+          inPorts: {253: 12},
         ),
         expectedState: State(
           register8Values: {Registers.R_A: 12},
@@ -1673,7 +1673,7 @@ Scenario inIncDecSpec(String name, int opcode, int inc, int b, String flags,
       initialState: State(
         register8Values: {Registers.R_B: b, Registers.R_C: 254},
         register16Values: {Registers.R_HL: Scenario.RAM_START + 1},
-        ports: {254: 12},
+        inPorts: {254: 12},
         ram: [0, 0],
       ),
       expectedState: State(
@@ -1709,7 +1709,7 @@ Scenario outIncDecSpec(String name, int opcode, int inc, int b, String flags,
         register8Values: {Registers.R_B: b - 1},
         register16Values: {Registers.R_HL: Scenario.RAM_START + 1 + inc},
         ram: [0, 12],
-        ports: {254: 12},
+        outPorts: {254: 12},
         flags: flags,
         pc: finalPC,
       ),

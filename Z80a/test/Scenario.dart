@@ -12,14 +12,16 @@ import 'PortsTest.dart';
 class State {
   Map<int, int> registerValues = {};
   List<int> ram = [];
-  Map<int, int> ports;
+  Map<int, int> inPorts;
+  Map<int, int> outPorts;
   int pc = 0;
   String flags = "";
 
   State({
     Map<int, int> register8Values = const {},
     Map<int, int> register16Values = const {},
-    Map<int, int> ports = const {},
+    Map<int, int> inPorts = const {},
+    Map<int, int> outPorts = const {},
     this.ram = const [],
     this.pc,
     this.flags = "",
@@ -31,7 +33,8 @@ class State {
       this.registerValues[r] = hi(value);
       this.registerValues[r + 1] = lo(value);
     });
-    this.ports = ports;
+    this.inPorts = inPorts;
+    this.outPorts = outPorts;
   }
 }
 
@@ -120,9 +123,9 @@ class Scenario {
     expect(z80a.memory.range(10), expectedState.ram,
         reason: '${scenarioName(opcodes)}\nReason: RAM is wrong');
 
-    expectedState.ports.forEach((port, value) {
-      expect(z80a.ports.inPort(port), value,
-          reason: '${scenarioName(opcodes)}\nReason: Port $port is wrong');
+    expectedState.outPorts.forEach((port, value) {
+      expect(z80a.ports.readOutPort(port), value,
+          reason: '${scenarioName(opcodes)}\nReason: OutPort $port is wrong');
     });
 
     expect(
@@ -172,8 +175,8 @@ class Scenario {
 
   Ports setupPorts() {
     var ports = PortsTest();
-    initialState.ports.forEach((port, value) {
-      ports.outPort(port, value);
+    initialState.inPorts.forEach((port, value) {
+      ports.writeInPort(port, value);
     });
     return ports;
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:Z80a/Util.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
@@ -23,6 +24,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   void loadRom() async {
     var s = await rootBundle.load('assets/48.rom');
     zxSpectrum.load(0, s.buffer.asUint8List());
+    zxSpectrum.start();
   }
 
   @override
@@ -41,7 +43,6 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     // ]);
     // zxSpectrum.load(0, program);
     loadRom();
-    zxSpectrum.start();
   }
 
   void refreshScreen() {
@@ -51,7 +52,9 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   }
 
   void pressP() {
-    zxSpectrum.z80a.ports.outPort(0xDF, 0x01);
+    zxSpectrum.z80a.ports.writeInPort(0xDFFE, 0xFE);
+    Timer(Duration(milliseconds: 500),
+        () => zxSpectrum.z80a.ports.writeInPort(0xDFFE, 0xFF));
   }
 
   @override
@@ -61,6 +64,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
       SizedBox(height: 30),
       if (screen != null) Display(screen),
       Text(toHex(zxSpectrum.z80a.PC), style: style),
+      Text(toHex(zxSpectrum.z80a.ports.inPort(0xDFFE)), style: style),
       // Text(toHex(zxSpectrum.memory.peek(0)), style: style),
       // Text("A: ${toHex(zxSpectrum.z80a.registers.A)}", style: style),
       // Text("B: ${toHex(zxSpectrum.z80a.registers.B)}", style: style),

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Cpu/Z80Assembler.dart';
 import 'package:Z80a/Util.dart';
@@ -870,14 +872,26 @@ void main() {
     expect(z80a.interruptMode, InterruptMode.im2);
   });
 
+  test("Maskable interrupts - disabled", () {
+    var z80a = newCPU();
+    z80a.PC = 400;
+    z80a.memory.setRange(z80a.PC, Z80Assembler.di());
+    z80a.step();
+    z80a.maskableInterrupt();
+    expect(z80a.PC, 401);
+  });
+
   test("Maskable interrupts - mode 1", () {
     var z80a = newCPU();
     z80a.PC = 400;
     z80a.registers.SP = 128;
-    z80a.memory.setRange(z80a.PC, Z80Assembler.im1());
+    z80a.memory.setRange(z80a.PC, Z80Assembler.ei());
+    z80a.memory.setRange(z80a.PC + 1, Z80Assembler.im1());
+    z80a.step();
     z80a.step();
     z80a.maskableInterrupt();
-    expect(z80a.memory.peek2(128 - 2), 400 + 2);
+    expect(z80a.interruptsEnabled, false);
+    expect(z80a.memory.peek2(128 - 2), 400 + 3);
     expect(z80a.registers.SP, 128 - 2);
     expect(z80a.PC, 0x38);
   });
@@ -889,11 +903,24 @@ void main() {
     z80a.registers.I = 2;
     var address = 256 * z80a.registers.I + 254;
     z80a.memory.poke2(address, 12345);
-    z80a.memory.setRange(z80a.PC, Z80Assembler.im2());
+    z80a.memory.setRange(z80a.PC, Z80Assembler.ei());
+    z80a.memory.setRange(z80a.PC + 1, Z80Assembler.im2());
+    z80a.step();
     z80a.step();
     z80a.maskableInterrupt();
-    expect(z80a.memory.peek2(128 - 2), 400 + 2);
+    expect(z80a.interruptsEnabled, false);
+    expect(z80a.memory.peek2(128 - 2), 400 + 3);
     expect(z80a.registers.SP, 128 - 2);
     expect(z80a.PC, 12345);
+  });
+
+  test("bit 5, (IY+2)", () {
+    var z80a = newCPU();
+    var opcodes = Uint8List.fromList([0xFD, 0xCB, 0x02, 0x6E]);
+    z80a.memory.setRange(z80a.PC, opcodes);
+    z80a.registers.IY = 10;
+    z80a.memory.poke(z80a.registers.IY + 2, binary("11011111"));
+    z80a.step();
+    expect(z80a.registers.zeroFlag, true);
   });
 }
