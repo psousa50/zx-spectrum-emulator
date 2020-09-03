@@ -53,7 +53,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void pressP() {
     zxSpectrum.z80a.ports.writeInPort(0xDFFE, 0xFE);
-    Timer(Duration(milliseconds: 500),
+    Timer(Duration(milliseconds: 10),
         () => zxSpectrum.z80a.ports.writeInPort(0xDFFE, 0xFF));
   }
 

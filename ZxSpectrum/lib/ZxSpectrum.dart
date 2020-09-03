@@ -25,16 +25,37 @@ class ZxSpectrum {
     this.onFrame = onFrame;
     memory = Memory48K();
     ports = ZxSpectrumPorts();
-    // ports.writeInPort(0xFEFE, 0xFF);
-    // ports.writeInPort(0xFDFE, 0xFF);
-    // ports.writeInPort(0xFBFE, 0xFF);
-    // ports.writeInPort(0xF7FE, 0xFF);
-    // ports.writeInPort(0xEFFE, 0xFF);
-    // ports.writeInPort(0xDFFE, 0xFF);
-    // ports.writeInPort(0xBFFE, 0xFF);
-    // ports.writeInPort(0x7FFE, 0xFF);
+    ports.writeInPort(0xFEFE, 0xFF);
+    ports.writeInPort(0xFDFE, 0xFF);
+    ports.writeInPort(0xFBFE, 0xFF);
+    ports.writeInPort(0xF7FE, 0xFF);
+    ports.writeInPort(0xEFFE, 0xFF);
+    ports.writeInPort(0xDFFE, 0xFF);
+    ports.writeInPort(0xBFFE, 0xFF);
+    ports.writeInPort(0x7FFE, 0xFF);
     ula = Ula(memory);
     z80a = Z80a(memory, ports);
+  }
+
+  var printBuffer = List<String>();
+  void log(String s) {
+    // var state = "${toHex2(z80a.PC)}" +
+    //     "A:${toHex(z80a.registers.A)} " +
+    //     "BC:${toHex2(z80a.registers.BC)} " +
+    //     "DE:${toHex2(z80a.registers.DE)} " +
+    //     "HL:${toHex2(z80a.registers.HL)}" +
+    //     " ${z80a.registers.signFlag ? "S" : " "}" +
+    //     " ${z80a.registers.zeroFlag ? "Z" : " "}" +
+    //     " ${z80a.registers.halfCarryFlag ? "H" : " "}" +
+    //     " ${z80a.registers.parityOverflowFlag ? "P" : " "}" +
+    //     " ${z80a.registers.addSubtractFlag ? "N" : " "}" +
+    //     " ${z80a.registers.carryFlag ? "C" : " "}";
+    // printBuffer.add("${DateTime.now()} $state       $s");
+
+    // if (printBuffer.length > 10) {
+    //   print("\n${printBuffer.join("\n")}");
+    //   printBuffer.clear();
+    // }
   }
 
   void load(int address, Uint8List bytes) {
@@ -42,27 +63,17 @@ class ZxSpectrum {
   }
 
   void start() {
-    // next(0);
-    while (true) {
-      frame();
-    }
+    next(0);
+    // while (true) {
+    //   frame();
+    // }
   }
 
   void next(int timeMicroseconds) =>
       Timer(Duration(microseconds: timeMicroseconds), frame);
 
-  var printBuffer = List<String>();
-  void printAdd(String s) {
-    printBuffer.add("${DateTime.now()} $s");
-
-    if (printBuffer.length > 10) {
-      print("\n${printBuffer.join("\n")}");
-      printBuffer.clear();
-    }
-  }
-
   void frame() {
-    printAdd("start frame");
+    log("start frame");
 
     int tStatesTotal = 0;
     while (tStatesTotal < 69888) {
@@ -71,21 +82,20 @@ class ZxSpectrum {
       var d2 = z80a.memory.peek(z80a.PC + 2);
       var i = z80a.getInstruction();
       if (i != null) {
-        printAdd(
-            "${toHex(z80a.PC)} -- ${i.name}           T: $tStatesTotal Opcodes: $d0 $d1 $d2");
+        log("${i.name}");
       }
       tStatesTotal += step();
     }
-    printAdd("maskableInterrupt ${z80a.interruptsEnabled} ${toHex(z80a.PC)}");
+    log("maskableInterrupt ${z80a.interruptsEnabled}");
     z80a.maskableInterrupt();
     ula.refreshScreen();
     currentFrame++;
     if (onFrame != null) {
       onFrame();
     }
-    printAdd("end frame 0");
-    // next(0);
-    printAdd("end frame 1");
+    log("end frame 0");
+    next(0);
+    log("end frame 1");
   }
 
   int step() {

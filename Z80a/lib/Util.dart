@@ -10,7 +10,10 @@ String toBinary8(int b) {
 }
 
 String toHex(int value) =>
-    "${value < 16 ? "0" : ''}${value.toRadixString(16).toUpperCase()}";
+    "${value < 0x10 ? "0" : ''}${value.toRadixString(16).toUpperCase()}";
+
+String toHex2(int value) =>
+    "${value < 0x1000 ? "0" : ''}${value < 0x100 ? "0" : ''}${value < 0x10 ? "0" : ''}${value.toRadixString(16).toUpperCase()}";
 
 int lo(int w) => w % 256;
 int hi(int w) => w ~/ 256;

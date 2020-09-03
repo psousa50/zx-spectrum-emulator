@@ -110,7 +110,6 @@ class Z80a {
 
     var d0 = this.memory.peek(this.PC + 0);
     var d1 = this.memory.peek(this.PC + 1);
-    var d2 = this.memory.peek(this.PC + 2);
     var d3 = this.memory.peek(this.PC + 3);
     switch (d0) {
       case IX_PREFIX:

@@ -20,7 +20,7 @@ class Z80Instructions {
       var rb345 = Registers.rBit345(opcode);
       var r16 = i < 4 ? Registers.r16SPTable[i] : 0;
       var flag = i < 8 ? flags[i] : "";
-      var bit = i % 0x07;
+      var bit = i & 0x07;
       var rst = opcode & 0x38;
       var name = namePattern
           .replaceAll("[cc]", flag)

@@ -762,7 +762,7 @@ Z80a newCPU() {
 }
 
 void main() {
-  const runAll = true;
+  const runAll = false;
 
   test("All Scenarios", () {
     allScenarios.forEach((scenario) {
@@ -772,11 +772,11 @@ void main() {
 
   test("One Scenario", () {
     print("RUNNING ONLY ONE SCENARIO");
-    var scenarios = jrCCNN(0x20, "Z", false);
+    var scenarios = exAFAFt(0x08);
     scenarios.forEach((scenario) {
       scenario.run();
     });
-  }, skip: runAll);
+  }, skip: !runAll);
 
   void testDAA(String op, int a, int n, int result) {
     var z80a = newCPU();
@@ -791,6 +791,34 @@ void main() {
         reason:
             "A has wrong value after DAA (${toHex(a)} + ${toHex(n)} = ${toHex(result)})");
   }
+
+  test("Check hi and low register pairs", () {
+    var z80a = newCPU();
+
+    z80a.registers.A = 200;
+    z80a.registers.F = 100;
+    expect(z80a.registers.AF, 256 * 200 + 100, reason: "AF is wrong");
+
+    z80a.registers.B = 200;
+    z80a.registers.C = 100;
+    expect(z80a.registers.BC, 256 * 200 + 100, reason: "BC is wrong");
+
+    z80a.registers.D = 200;
+    z80a.registers.E = 100;
+    expect(z80a.registers.DE, 256 * 200 + 100, reason: "DE is wrong");
+
+    z80a.registers.H = 200;
+    z80a.registers.L = 100;
+    expect(z80a.registers.HL, 256 * 200 + 100, reason: "HL is wrong");
+
+    z80a.registers.IX_H = 200;
+    z80a.registers.IX_L = 100;
+    expect(z80a.registers.IX, 256 * 200 + 100, reason: "IX is wrong");
+
+    z80a.registers.IY_H = 200;
+    z80a.registers.IY_L = 100;
+    expect(z80a.registers.IY, 256 * 200 + 100, reason: "IY is wrong");
+  }, skip: runAll);
 
   test("DAA", () {
     testDAA("ADD", 0x15, 0x13, 0x28);
@@ -808,7 +836,7 @@ void main() {
     z80a.memory.poke(1, 0xF3);
     z80a.step();
     expect(z80a.interruptsEnabled, false);
-  }, skip: false);
+  }, skip: !runAll);
 
   test("Halt", () {
     var z80a = newCPU();
@@ -820,7 +848,8 @@ void main() {
     z80a.step();
     z80a.step();
     expect(z80a.PC, 0x02);
-  }, skip: false);
+    expect(z80a.PC, 0x02);
+  }, skip: !runAll);
 
   test("Instruction returns T states", () {
     var z80a = Z80a(MemoryTest(size: 20), PortsTest());
@@ -849,28 +878,28 @@ void main() {
     z80a.memory.poke(0, 0xCC); // CALL Z
     tStates = z80a.step();
     expect(tStates, 17, reason: "CALL NZ => On call T states should be 17");
-  }, skip: false);
+  }, skip: !runAll);
 
   test("Interrupt mode 0", () {
     var z80a = newCPU();
     z80a.memory.setRange(0, Z80Assembler.im0());
     z80a.step();
     expect(z80a.interruptMode, InterruptMode.im0);
-  });
+  }, skip: !runAll);
 
   test("Interrupt mode 1", () {
     var z80a = newCPU();
     z80a.memory.setRange(0, Z80Assembler.im1());
     z80a.step();
     expect(z80a.interruptMode, InterruptMode.im1);
-  });
+  }, skip: !runAll);
 
   test("Interrupt mode 2", () {
     var z80a = newCPU();
     z80a.memory.setRange(0, Z80Assembler.im2());
     z80a.step();
     expect(z80a.interruptMode, InterruptMode.im2);
-  });
+  }, skip: !runAll);
 
   test("Maskable interrupts - disabled", () {
     var z80a = newCPU();
@@ -879,7 +908,7 @@ void main() {
     z80a.step();
     z80a.maskableInterrupt();
     expect(z80a.PC, 401);
-  });
+  }, skip: !runAll);
 
   test("Maskable interrupts - mode 1", () {
     var z80a = newCPU();
@@ -894,7 +923,7 @@ void main() {
     expect(z80a.memory.peek2(128 - 2), 400 + 3);
     expect(z80a.registers.SP, 128 - 2);
     expect(z80a.PC, 0x38);
-  });
+  }, skip: !runAll);
 
   test("Maskable interrupts - mode 2", () {
     var z80a = newCPU();
@@ -912,9 +941,9 @@ void main() {
     expect(z80a.memory.peek2(128 - 2), 400 + 3);
     expect(z80a.registers.SP, 128 - 2);
     expect(z80a.PC, 12345);
-  });
+  }, skip: !runAll);
 
-  test("bit 5, (IY+2)", () {
+  test("BIT 5, (IY+2)", () {
     var z80a = newCPU();
     var opcodes = Uint8List.fromList([0xFD, 0xCB, 0x02, 0x6E]);
     z80a.memory.setRange(z80a.PC, opcodes);
@@ -922,5 +951,15 @@ void main() {
     z80a.memory.poke(z80a.registers.IY + 2, binary("11011111"));
     z80a.step();
     expect(z80a.registers.zeroFlag, true);
-  });
+  }, skip: !runAll);
+
+  test("LD B, (IY+2)", () {
+    var z80a = newCPU();
+    var opcodes = Uint8List.fromList([0xFD, 0x46, 0x02]);
+    z80a.memory.setRange(z80a.PC, opcodes);
+    z80a.registers.IY = 10;
+    z80a.memory.poke(z80a.registers.IY + 2, 123);
+    z80a.step();
+    expect(z80a.registers.B, 123);
+  }, skip: !runAll);
 }
