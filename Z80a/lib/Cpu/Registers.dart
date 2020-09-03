@@ -64,8 +64,8 @@ class Registers {
   static const R_P = 9;
   static const R_IX_H = 10;
   static const R_IX_L = 11;
-  static const R_IY_L = 12;
-  static const R_IY_H = 13;
+  static const R_IY_H = 12;
+  static const R_IY_L = 13;
   static const R_At = 14;
   static const R_Ft = 15;
   static const R_Bt = 16;
