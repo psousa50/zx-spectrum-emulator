@@ -35,11 +35,11 @@ class Ula {
 
   Ula(this.memory);
 
-  void refreshScreen() {
-    screen = buildImage(memory.range(16384, end: 16384 + 6912));
+  void refreshScreen(int currentFrame) {
+    screen = buildImage(memory.range(16384, end: 16384 + 6912), currentFrame);
   }
 
-  Uint8List buildImage(Uint8List zxScreen) {
+  Uint8List buildImage(Uint8List zxScreen, int currentFrame) {
     if (palette == null) {
       palette = Uint8List(paletteSize);
       int p = 0;
@@ -83,9 +83,15 @@ class Ula {
         var zxByte = zxScreen[lineAddress + x];
         int c = 0x1800 + (y >> 3) * 32 + x;
         var zxColor = zxScreen[c];
-        var brightIdx = zxColor & 0x04 == 0x40 ? 8 : 0;
+        var flash = zxColor & 0x80 == 0x80;
+        var brightIdx = zxColor & 0x40 == 0x40 ? 8 : 0;
         var inkColorIdx = zxColor & 0x07 + brightIdx;
         var paperColorIdx = (zxColor & 0x38) >> 3 + brightIdx;
+        if (flash && (currentFrame ~/ 32) % 2 == 1) {
+          var s = inkColorIdx;
+          inkColorIdx = paperColorIdx;
+          paperColorIdx = s;
+        }
 
         for (var b = 0; b < 8; b++) {
           var bitSet = zxByte & 0x80 == 0x80;

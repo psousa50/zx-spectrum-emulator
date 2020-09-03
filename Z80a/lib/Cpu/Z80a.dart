@@ -64,19 +64,6 @@ class Z80a {
   }
 
   int step() {
-    // if (PC >= 0x028E && PC < 0x02BF) {
-    //   print("PC: ${toHex(PC)}");
-    //   print("A: ${toHex(registers.A)}");
-    //   print("C: ${toHex(registers.C)}");
-    //   print("D: ${toHex(registers.D)}");
-    //   print("E: ${toHex(registers.E)}");
-    //   print("port: ${toHex(ports.inPort(0xDF))}");
-    // }
-
-    if (PC == 0x0296 && this.ports.inPort(0xDFFE) == 1) {
-      print("stop");
-    }
-
     var tStates = 0;
 
     if (halted) return 0;
