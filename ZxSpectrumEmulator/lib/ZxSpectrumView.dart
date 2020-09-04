@@ -1,10 +1,11 @@
-import 'dart:async';
 import 'dart:typed_data';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
+import 'package:ZxSpectrumEmulator/Keyboard.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import 'Display.dart';
+import 'ZxSpectrumKey.dart';
 
 class ZxSpectrumView extends StatefulWidget {
   @override
@@ -39,10 +40,16 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     });
   }
 
-  void pressP() {
-    zxSpectrum.z80a.ports.writeInPort(0xDFFE, 0xFE);
-    Timer(Duration(milliseconds: 10),
-        () => zxSpectrum.z80a.ports.writeInPort(0xDFFE, 0xFF));
+  void onKeyEvent(ZxSpectrumKey key, KeyEvent event) {
+    print(key.text);
+    print(event);
+    int port = key.port * 256 + 0xFE;
+    int v0 = zxSpectrum.z80a.ports.inPort(port);
+    int v1 =
+        event == KeyEvent.Down ? v0 & (0xFF ^ key.bitMask) : v0 | key.bitMask;
+    print(port);
+    print(v1);
+    zxSpectrum.z80a.ports.writeInPort(port, v1);
   }
 
   @override
@@ -51,12 +58,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
       SizedBox(height: 30),
       if (screen != null) Display(screen),
       SizedBox(height: 30),
-      RaisedButton(
-        onPressed: pressP,
-        child: Text(
-          "P",
-        ),
-      ),
+      Keyboard(onKeyEvent),
     ]);
   }
 }
