@@ -1247,6 +1247,36 @@ class Z80a {
     return context.instruction.tStates();
   }
 
+  int rld(InstructionContext context) {
+    int v1 = this.registers.A;
+    int v2 = this.memory.peek(this.registers.HL);
+
+    this.registers.A = (v1 & 0xF0) | ((v2 & 0xF0) >> 4);
+    this.memory.poke(this.registers.HL, (v2 << 4) | (v1 & 0x0F));
+
+    this.registers.halfCarryFlag = false;
+    this.registers.addSubtractFlag = false;
+    this.registers.parityOverflowFlag = parity(this.registers.A);
+    setZeroAndSignFlagsOn8BitResult(this.registers.A);
+
+    return context.instruction.tStates();
+  }
+
+  int rrd(InstructionContext context) {
+    int v1 = this.registers.A;
+    int v2 = this.memory.peek(this.registers.HL);
+
+    this.registers.A = (v1 & 0xF0) | (v2 & 0x0F);
+    this.memory.poke(this.registers.HL, (v2 >> 4) | ((v1 & 0x0F) << 4));
+
+    this.registers.halfCarryFlag = false;
+    this.registers.addSubtractFlag = false;
+    this.registers.parityOverflowFlag = parity(this.registers.A);
+    setZeroAndSignFlagsOn8BitResult(this.registers.A);
+
+    return context.instruction.tStates();
+  }
+
   int ldi(InstructionContext context) {
     this.memory.poke(this.registers.DE, this.memory.peek(this.registers.HL));
     this.registers.HL = this.registers.HL + 1;
@@ -1482,17 +1512,16 @@ class Z80a {
     extendedOpcodes.buildM16C4(0x4D, "RETI", reti, 14);
 
     extendedOpcodes.buildM16C4(0x46, "IM 0", im0, 8);
+    extendedOpcodes.buildM16C4(0x56, "IM 1", im1, 8);
+    extendedOpcodes.buildM16C4(0x5E, "IM 2", im2, 8);
+
     extendedOpcodes.buildM16C4(0x47, "LD I, A", ldIA, 9);
     extendedOpcodes.buildM16C4(0x4F, "LD R, A", ldRA, 9);
-    extendedOpcodes.buildM16C4(0x66, "IM 0", im0, 8);
-
-    extendedOpcodes.buildM16C4(0x56, "IM 1", im1, 8);
     extendedOpcodes.buildM16C4(0x57, "LD A, I", ldAI, 9);
     extendedOpcodes.buildM16C4(0x5F, "LD A, R", ldAR, 9);
-    extendedOpcodes.buildM16C4(0x66, "IM 1", im1, 8);
 
-    extendedOpcodes.buildM16C4(0x5E, "IM 1", im2, 8);
-    extendedOpcodes.buildM16C4(0x6E, "IM 1", im2, 8);
+    extendedOpcodes.build(0x67, "RDD", rrd, 18);
+    extendedOpcodes.build(0x6F, "RLD", rld, 18);
 
     extendedOpcodes.build(0xA0, "LDI", ldi, 16);
     extendedOpcodes.build(0xA1, "CPI", cpi, 16);

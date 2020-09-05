@@ -408,6 +408,8 @@ var allScenarios = [
   ...indr(0xBA),
   ...otir(0xB3),
   ...otdr(0xBB),
+  ...rrd(0x67),
+  ...rld(0x6F),
 
   // CB
 

@@ -499,6 +499,40 @@ List<Scenario> sraR8(int opcode, int r8) =>
 List<Scenario> srlR8(int opcode, int r8) =>
     srlR8Spec("SRL", opcode, r8, prefix: Z80a.BIT_OPCODES);
 
+Scenario rldrrdSpec(String name, int opcode, int a, int mHL, int aResult,
+        int mHlResult, String flags) =>
+    Scenario(
+      name,
+      [Z80a.EXTENDED_OPCODES, opcode],
+      initialState: State(
+        register8Values: {Registers.R_A: a},
+        register16Values: {Registers.R_HL: Scenario.RAM_START},
+        ram: [mHL],
+      ),
+      expectedState: State(
+        register8Values: {Registers.R_A: aResult},
+        register16Values: {Registers.R_HL: Scenario.RAM_START},
+        ram: [mHlResult],
+        flags: flags,
+      ),
+    );
+
+List<Scenario> rld(int opcode) => [
+      rldrrdSpec("RLD", opcode, binary("01111010"), binary("10100101"),
+          binary("01111010"), binary("01011010"), "~S ~Z ~H P ~N"),
+      rldrrdSpec("RLD", opcode, binary("00001010"), binary("00000101"),
+          binary("00000000"), binary("01011010"), "~S Z ~H ~P ~N"),
+      rldrrdSpec("RLD", opcode, binary("10001010"), binary("00000101"),
+          binary("10000000"), binary("01011010"), "S ~Z ~H P ~N"),
+    ];
+
+List<Scenario> rrd(int opcode) => [
+      rldrrdSpec("RRD", opcode, binary("10110101"), binary("11000110"),
+          binary("10110110"), binary("01011100"), "S ~Z ~H P ~N"),
+      rldrrdSpec("RRD", opcode, binary("00000101"), binary("11000000"),
+          binary("00000000"), binary("01011100"), "~S Z ~H ~P ~N"),
+    ];
+
 List<Scenario> ldR8R8(int opcode, int r8Dest, int r8Source) => [
       Scenario(
         'LD ${Registers.r8Names[r8Dest]}, ${Registers.r8Names[r8Source]}',
