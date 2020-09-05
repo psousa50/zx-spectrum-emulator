@@ -762,7 +762,7 @@ Z80a newCPU() {
 }
 
 void main() {
-  const runAll = false;
+  const runAll = true;
 
   test("All Scenarios", () {
     allScenarios.forEach((scenario) {
@@ -776,7 +776,7 @@ void main() {
     scenarios.forEach((scenario) {
       scenario.run();
     });
-  }, skip: !runAll);
+  }, skip: runAll);
 
   void testDAA(String op, int a, int n, int result) {
     var z80a = newCPU();

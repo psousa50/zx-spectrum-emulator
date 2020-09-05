@@ -158,8 +158,11 @@ Scenario changeR16R16Spec(String name, int opcode, int rhxy, int r16,
     );
 
 List<Scenario> addHLR16(int opcode, int rhxy, int r16) => [
-      changeR16R16Spec("ADD", opcode, rhxy, r16, 10000, 2345, 12345, "~C"),
-      changeR16R16Spec("ADD", opcode, rhxy, r16, 65535, 2, 1, "C"),
+      changeR16R16Spec(
+          "ADD", opcode, rhxy, r16, 0x0E00, 0x0100, 0x0F00, "~H ~N ~C"),
+      changeR16R16Spec("ADD", opcode, rhxy, r16, 0xFFFF, 2, 1, "H ~N C"),
+      changeR16R16Spec(
+          "ADD", opcode, rhxy, r16, 0x0F00, 0x0100, 0x1000, "H ~N ~C"),
     ];
 
 Scenario addHLHLSpec(
@@ -175,8 +178,8 @@ Scenario addHLHLSpec(
     );
 
 List<Scenario> addHLHL(int opcode, int rhxy) => [
-      addHLHLSpec(opcode, rhxy, 10000, 20000, "~C"),
-      addHLHLSpec(opcode, rhxy, 65535, 65534, "C"),
+      addHLHLSpec(opcode, rhxy, 0x0200, 0x0400, "~H ~N ~C"),
+      addHLHLSpec(opcode, rhxy, 0xFFFF, 0xFFFE, "H ~N C"),
     ];
 
 Scenario changeR16(String name, int opcode, int rhxy, int value, int result) =>
@@ -266,17 +269,18 @@ Scenario changeR8(
                 inFlags: inFlags, prefix: prefix);
 
 List<Scenario> incR8(int opcode, int r8) => [
-      changeR8("INC", opcode, r8, 10, 11, "~Z ~S ~P ~N"),
-      changeR8("INC", opcode, r8, 255, 0, "Z ~S ~P ~N"),
-      changeR8("INC", opcode, r8, 127, 128, "~Z S P ~N"),
-      changeR8("INC", opcode, r8, 130, 131, "~Z S ~P ~N"),
+      changeR8("INC", opcode, r8, 10, 11, "~S ~Z ~H ~P ~N"),
+      changeR8("INC", opcode, r8, 255, 0, "~S Z H ~P ~N"),
+      changeR8("INC", opcode, r8, 127, 128, "S ~Z H P ~N"),
+      changeR8("INC", opcode, r8, 130, 131, "S ~Z ~H ~P ~N"),
     ];
 
 List<Scenario> decR8(int opcode, int r8) => [
-      changeR8("DEC", opcode, r8, 10, 9, "~Z ~S ~P N"),
-      changeR8("DEC", opcode, r8, 1, 0, "Z ~S ~P N"),
-      changeR8("DEC", opcode, r8, 128, 127, "~Z ~S P N"),
-      changeR8("DEC", opcode, r8, 131, 130, "~Z S ~P N"),
+      changeR8("DEC", opcode, r8, 10, 9, "~S ~Z ~H ~P N"),
+      changeR8("DEC", opcode, r8, 1, 0, "~S Z ~H ~P N"),
+      changeR8("DEC", opcode, r8, 0, 255, "S ~Z H ~P N"),
+      changeR8("DEC", opcode, r8, 128, 127, "~S ~Z H P N"),
+      changeR8("DEC", opcode, r8, 131, 130, "S ~Z ~H ~P N"),
     ];
 
 List<Scenario> exAFAFt(int opcode) => [
@@ -324,153 +328,153 @@ List<Scenario> ldAR16(int opcode, int r16) => [
 
 List<Scenario> rlca(int opcode) => [
       changeR8("RLCA", 0x07, Registers.R_A, binary("00010011"),
-          binary("00100110"), "~C ~N ~H"),
+          binary("00100110"), "~N ~H ~C"),
       changeR8("RLCA", 0x07, Registers.R_A, binary("10010011"),
-          binary("00100111"), "C ~N ~H"),
+          binary("00100111"), "~N ~H C"),
     ];
 
 List<Scenario> rrca(int opcode) => [
       changeR8("RRCA", 0x0F, Registers.R_A, binary("10100010"),
-          binary("01010001"), "~C ~N ~H"),
+          binary("01010001"), "~H ~N ~C"),
       changeR8("RRCA", 0x0F, Registers.R_A, binary("10100011"),
-          binary("11010001"), "C ~N ~H"),
+          binary("11010001"), "~H ~N C"),
     ];
 
 List<Scenario> rla(int opcode) => [
       changeR8("RLA", 0x17, Registers.R_A, binary("00100010"),
-          binary("01000100"), "~C ~N ~H",
+          binary("01000100"), "~H ~N ~C",
           inFlags: "~C"),
       changeR8("RLA", 0x17, Registers.R_A, binary("10100010"),
-          binary("01000100"), "C ~N ~H",
+          binary("01000100"), "~H ~N C",
           inFlags: "~C"),
       changeR8("RLA", 0x17, Registers.R_A, binary("00100010"),
-          binary("01000101"), "~C ~N ~H",
+          binary("01000101"), "~H ~N ~C",
           inFlags: "C"),
       changeR8("RLA", 0x17, Registers.R_A, binary("10100010"),
-          binary("01000101"), "C ~N ~H",
+          binary("01000101"), "~H ~N C",
           inFlags: "C"),
     ];
 
 List<Scenario> rra(int opcode) => [
       changeR8("RRA", 0x1F, Registers.R_A, binary("00100010"),
-          binary("00010001"), "~C ~N ~H",
+          binary("00010001"), "~H ~N ~C",
           inFlags: "~C"),
       changeR8("RRA", 0x1F, Registers.R_A, binary("00100011"),
-          binary("00010001"), "C ~N ~H",
+          binary("00010001"), "~H ~N C",
           inFlags: "~C"),
       changeR8("RRA", 0x1F, Registers.R_A, binary("00100010"),
-          binary("10010001"), "~C ~N ~H",
+          binary("10010001"), "~H ~N ~C",
           inFlags: "C"),
       changeR8("RRA", 0x1F, Registers.R_A, binary("00100011"),
-          binary("10010001"), "C ~N ~H",
+          binary("10010001"), "~H ~N C",
           inFlags: "C"),
     ];
 
 List<Scenario> rlR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(name, opcode, r8, binary("00010011"), binary("00100110"),
-          "~S ~Z ~C ~N P ~H",
+          "~S ~Z ~H P ~N ~C",
           inFlags: "~C", prefix: prefix),
       changeR8(name, opcode, r8, binary("11010011"), binary("10100110"),
-          "S ~Z C ~N ~P ~H",
+          "S ~Z ~H ~P ~N C",
           inFlags: "~C", prefix: prefix),
       changeR8(name, opcode, r8, binary("10000000"), binary("00000000"),
-          "~S Z C ~N ~P ~H",
+          "~S Z ~H ~P ~N C",
           inFlags: "~C", prefix: prefix),
       changeR8(name, opcode, r8, binary("10010011"), binary("00100111"),
-          "~S ~Z C ~N ~P ~H",
+          "~S ~Z ~H ~P ~N C",
           inFlags: "C", prefix: prefix),
       changeR8(name, opcode, r8, binary("00010011"), binary("00100111"),
-          "~S ~Z ~C ~N ~P ~H",
+          "~S ~Z ~H ~P ~N ~C",
           inFlags: "C", prefix: prefix),
     ];
 
 List<Scenario> rrR8Spec(String name, int opcode, int r8, {int prefix}) => [
-      changeR8("$name 1", opcode, r8, binary("10100010"), binary("01010001"),
-          "~S ~Z ~C ~N P ~H",
+      changeR8(name, opcode, r8, binary("10100010"), binary("01010001"),
+          "~S ~Z ~H P ~N ~C",
           inFlags: "~C", prefix: prefix),
-      changeR8("$name 2", opcode, r8, binary("10100011"), binary("01010001"),
-          "~S ~Z C ~N P ~H",
+      changeR8(name, opcode, r8, binary("10100011"), binary("01010001"),
+          "~S ~Z ~H P ~N C",
           inFlags: "~C", prefix: prefix),
-      changeR8("$name 3", opcode, r8, binary("00000001"), binary("00000000"),
-          "~S Z C ~N ~P ~H",
+      changeR8(name, opcode, r8, binary("00000001"), binary("00000000"),
+          "~S Z ~H ~P ~N C",
           inFlags: "~C", prefix: prefix),
-      changeR8("$name 4", opcode, r8, binary("10100010"), binary("11010001"),
-          "S ~Z ~C ~N ~P ~H",
+      changeR8(name, opcode, r8, binary("10100010"), binary("11010001"),
+          "S ~Z ~H ~P ~N ~C",
           inFlags: "C", prefix: prefix),
-      changeR8("$name 5", opcode, r8, binary("10100011"), binary("11010001"),
-          "S ~Z C ~N ~P ~H",
+      changeR8(name, opcode, r8, binary("10100011"), binary("11010001"),
+          "S ~Z ~H ~P ~N C",
           inFlags: "C", prefix: prefix),
     ];
 
 List<Scenario> rlcR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(name, opcode, r8, binary("00100010"), binary("01000100"),
-          "~S ~Z ~C ~N ~P ~H",
+          "~S ~Z ~N ~P ~H ~C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("11100010"), binary("11000101"),
-          "S ~Z C ~N ~P ~H",
+          "S ~Z ~N ~P ~H C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("00000000"), binary("00000000"),
-          "~S Z ~C ~N ~P ~H",
+          "~S Z ~N ~P ~H ~C",
           prefix: prefix),
     ];
 
 List<Scenario> rrcR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(name, opcode, r8, binary("00100010"), binary("00010001"),
-          "~S ~Z ~C ~N ~P ~H",
+          "~S ~Z ~H ~P ~N ~C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("00100011"), binary("10010001"),
-          "S ~Z C ~N P ~H",
+          "S ~Z ~H P ~N C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("00000000"), binary("00000000"),
-          "~S Z ~C ~N ~P ~H",
+          "~S Z ~H ~P ~N ~C",
           prefix: prefix),
     ];
 
 List<Scenario> slaR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(name, opcode, r8, binary("00100110"), binary("01001100"),
-          "~S ~Z ~C ~N ~H P",
+          "~S ~Z ~H P ~N ~C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("11100011"), binary("11000110"),
-          "S ~Z C ~N ~H ~P",
+          "S ~Z ~H ~P ~N C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("10000000"), binary("00000000"),
-          "~S Z C ~N ~H ~P",
+          "~S Z ~H ~P ~N C",
           prefix: prefix),
     ];
 
 List<Scenario> sraR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(name, opcode, r8, binary("00100110"), binary("00010011"),
-          "~S ~Z ~C ~N ~H P",
+          "~S ~Z ~H P ~N ~C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("00100111"), binary("00010011"),
-          "~S ~Z C ~N ~H P",
+          "~S ~Z ~H P ~N C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("10100110"), binary("11010011"),
-          "S ~Z ~C ~N ~H P",
+          "S ~Z ~H P ~N ~C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("10100111"), binary("11010011"),
-          "S ~Z C ~N ~H P",
+          "S ~Z ~H P ~N C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("00000000"), binary("00000000"),
-          "~S Z ~C ~N ~H ~P",
+          "~S Z ~H ~C ~N ~P",
           prefix: prefix),
     ];
 
 List<Scenario> srlR8Spec(String name, int opcode, int r8, {int prefix}) => [
       changeR8(name, opcode, r8, binary("00100110"), binary("00010011"),
-          "~S ~Z ~C ~N ~H P",
+          "~S ~Z ~H P ~N ~C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("00100111"), binary("00010011"),
-          "~S ~Z C ~N ~H P",
+          "~S ~Z ~H P ~N C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("10100110"), binary("01010011"),
-          "~S ~Z ~C ~N ~H ~P",
+          "~S ~Z ~H ~P ~N ~C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("10100111"), binary("01010011"),
-          "~S ~Z C ~N ~H ~P",
+          "~S ~Z ~H ~P ~N C",
           prefix: prefix),
       changeR8(name, opcode, r8, binary("00000000"), binary("00000000"),
-          "~S Z ~C ~N ~H ~P",
+          "~S Z ~H ~P ~N ~C",
           prefix: prefix),
     ];
 
@@ -859,6 +863,7 @@ Scenario cplN(int opcode, int value, int result) => Scenario("CPL", [opcode],
     ),
     expectedState: State(
       register8Values: {Registers.R_A: result},
+      flags: "N H",
     ));
 
 List<Scenario> cpl(int opcode) => [
@@ -882,7 +887,7 @@ List<Scenario> ccf(int opcode) => [
     ];
 
 List<Scenario> scf(int opcode) => [
-      flagsTest(opcode, "", "C ~N"),
+      flagsTest(opcode, "", "C ~N ~H"),
     ];
 
 Scenario r8r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
@@ -980,6 +985,8 @@ List<Scenario> adcAR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
         r8Operation("ADC A,", opcode, r8, 10, 10, 20, "~S ~Z H ~P ~N ~C",
             inFlags: "~C"),
+        r8Operation("ADC A,", opcode, r8, 128, 128, 0, "~S Z ~H P ~N C",
+            inFlags: "~C"),
         r8Operation("ADC A,", opcode, r8, 10, 10, 21, "~S ~Z H ~P ~N ~C",
             inFlags: "C"),
         r8Operation("ADC A,", opcode, r8, 128, 128, 0, "~S Z ~H P ~N C",
@@ -1057,13 +1064,13 @@ List<Scenario> sbcAR8(int opcode, int r8) => r8 == Registers.R_A
 
 List<Scenario> andR8(int opcode, int r8) => r8 == Registers.R_A
     ? [
-        r8Operation("AND", opcode, r8, 0x07, 0x07, 0x07, "~S ~Z ~H P ~N ~C"),
-        r8Operation("AND", opcode, r8, 0x00, 0x00, 0x00, "~S Z ~H ~P ~N ~C"),
-        r8Operation("AND", opcode, r8, 0x90, 0x90, 0x90, "S ~Z ~H ~P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x07, 0x07, 0x07, "~S ~Z H P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x00, 0x00, 0x00, "~S Z H ~P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x90, 0x90, 0x90, "S ~Z H ~P ~N ~C"),
       ]
     : [
-        r8Operation("AND", opcode, r8, 0x03, 0x01, 0x01, "~S ~Z ~H P ~N ~C"),
-        r8Operation("AND", opcode, r8, 0x03, 0x04, 0x00, "~S Z ~H ~P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x03, 0x01, 0x01, "~S ~Z H P ~N ~C"),
+        r8Operation("AND", opcode, r8, 0x03, 0x04, 0x00, "~S Z H ~P ~N ~C"),
       ];
 
 List<Scenario> xorR8(int opcode, int r8) => r8 == Registers.R_A
@@ -1152,18 +1159,21 @@ List<Scenario> sbcAN(int opcode) => [
     ];
 
 List<Scenario> andAN(int opcode) => [
-      nOperation("AND A, N", opcode, 0x03, 0x01, 0x01, "~S ~Z ~H P ~N ~C"),
-      nOperation("AND A, N", opcode, 0x03, 0x04, 0x00, "~S Z ~H ~P ~N ~C"),
+      nOperation("AND A, N", opcode, 0x03, 0x01, 0x01, "~S ~Z H P ~N ~C"),
+      nOperation("AND A, N", opcode, 0x03, 0x04, 0x00, "~S Z H ~P ~N ~C"),
+      nOperation("AND A, N", opcode, 0x80, 0x81, 0x80, "S ~Z H P ~N ~C"),
     ];
 
 List<Scenario> xorN(int opcode) => [
       nOperation("XOR N", opcode, 0x03, 0x01, 0x02, "~S ~Z ~H P ~N ~C"),
       nOperation("XOR N", opcode, 0x03, 0x81, 0x82, "S ~Z ~H ~P ~N ~C"),
+      nOperation("XOR N", opcode, 0x00, 0x00, 0x00, "~S Z ~H ~P ~N ~C"),
     ];
 
 List<Scenario> orN(int opcode) => [
       nOperation("OR N", opcode, 0x02, 0x01, 0x03, "~S ~Z ~H ~P ~N ~C"),
       nOperation("OR N", opcode, 0x02, 0x81, 0x83, "S ~Z ~H P ~N ~C"),
+      nOperation("OR N", opcode, 0x00, 0x00, 0x00, "~S Z ~H ~P ~N ~C"),
     ];
 
 List<Scenario> cpN(int opcode) => [
@@ -1552,17 +1562,22 @@ List<Scenario> ldIA(int opcode) => [
       )
     ];
 
+Scenario ldAISpec(int opcode, int value, String flags) => Scenario(
+      'LD A, I ($value)',
+      [Z80a.EXTENDED_OPCODES, opcode],
+      initialState: State(
+        register8Values: {Registers.R_I: value},
+      ),
+      expectedState: State(
+        register8Values: {Registers.R_A: value},
+        flags: flags,
+      ),
+    );
+
 List<Scenario> ldAI(int opcode) => [
-      Scenario(
-        'LD A, I',
-        [Z80a.EXTENDED_OPCODES, opcode],
-        initialState: State(
-          register8Values: {Registers.R_I: 12},
-        ),
-        expectedState: State(
-          register8Values: {Registers.R_A: 12},
-        ),
-      )
+      ldAISpec(opcode, 12, "~S ~Z ~H ~N"),
+      ldAISpec(opcode, 0, "~S Z ~H ~N"),
+      ldAISpec(opcode, 255, "S ~Z ~H ~N"),
     ];
 
 List<Scenario> ldRA(int opcode) => [
@@ -1578,17 +1593,22 @@ List<Scenario> ldRA(int opcode) => [
       )
     ];
 
+Scenario ldARSpec(int opcode, int value, String flags) => Scenario(
+      'LD A, R ($value)',
+      [Z80a.EXTENDED_OPCODES, opcode],
+      initialState: State(
+        register8Values: {Registers.R_R: value},
+      ),
+      expectedState: State(
+        register8Values: {Registers.R_A: value},
+        flags: flags,
+      ),
+    );
+
 List<Scenario> ldAR(int opcode) => [
-      Scenario(
-        'LD A, R',
-        [Z80a.EXTENDED_OPCODES, opcode],
-        initialState: State(
-          register8Values: {Registers.R_R: 12},
-        ),
-        expectedState: State(
-          register8Values: {Registers.R_A: 12},
-        ),
-      )
+      ldARSpec(opcode, 12, "~S ~Z ~H ~N"),
+      ldARSpec(opcode, 0, "~S Z ~H ~N"),
+      ldARSpec(opcode, 255, "S ~Z ~H ~N"),
     ];
 
 Scenario ldIncDecSpec(String name, int opcode, int inc, int bc, String flags,

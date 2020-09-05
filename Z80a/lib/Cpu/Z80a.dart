@@ -186,6 +186,8 @@ class Z80a {
   int addWord(int w1, int w2) {
     int r = w1 + w2;
     registers.carryFlag = r > 65535;
+    registers.addSubtractFlag = false;
+    registers.halfCarryFlag = (w1 & 0x0FFF) + (w2 & 0x0FFF) > 0x0FFF;
     return word(r);
   }
 
@@ -263,6 +265,7 @@ class Z80a {
 
   int incR8Value(int value) {
     registers.parityOverflowFlag = value == 0x7F;
+    registers.halfCarryFlag = 1 + (value & 0x0F) > 0x0F;
     var newValue = byte(value + 1);
     setZeroAndSignFlagsOn8BitResult(newValue);
     registers.addSubtractFlag = false;
@@ -272,6 +275,7 @@ class Z80a {
 
   int decR8Value(int value) {
     registers.parityOverflowFlag = value == 0x80;
+    registers.halfCarryFlag = (value & 0x0F) - 1 < 0;
     var newValue = byte(value - 1);
     setZeroAndSignFlagsOn8BitResult(newValue);
     registers.addSubtractFlag = true;
@@ -300,7 +304,7 @@ class Z80a {
     var result = registers.A & value;
     setZeroAndSignFlagsOn8BitResult(result);
     registers.carryFlag = false;
-    registers.halfCarryFlag = false;
+    registers.halfCarryFlag = true;
     registers.addSubtractFlag = false;
     registers.parityOverflowFlag = parity(result);
 
@@ -523,11 +527,15 @@ class Z80a {
 
   int cpl(InstructionContext context) {
     registers.A = registers.A ^ 255;
+    this.registers.addSubtractFlag = true;
+    this.registers.halfCarryFlag = true;
     return context.instruction.tStates();
   }
 
   int scf(InstructionContext context) {
     registers.F = registers.F & ~Registers.F_ADD_SUB | Registers.F_CARRY;
+    this.registers.addSubtractFlag = false;
+    this.registers.halfCarryFlag = false;
     return context.instruction.tStates();
   }
 
@@ -1215,6 +1223,9 @@ class Z80a {
 
   int ldAI(InstructionContext context) {
     this.registers.A = this.registers.I;
+    setZeroAndSignFlagsOn8BitResult(this.registers.A);
+    this.registers.addSubtractFlag = false;
+    this.registers.halfCarryFlag = false;
     return context.instruction.tStates();
   }
 
@@ -1225,6 +1236,9 @@ class Z80a {
 
   int ldAR(InstructionContext context) {
     this.registers.A = this.registers.R;
+    setZeroAndSignFlagsOn8BitResult(this.registers.A);
+    this.registers.addSubtractFlag = false;
+    this.registers.halfCarryFlag = false;
     return context.instruction.tStates();
   }
 
