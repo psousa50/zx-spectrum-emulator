@@ -1,25 +1,25 @@
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:Z80a/Memory.dart';
+import 'package:color/color.dart';
 
 const SpectrumColors = [
-  0x000000,
-  0x0000D7,
-  0xD70000,
-  0xD700D7,
-  0x00D700,
-  0x00D7D7,
-  0xD7D700,
-  0xD7D7D7,
-  0x000000,
-  0x0000FF,
-  0xFF0000,
-  0xFF00FF,
-  0x00FF00,
-  0x00FFFF,
-  0xFFFF00,
-  0xFFFFFF,
+  '000000',
+  '0000D7',
+  'D70000',
+  'D700D7',
+  '00D700',
+  '00D7D7',
+  'D7D700',
+  'D7D7D7',
+  '000000',
+  '0000FF',
+  'FF0000',
+  'FF00FF',
+  '00FF00',
+  '00FFFF',
+  'FFFF00',
+  'FFFFFF',
 ];
 
 class Ula {
@@ -44,9 +44,9 @@ class Ula {
       palette = Uint8List(paletteSize);
       int p = 0;
       for (var spectrumColor in SpectrumColors) {
-        palette[p++] = Color(spectrumColor).red;
-        palette[p++] = Color(spectrumColor).green;
-        palette[p++] = Color(spectrumColor).blue;
+        palette[p++] = HexColor(spectrumColor).r;
+        palette[p++] = HexColor(spectrumColor).g;
+        palette[p++] = HexColor(spectrumColor).b;
         palette[p++] = 0;
       }
     }

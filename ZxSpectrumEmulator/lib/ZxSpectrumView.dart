@@ -34,22 +34,20 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     loadRomAndStart();
   }
 
-  void refreshScreen(int currentFrame) {
+  void refreshScreen(ZxSpectrum zx, int currentFrame) {
     setState(() {
-      screen = zxSpectrum.ula.screen;
+      screen = zx.ula.screen;
     });
   }
 
-  void onKeyEvent(ZxSpectrumKey key, KeyEvent event) {
-    print(key.text);
-    print(event);
-    int port = key.port * 256 + 0xFE;
-    int v0 = zxSpectrum.z80a.ports.inPort(port);
-    int v1 =
-        event == KeyEvent.Down ? v0 & (0xFF ^ key.bitMask) : v0 | key.bitMask;
-    print(port);
-    print(v1);
-    zxSpectrum.z80a.ports.writeInPort(port, v1);
+  void onKeyEvent(ZxSpectrumKeyState keyState) {
+    print("${keyState.text} ${keyState.pressed ? 'PRESSED' : 'NOT PRESSED'}");
+    int port = keyState.port * 256 + 0xFE;
+    int portValue = zxSpectrum.z80a.ports.inPort(port);
+    int finalPortValue = keyState.pressed
+        ? portValue & (0xFF ^ keyState.bitMask)
+        : portValue | keyState.bitMask;
+    zxSpectrum.z80a.ports.writeInPort(port, finalPortValue);
   }
 
   @override
@@ -59,6 +57,14 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
       if (screen != null) Display(screen),
       SizedBox(height: 30),
       Keyboard(onKeyEvent),
+      RaisedButton(
+        onPressed: () {
+          zxSpectrum.startLog();
+        },
+        child: Text(
+          "Log",
+        ),
+      )
     ]);
   }
 }

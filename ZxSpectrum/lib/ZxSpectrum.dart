@@ -9,7 +9,7 @@ import 'Ula.dart';
 import 'Util.dart';
 import 'ZxSpectrumPorts.dart';
 
-typedef void OnFrame(int frameCounter);
+typedef void OnFrame(ZxSpectrum zx, int frameCounter);
 
 class ZxSpectrum {
   Memory48K memory;
@@ -21,6 +21,8 @@ class ZxSpectrum {
 
   int tStatesCounter = 0;
   int currentFrame = 0;
+
+  var log;
 
   ZxSpectrum({OnFrame onFrame}) {
     this.onFrame = onFrame;
@@ -36,11 +38,18 @@ class ZxSpectrum {
     ports.writeInPort(0x7FFE, 0xFF);
     ula = Ula(memory);
     z80a = Z80a(memory, ports);
+
+    log = this.logNull;
+  }
+
+  void startLog() {
+    log = logScreen;
   }
 
   var printBuffer = List<String>();
-  void log(String s) {
-    var state = "${toHex2(z80a.PC)}" +
+  void logNull(String _) {}
+  void logScreen(String s) {
+    var state = "#${toHex2(z80a.PC)} " +
         "A:${toHex(z80a.registers.A)} " +
         "BC:${toHex2(z80a.registers.BC)} " +
         "DE:${toHex2(z80a.registers.DE)} " +
@@ -73,12 +82,19 @@ class ZxSpectrum {
     int tStatesTotal = 0;
     while (tStatesTotal < 69888) {
       tStatesTotal += step();
+      var i = z80a.getInstruction();
+      if (i != null) {
+        log("${i.name}");
+      } else {
+        log("Invalid Instruction");
+      }
     }
+    log("maskableInterrupt ${z80a.interruptsEnabled}");
     z80a.maskableInterrupt();
     currentFrame++;
     ula.refreshScreen(currentFrame);
     if (onFrame != null) {
-      onFrame(currentFrame);
+      onFrame(this, currentFrame);
     }
     nextFrame();
   }

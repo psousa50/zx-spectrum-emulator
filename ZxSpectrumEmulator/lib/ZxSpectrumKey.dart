@@ -1,29 +1,51 @@
 import 'package:flutter/material.dart';
 
-enum KeyEvent {
-  Up,
-  Down,
-}
-typedef void OnKeyEvent(ZxSpectrumKey key, KeyEvent event);
+typedef void OnKeyEvent(ZxSpectrumKeyState keyState);
 
-class ZxSpectrumKey extends StatelessWidget {
+class ZxSpectrumKeyState {
   final String text;
   final int port;
   final int bitMask;
+  final bool toggle;
+
+  bool pressed = false;
+
+  ZxSpectrumKeyState(this.text, this.port, this.bitMask, {this.toggle = false});
+}
+
+class ZxSpectrumKeyView extends StatefulWidget {
+  final ZxSpectrumKeyState keyState;
   final OnKeyEvent onKeyEvent;
 
-  final style = TextStyle(fontSize: 20, decoration: TextDecoration.none);
+  ZxSpectrumKeyView(this.keyState, this.onKeyEvent);
 
-  ZxSpectrumKey(this.text, this.port, this.bitMask, this.onKeyEvent);
+  @override
+  _ZxSpectrumKeyViewState createState() => _ZxSpectrumKeyViewState(keyState);
+}
+
+class _ZxSpectrumKeyViewState extends State<ZxSpectrumKeyView> {
+  ZxSpectrumKeyState keyState;
+
+  _ZxSpectrumKeyViewState(this.keyState);
 
   @override
   Widget build(BuildContext context) {
+    var style = TextStyle(
+        fontSize: 20,
+        decoration: TextDecoration.none,
+        color: keyState.pressed ? Colors.white : Colors.red);
     return GestureDetector(
-      onTapDown: (TapDownDetails _) => onKeyEvent(this, KeyEvent.Down),
-      onTapUp: (TapUpDetails _) => onKeyEvent(this, KeyEvent.Up),
+      onTapDown: (TapDownDetails _) {
+        keyState.pressed = keyState.toggle ? !keyState.pressed : true;
+        widget.onKeyEvent(this.keyState);
+      },
+      onTapUp: (TapUpDetails _) {
+        keyState.pressed = keyState.toggle ? keyState.pressed : false;
+        widget.onKeyEvent(this.keyState);
+      },
       child: Padding(
           padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-          child: Text(text, style: style)),
+          child: Text(widget.keyState.text, style: style)),
     );
   }
 }
