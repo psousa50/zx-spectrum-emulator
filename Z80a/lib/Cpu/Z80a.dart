@@ -66,7 +66,7 @@ class Z80a {
   int step() {
     var tStates = 0;
 
-    if (halted) return 0;
+    if (halted) return 4;
 
     final opcode = fetch();
 
@@ -1617,6 +1617,8 @@ class Z80a {
 
   void maskableInterrupt() {
     if (!interruptsEnabled) return;
+
+    halted = false;
 
     switch (interruptMode) {
       case InterruptMode.im1:

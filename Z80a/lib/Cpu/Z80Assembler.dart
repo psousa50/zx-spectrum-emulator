@@ -25,6 +25,7 @@ class Z80Assembler {
   static Uint8List im1() => u([Z80a.EXTENDED_OPCODES, 0x56]);
   static Uint8List im2() => u([Z80a.EXTENDED_OPCODES, 0x5E]);
 
+  static Uint8List halt() => u([0x76]);
   static Uint8List di() => u([0xF3]);
   static Uint8List ei() => u([0xFB]);
 }

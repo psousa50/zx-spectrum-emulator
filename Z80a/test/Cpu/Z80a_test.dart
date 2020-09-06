@@ -945,6 +945,26 @@ void main() {
     expect(z80a.PC, 12345);
   }, skip: !runAll);
 
+  test("Maskable interrupts disabled 'Halt'", () {
+    var z80a = newCPU();
+    var program = Uint8List.fromList([
+      ...Z80Assembler.im1(),
+      ...Z80Assembler.ei(),
+      ...Z80Assembler.halt(),
+    ]);
+    z80a.memory.setRange(z80a.PC, program);
+    z80a.step();
+    z80a.step();
+    z80a.step();
+    expect(z80a.halted, true, reason: "CPU should be halted");
+    expect(z80a.interruptsEnabled, true,
+        reason: "Interrupts should be enabled");
+    z80a.maskableInterrupt();
+    expect(z80a.halted, false, reason: "CPU should NOT be halted");
+    expect(z80a.interruptsEnabled, false,
+        reason: "Interrupts should NOT be enabled");
+  }, skip: !runAll);
+
   test("BIT 5, (IY+2)", () {
     var z80a = newCPU();
     var opcodes = Uint8List.fromList([0xFD, 0xCB, 0x02, 0x6E]);
