@@ -6,10 +6,11 @@ import 'package:Z80a/Cpu/Z80a.dart';
 
 import 'Memory48K.dart';
 import 'Ula.dart';
-import 'Util.dart';
 import 'ZxSpectrumPorts.dart';
 
 typedef void OnFrame(ZxSpectrum zx, int frameCounter);
+typedef void OnInstruction(ZxSpectrum zx);
+typedef void OnInterrupt(ZxSpectrum zx);
 
 class ZxSpectrum {
   Memory48K memory;
@@ -18,14 +19,14 @@ class ZxSpectrum {
   Ula ula;
 
   OnFrame onFrame;
+  OnInstruction onInstruction;
+  OnInterrupt onInterrupt;
+  bool running;
 
   int tStatesCounter = 0;
   int currentFrame = 0;
 
-  var log;
-
-  ZxSpectrum({OnFrame onFrame}) {
-    this.onFrame = onFrame;
+  ZxSpectrum({this.onFrame, this.onInstruction, this.onInterrupt}) {
     memory = Memory48K();
     ports = ZxSpectrumPorts();
     ports.writeInPort(0xFEFE, 0xFF);
@@ -38,34 +39,6 @@ class ZxSpectrum {
     ports.writeInPort(0x7FFE, 0xFF);
     ula = Ula(memory);
     z80a = Z80a(memory, ports);
-
-    log = this.logNull;
-  }
-
-  void startLog() {
-    log = logScreen;
-  }
-
-  var printBuffer = List<String>();
-  void logNull(String _) {}
-  void logScreen(String s) {
-    var state = "#${toHex2(z80a.PC)} " +
-        "A:${toHex(z80a.registers.A)} " +
-        "BC:${toHex2(z80a.registers.BC)} " +
-        "DE:${toHex2(z80a.registers.DE)} " +
-        "HL:${toHex2(z80a.registers.HL)}" +
-        " ${z80a.registers.signFlag ? "S" : " "}" +
-        " ${z80a.registers.zeroFlag ? "Z" : " "}" +
-        " ${z80a.registers.halfCarryFlag ? "H" : " "}" +
-        " ${z80a.registers.parityOverflowFlag ? "P" : " "}" +
-        " ${z80a.registers.addSubtractFlag ? "N" : " "}" +
-        " ${z80a.registers.carryFlag ? "C" : " "}";
-    printBuffer.add("${DateTime.now()} $state       $s");
-
-    if (printBuffer.length > 10) {
-      print("\n${printBuffer.join("\n")}");
-      printBuffer.clear();
-    }
   }
 
   void load(int address, Uint8List bytes) {
@@ -73,23 +46,29 @@ class ZxSpectrum {
   }
 
   void start() {
+    running = true;
     nextFrame();
+  }
+
+  void stop() {
+    running = false;
   }
 
   void nextFrame() => Timer(Duration(microseconds: 0), frame);
 
   void frame() {
+    if (!running) return;
+
     int tStatesTotal = 0;
     while (tStatesTotal < 69888) {
-      tStatesTotal += step();
-      var i = z80a.getInstruction();
-      if (i != null) {
-        log("${i.name}");
-      } else {
-        log("Invalid Instruction");
+      if (onInstruction != null) {
+        onInstruction(this);
       }
+      tStatesTotal += step();
     }
-    log("maskableInterrupt ${z80a.interruptsEnabled}");
+    if (onInterrupt != null) {
+      onInterrupt(this);
+    }
     z80a.maskableInterrupt();
     currentFrame++;
     ula.refreshScreen(currentFrame);
