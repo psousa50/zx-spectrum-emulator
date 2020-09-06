@@ -243,15 +243,15 @@ Scenario changeR8IXYd(
     Scenario(
       '$name (IX+d)',
       isIXIY(rxy) && prefix != null
-          ? [...ixyPrefix(rxy), prefix, 2, opcode]
-          : [...ixyPrefix(rxy), if (prefix != null) prefix, opcode, 2],
+          ? [...ixyPrefix(rxy), prefix, 0xFE, opcode]
+          : [...ixyPrefix(rxy), if (prefix != null) prefix, opcode, 0xFE],
       initialState: State(
-        register16Values: {rxy: Scenario.RAM_START},
-        ram: [0, 0, value],
+        register16Values: {rxy: Scenario.RAM_START + 3},
+        ram: [0, value],
         flags: inFlags,
       ),
       expectedState: State(
-        ram: [0, 0, result],
+        ram: [0, result],
         flags: flags,
       ),
     );
@@ -711,7 +711,7 @@ Scenario jpCCNNJump(int opcode, String flag) => Scenario(
 
 Scenario jpCCNNNotJump(int opcode, String flag) => Scenario(
       "JP $flag",
-      [opcode],
+      [opcode, 12, 34],
       initialState: State(
         flags: flag,
       ),

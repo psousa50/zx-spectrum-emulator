@@ -169,6 +169,8 @@ class Z80a {
   void setIXY(int prefix, int w) =>
       prefix == IX_PREFIX ? registers.IX = w : registers.IY = w;
 
+  int iXYDisp(int prefix, int d) => getIXY(prefix) + signedByte(d);
+
   int r8Value(int r) =>
       r == Registers.R_MHL ? this.memory.peek(registers.HL) : registers[r];
 
@@ -604,15 +606,15 @@ class Z80a {
 
   int incmIXY(InstructionContext context) {
     var d = fetch();
-    this.memory.poke(getIXY(context.prefix) + d,
-        incR8Value(this.memory.peek(getIXY(context.prefix) + d)));
+    this.memory.poke(iXYDisp(context.prefix, d),
+        incR8Value(this.memory.peek(iXYDisp(context.prefix, d))));
     return context.instruction.tStates();
   }
 
   int decmIXY(InstructionContext context) {
     var d = fetch();
-    this.memory.poke(getIXY(context.prefix) + d,
-        decR8Value(this.memory.peek(getIXY(context.prefix) + d)));
+    this.memory.poke(iXYDisp(context.prefix, d),
+        decR8Value(this.memory.peek(iXYDisp(context.prefix, d))));
     return context.instruction.tStates();
   }
 
@@ -880,7 +882,7 @@ class Z80a {
   int retn(InstructionContext context) => ret(context);
   int reti(InstructionContext context) => ret(context);
 
-  int jp(InstructionContext context) {
+  int jpnn(InstructionContext context) {
     this.PC = fetch2();
     return context.instruction.tStates();
   }
@@ -905,8 +907,9 @@ class Z80a {
 
   int jpccnn(InstructionContext context) {
     var cond = getFlagCondition(bit345(context.opcode));
+    var address = fetch2();
     if (cond) {
-      this.PC = fetch2();
+      this.PC = address;
     }
     return context.instruction.tStates(cond: cond);
   }
@@ -1005,69 +1008,69 @@ class Z80a {
   int ldmIXYdn(InstructionContext context) {
     var d = fetch();
     var value = fetch();
-    this.memory.poke(getIXY(context.prefix) + d, value);
+    this.memory.poke(iXYDisp(context.prefix, d), value);
     return context.instruction.tStates();
   }
 
   int ldR8mIXYd(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
     int d = fetch();
-    setR8Value(r8, this.memory.peek(getIXY(context.prefix) + d));
+    setR8Value(r8, this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int ldmIXYdR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     int d = fetch();
-    this.memory.poke(getIXY(context.prefix) + d, r8Value(r8));
+    this.memory.poke(iXYDisp(context.prefix, d), r8Value(r8));
     return context.instruction.tStates();
   }
 
   int addAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = addA(this.memory.peek(getIXY(context.prefix) + d));
+    registers.A = addA(this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int adcAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = adcA(this.memory.peek(getIXY(context.prefix) + d));
+    registers.A = adcA(this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int subAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = subA(this.memory.peek(getIXY(context.prefix) + d));
+    registers.A = subA(this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int sbcAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = sbcA(this.memory.peek(getIXY(context.prefix) + d));
+    registers.A = sbcA(this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int andAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = andA(this.memory.peek(getIXY(context.prefix) + d));
+    registers.A = andA(this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int xorAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = xorA(this.memory.peek(getIXY(context.prefix) + d));
+    registers.A = xorA(this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int orAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = orA(this.memory.peek(getIXY(context.prefix) + d));
+    registers.A = orA(this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int cpAIXYd(InstructionContext context) {
     var d = fetch();
-    cpA(this.memory.peek(getIXY(context.prefix) + d));
+    cpA(this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
@@ -1100,49 +1103,49 @@ class Z80a {
 
   int rlcMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var address = getIXY(context.prefix) + d;
+    var address = iXYDisp(context.prefix, d);
     this.memory.poke(address, rlc(this.memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int rrcMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var address = getIXY(context.prefix) + d;
+    var address = iXYDisp(context.prefix, d);
     this.memory.poke(address, rrc(this.memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int rlMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var address = getIXY(context.prefix) + d;
+    var address = iXYDisp(context.prefix, d);
     this.memory.poke(address, rl(this.memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int rrMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var address = getIXY(context.prefix) + d;
+    var address = iXYDisp(context.prefix, d);
     this.memory.poke(address, rr(this.memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int slaMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var address = getIXY(context.prefix) + d;
+    var address = iXYDisp(context.prefix, d);
     this.memory.poke(address, sla(this.memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int sraMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var address = getIXY(context.prefix) + d;
+    var address = iXYDisp(context.prefix, d);
     this.memory.poke(address, sra(this.memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int srlMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var address = getIXY(context.prefix) + d;
+    var address = iXYDisp(context.prefix, d);
     this.memory.poke(address, srl(this.memory.peek(address)));
     return context.instruction.tStates();
   }
@@ -1150,14 +1153,14 @@ class Z80a {
   int bitnMIXYd(InstructionContext context) {
     var d = context.displacement;
     var bit = bit345(context.opcode);
-    bitNR8Op(bit, this.memory.peek(getIXY(context.prefix) + d));
+    bitNR8Op(bit, this.memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int resnMIXYd(InstructionContext context) {
     var d = context.displacement;
     var bit = bit345(context.opcode);
-    var address = getIXY(context.prefix) + d;
+    var address = iXYDisp(context.prefix, d);
     this.memory.poke(address, resNR8Op(bit, this.memory.peek(address)));
     return context.instruction.tStates();
   }
@@ -1165,7 +1168,7 @@ class Z80a {
   int setnMIXYd(InstructionContext context) {
     var d = context.displacement;
     var bit = bit345(context.opcode);
-    var address = getIXY(context.prefix) + d;
+    var address = iXYDisp(context.prefix, d);
     this.memory.poke(address, setNR8Op(bit, this.memory.peek(address)));
     return context.instruction.tStates();
   }
@@ -1466,13 +1469,13 @@ class Z80a {
     unPrefixed.buildM1C8(0xB8, "CP [rb012]", cpAR8, 4);
 
     unPrefixed.buildM8C8(0xC0, "RET [cc]", retcc, 5, tStatesOnTrueCond: 11);
-    unPrefixed.buildM16C4(0xC1, "POP [r16]", popR16, 10);
+    unPrefixed.buildM16C4(0xC1, "POP [r16af]", popR16, 10);
     unPrefixed.buildM8C8(0xC2, "JP [cc], nn", jpccnn, 10,
         tStatesOnTrueCond: 10);
-    unPrefixed.build(0xC3, "JP", jp, 10);
+    unPrefixed.build(0xC3, "JP nn", jpnn, 10);
     unPrefixed.buildM8C8(0xC4, "CALL [cc], nn", callccnn, 10,
         tStatesOnTrueCond: 17);
-    unPrefixed.buildM16C4(0xC5, "PUSH [r16]", pushR16, 11);
+    unPrefixed.buildM16C4(0xC5, "PUSH [r16af]", pushR16, 11);
     unPrefixed.build(0xC6, "ADD A, N", addAn, 7);
     unPrefixed.buildM8C8(0xC7, "RST [rst]", rstNN, 11);
     unPrefixed.build(0xC9, "RET", ret, 10);

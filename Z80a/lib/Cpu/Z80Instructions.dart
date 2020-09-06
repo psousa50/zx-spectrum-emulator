@@ -1,3 +1,4 @@
+import '../Util.dart';
 import 'InstructionContext.dart';
 import 'Registers.dart';
 import 'Z80Instruction.dart';
@@ -19,8 +20,9 @@ class Z80Instructions {
       var rb012 = Registers.rBit012(opcode);
       var rb345 = Registers.rBit345(opcode);
       var r16 = i < 4 ? Registers.r16SPTable[i] : 0;
+      var r16af = i < 4 ? Registers.r16AFTable[i] : 0;
       var flag = i < 8 ? flags[i] : "";
-      var bit = i & 0x07;
+      var bit = bit345(opcode);
       var rst = opcode & 0x38;
       var name = namePattern
           .replaceAll("[cc]", flag)
@@ -28,6 +30,7 @@ class Z80Instructions {
           .replaceAll("[rb345]", Registers.r8Names[rb345])
           .replaceAll("[r8]", Registers.r8Names[rb345])
           .replaceAll("[r16]", Registers.r16Names[r16])
+          .replaceAll("[r16af]", Registers.r16Names[r16af])
           .replaceAll("[rst]", rst.toString())
           .replaceAll("[bit]", bit.toString());
 
