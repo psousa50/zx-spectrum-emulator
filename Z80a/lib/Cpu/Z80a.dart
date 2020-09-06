@@ -920,7 +920,8 @@ class Z80a {
   }
 
   int inAn(InstructionContext context) {
-    registers.A = this.ports.inPort(fetch());
+    var port = w(fetch(), registers.A);
+    registers.A = this.ports.inPort(port);
     return context.instruction.tStates();
   }
 

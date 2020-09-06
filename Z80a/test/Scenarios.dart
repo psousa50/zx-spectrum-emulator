@@ -1435,7 +1435,8 @@ List<Scenario> inAN(int opcode) => [
         'IN A, (N)',
         [opcode, 253],
         initialState: State(
-          inPorts: {253: 12},
+          register8Values: {Registers.R_A: 10},
+          inPorts: {10 * 256 + 253: 12},
         ),
         expectedState: State(
           register8Values: {Registers.R_A: 12},
