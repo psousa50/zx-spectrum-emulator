@@ -805,7 +805,7 @@ class Z80a {
 
   int outCR8(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
-    this.ports.outPort(registers.C, r8Value(r8));
+    this.ports.outPort(registers.BC, r8Value(r8));
     return context.instruction.tStates();
   }
 
@@ -915,7 +915,8 @@ class Z80a {
   }
 
   int outnA(InstructionContext context) {
-    this.ports.outPort(fetch(), registers.A);
+    var port = w(fetch(), registers.A);
+    this.ports.outPort(port, registers.A);
     return context.instruction.tStates();
   }
 

@@ -1407,12 +1407,16 @@ List<Scenario> outCR8(int opcode, int r8) => [
         [Z80a.EXTENDED_OPCODES, opcode],
         initialState: State(
           register8Values: {
+            Registers.R_B: 10,
             Registers.R_C: 254,
-            r8: r8 == Registers.R_C ? 254 : 12
+            r8: r8 == Registers.R_B ? 10 : r8 == Registers.R_C ? 254 : 12
           },
         ),
         expectedState: State(
-          outPorts: {254: r8 == Registers.R_C ? 254 : 12},
+          outPorts: {
+            w(254, 10):
+                r8 == Registers.R_B ? 10 : r8 == Registers.R_C ? 254 : 12
+          },
         ),
       )
     ];
@@ -1425,7 +1429,7 @@ List<Scenario> outNA(int opcode) => [
           register8Values: {Registers.R_A: 12},
         ),
         expectedState: State(
-          outPorts: {253: 12},
+          outPorts: {w(253, 12): 12},
         ),
       )
     ];
