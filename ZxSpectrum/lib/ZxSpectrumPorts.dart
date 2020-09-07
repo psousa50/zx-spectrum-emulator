@@ -1,24 +1,30 @@
-import 'dart:typed_data';
-
 import 'package:Z80a/Ports.dart';
 
+import 'PortHandler.dart';
+
+class PortBinding {
+  int bitMask;
+  int value;
+  PortHandler portHandler;
+
+  PortBinding(this.bitMask, this.value, this.portHandler);
+}
+
 class ZxSpectrumPorts extends Ports {
-  Uint8List inPorts = Uint8List(65536);
-  Uint8List outPorts = Uint8List(65536);
+  var bindings = List<PortBinding>();
 
-  @override
-  int inPort(int port) => inPorts[port];
+  void bindPort(int bitMask, int value, PortHandler handler) {
+    bindings.add(PortBinding(bitMask, value, handler));
+  }
 
-  @override
-  void outPort(int port, int value) {
-    outPorts[port] = value;
+  PortHandler handler(int port) {
+    var h = bindings.firstWhere((b) => (port & b.bitMask) == b.value);
+    return h == null ? null : h.portHandler;
   }
 
   @override
-  int readOutPort(int port) => outPorts[port];
+  int inPort(int port) => handler(port)?.read(port);
 
   @override
-  void writeInPort(int port, int value) {
-    inPorts[port] = value;
-  }
+  void outPort(int port, int value) => handler(port)?.write(port, value);
 }

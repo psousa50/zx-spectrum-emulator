@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:ZxSpectrum/PortHandler.dart';
 import 'package:color/color.dart';
 
 import 'package:Z80a/Memory.dart';
@@ -24,7 +25,7 @@ const SpectrumColors = [
   Color.rgb(0xFF, 0xFF, 0xFF),
 ];
 
-class Ula {
+class Ula with PortHandler {
   static Uint8List palette;
 
   Uint8List screen;
@@ -62,11 +63,6 @@ class Ula {
   void keyUp(ZxKey key) {
     var k = keys[key];
     keyStates[k.address] = keyStates[k.address] | (k.bitMask);
-  }
-
-  int inPort(int address) {
-    var value = keyStates[address];
-    return value == null ? 0 : value;
   }
 
   Uint8List buildImage(Uint8List zxScreen, int currentFrame) {
@@ -134,4 +130,13 @@ class Ula {
 
     return bitmap;
   }
+
+  @override
+  int read(int port) {
+    var value = keyStates[port];
+    return value == null ? 0 : value;
+  }
+
+  @override
+  void write(int port, int value) {}
 }

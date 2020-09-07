@@ -29,15 +29,10 @@ class ZxSpectrum {
   ZxSpectrum({this.onFrame, this.onInstruction, this.onInterrupt}) {
     memory = Memory48K();
     ports = ZxSpectrumPorts();
-    ports.writeInPort(0xFEFE, 0xFF);
-    ports.writeInPort(0xFDFE, 0xFF);
-    ports.writeInPort(0xFBFE, 0xFF);
-    ports.writeInPort(0xF7FE, 0xFF);
-    ports.writeInPort(0xEFFE, 0xFF);
-    ports.writeInPort(0xDFFE, 0xFF);
-    ports.writeInPort(0xBFFE, 0xFF);
-    ports.writeInPort(0x7FFE, 0xFF);
     ula = Ula(memory);
+
+    ports.bindPort(0x01, 0x00, ula);
+
     z80a = Z80a(memory, ports);
   }
 

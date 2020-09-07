@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Z80a/Util.dart';
+import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 
 class ZxSpectrumRunner {
@@ -47,14 +48,9 @@ class ZxSpectrumRunner {
   }
 
   void clearKeys() {
-    zxSpectrum.z80a.ports.writeInPort(0xFEFE, 0xFF);
-    zxSpectrum.z80a.ports.writeInPort(0xFDFE, 0xFF);
-    zxSpectrum.z80a.ports.writeInPort(0xFBFE, 0xFF);
-    zxSpectrum.z80a.ports.writeInPort(0xF7FE, 0xFF);
-    zxSpectrum.z80a.ports.writeInPort(0xEFFE, 0xFF);
-    zxSpectrum.z80a.ports.writeInPort(0xDFFE, 0xFF);
-    zxSpectrum.z80a.ports.writeInPort(0xBFFE, 0xFF);
-    zxSpectrum.z80a.ports.writeInPort(0x7FFE, 0xFF);
+    ZxKey.values.forEach((k) {
+      zxSpectrum.ula.keyUp(k);
+    });
   }
 
   void onFrame(ZxSpectrum zx, int f) {
@@ -83,14 +79,14 @@ class ZxSpectrumRunner {
         case 0:
           clearKeys();
           log("PRESSED E (REM)");
-          zx.z80a.ports.writeInPort(0xFBFE, 0xFB);
+          zx.ula.keyDown(ZxKey.K_E);
           keyCount++;
           break;
 
         case 1:
           clearKeys();
           log("PRESSED ENTER");
-          zx.z80a.ports.writeInPort(0xBFFE, 0xFE);
+          zx.ula.keyDown(ZxKey.K_ENTER);
           keyCount++;
           break;
 
@@ -99,23 +95,7 @@ class ZxSpectrumRunner {
           keyCount++;
           break;
       }
-
-      // if (instructionCount > 1000000) {
-      //   zx.stop();
-      // }
     }
-
-    // if (keyCount < 3 && (keyCount % 2 == 1) && currentFrame - keyFrame > 1) {
-    //   keyCount++;
-    //   zx.z80a.ports.writeInPort(0xFEFE, 0xFF);
-    //   zx.z80a.ports.writeInPort(0xFDFE, 0xFF);
-    //   zx.z80a.ports.writeInPort(0xFBFE, 0xFF);
-    //   zx.z80a.ports.writeInPort(0xF7FE, 0xFF);
-    //   zx.z80a.ports.writeInPort(0xEFFE, 0xFF);
-    //   zx.z80a.ports.writeInPort(0xDFFE, 0xFF);
-    //   zx.z80a.ports.writeInPort(0xBFFE, 0xFF);
-    //   zx.z80a.ports.writeInPort(0x7FFE, 0xFF);
-    // }
   }
 
   void loadRom() async {
