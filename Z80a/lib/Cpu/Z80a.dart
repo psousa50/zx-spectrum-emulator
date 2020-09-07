@@ -3,10 +3,10 @@ library z80a;
 import 'package:Z80a/Cpu/Z80Instructions.dart';
 import 'package:Z80a/Memory.dart';
 import 'package:Z80a/Ports.dart';
-import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Util.dart';
 
 import 'InstructionContext.dart';
+import 'Registers.dart';
 import 'Z80Instruction.dart';
 
 // ignore_for_file: non_constant_identifier_names
@@ -49,17 +49,83 @@ class Z80a {
     buildIXYBitOpcodes();
   }
 
+  int get A => registers.A;
+  int get F => registers.F;
+  int get B => registers.B;
+  int get C => registers.C;
+  int get D => registers.D;
+  int get E => registers.E;
+  int get H => registers.H;
+  int get L => registers.L;
+  int get I => registers.I;
+  int get R => registers.R;
+
+  set A(int b) => registers.A = b;
+  set F(int b) => registers.F = b;
+  set B(int b) => registers.B = b;
+  set C(int b) => registers.C = b;
+  set D(int b) => registers.D = b;
+  set E(int b) => registers.E = b;
+  set H(int b) => registers.H = b;
+  set L(int b) => registers.L = b;
+  set S(int b) => registers.S = b;
+  set P(int b) => registers.P = b;
+  set IX_H(int b) => registers.IX_H = b;
+  set IX_L(int b) => registers.IX_L = b;
+  set IY_H(int b) => registers.IY_H = b;
+  set IY_L(int b) => registers.IY_L = b;
+  set I(int b) => registers.I = b;
+  set R(int b) => registers.R = b;
+
+  int get AF => registers.AF;
+  int get BC => registers.BC;
+  int get DE => registers.DE;
+  int get HL => registers.HL;
+  int get SP => registers.SP;
+  int get IX => registers.IX;
+  int get IY => registers.IY;
+  int get AFt => registers.AFt;
+  int get BCt => registers.BCt;
+  int get DEt => registers.DEt;
+  int get HLt => registers.HLt;
+
+  set AF(int w) => registers.AF = w;
+  set BC(int w) => registers.BC = w;
+  set DE(int w) => registers.DE = w;
+  set HL(int w) => registers.HL = w;
+  set SP(int w) => registers.SP = w;
+  set IX(int w) => registers.IX = w;
+  set IY(int w) => registers.IY = w;
+  set AFt(int w) => registers.AFt = w;
+  set BCt(int w) => registers.BCt = w;
+  set DEt(int w) => registers.DEt = w;
+  set HLt(int w) => registers.HLt = w;
+
+  bool get carryFlag => registers.carryFlag;
+  bool get addSubtractFlag => registers.addSubtractFlag;
+  bool get parityOverflowFlag => registers.parityOverflowFlag;
+  bool get halfCarryFlag => registers.halfCarryFlag;
+  bool get zeroFlag => registers.zeroFlag;
+  bool get signFlag => registers.signFlag;
+
+  set carryFlag(bool b) => registers.carryFlag = b;
+  set addSubtractFlag(bool b) => registers.addSubtractFlag = b;
+  set parityOverflowFlag(bool b) => registers.parityOverflowFlag = b;
+  set halfCarryFlag(bool b) => registers.halfCarryFlag = b;
+  set zeroFlag(bool b) => registers.zeroFlag = b;
+  set signFlag(bool b) => registers.signFlag = b;
+
   InterruptMode get interruptMode => _interruptMode;
 
   int fetch() {
-    final v = this.memory.peek(this.PC);
-    this.PC = this.PC + 1;
+    final v = memory.peek(PC);
+    PC = PC + 1;
     return v;
   }
 
   int fetch2() {
-    final v = this.memory.peek2(this.PC);
-    this.PC = this.PC + 2;
+    final v = memory.peek2(PC);
+    PC = PC + 2;
     return v;
   }
 
@@ -95,9 +161,9 @@ class Z80a {
   Z80Instruction getInstruction() {
     Z80Instruction i;
 
-    var d0 = this.memory.peek(this.PC + 0);
-    var d1 = this.memory.peek(this.PC + 1);
-    var d3 = this.memory.peek(this.PC + 3);
+    var d0 = memory.peek(PC + 0);
+    var d1 = memory.peek(PC + 1);
+    var d3 = memory.peek(PC + 3);
     switch (d0) {
       case IX_PREFIX:
       case IY_PREFIX:
@@ -164,21 +230,18 @@ class Z80a {
 
   int word(int v) => v % 65536;
 
-  int getIXY(int prefix) => prefix == IX_PREFIX ? registers.IX : registers.IY;
+  int getIXY(int prefix) => prefix == IX_PREFIX ? IX : IY;
 
-  void setIXY(int prefix, int w) =>
-      prefix == IX_PREFIX ? registers.IX = w : registers.IY = w;
+  void setIXY(int prefix, int w) => prefix == IX_PREFIX ? IX = w : IY = w;
 
   int iXYDisp(int prefix, int d) => getIXY(prefix) + signedByte(d);
 
-  int r8Value(int r) =>
-      r == Registers.R_MHL ? this.memory.peek(registers.HL) : registers[r];
+  int r8Value(int r) => r == Registers.R_MHL ? memory.peek(HL) : registers[r];
 
   int r16Value(int r) => 256 * registers[r] + registers[r + 1];
 
-  void setR8Value(int r, int b) => r == Registers.R_MHL
-      ? this.memory.poke(registers.HL, byte(b))
-      : registers[r] = byte(b);
+  void setR8Value(int r, int b) =>
+      r == Registers.R_MHL ? memory.poke(HL, byte(b)) : registers[r] = byte(b);
 
   void setR16Value(int r, int w) {
     registers[r] = hi(w);
@@ -187,32 +250,31 @@ class Z80a {
 
   int addWord(int w1, int w2) {
     int r = w1 + w2;
-    registers.carryFlag = r > 65535;
-    registers.addSubtractFlag = false;
-    registers.halfCarryFlag = (w1 & 0x0FFF) + (w2 & 0x0FFF) > 0x0FFF;
+    carryFlag = r > 65535;
+    addSubtractFlag = false;
+    halfCarryFlag = (w1 & 0x0FFF) + (w2 & 0x0FFF) > 0x0FFF;
     return word(r);
   }
 
   void setZeroAndSignFlagsOn8BitResult(int b) {
-    registers.zeroFlag = b == 0;
-    registers.signFlag = b > 127;
+    zeroFlag = b == 0;
+    signFlag = b > 127;
   }
 
   void setZeroAndSignFlagsOn16BitResult(int b) {
-    registers.zeroFlag = b == 0;
-    registers.signFlag = b > 32767;
+    zeroFlag = b == 0;
+    signFlag = b > 32767;
   }
 
   void push2(int w) {
-    this.memory.poke(registers.SP - 1, hi(w));
-    this.memory.poke(registers.SP - 2, lo(w));
-    registers.SP = registers.SP - 2;
+    memory.poke(SP - 1, hi(w));
+    memory.poke(SP - 2, lo(w));
+    SP = SP - 2;
   }
 
   int pop2() {
-    registers.SP = registers.SP + 2;
-    return w(
-        this.memory.peek(registers.SP - 2), this.memory.peek(registers.SP - 1));
+    SP = SP + 2;
+    return w(memory.peek(SP - 2), memory.peek(SP - 1));
   }
 
   bool sameSign8(int b1, int b2) => (b1 & 0x80) ^ (b2 & 0x80) == 0;
@@ -221,19 +283,19 @@ class Z80a {
     bool flag;
     switch (b ~/ 2) {
       case 0:
-        flag = registers.zeroFlag;
+        flag = zeroFlag;
         break;
 
       case 1:
-        flag = registers.carryFlag;
+        flag = carryFlag;
         break;
 
       case 2:
-        flag = registers.parityOverflowFlag;
+        flag = parityOverflowFlag;
         break;
 
       case 3:
-        flag = registers.signFlag;
+        flag = signFlag;
         break;
     }
 
@@ -252,85 +314,83 @@ class Z80a {
   }
 
   int addA(int value) {
-    var sum = registers.A + value;
-    registers.carryFlag = sum > 255;
-    registers.halfCarryFlag = (registers.A & 0x0F) + (value & 0x0F) > 0x0F;
+    var sum = A + value;
+    carryFlag = sum > 255;
+    halfCarryFlag = (A & 0x0F) + (value & 0x0F) > 0x0F;
     var result = byte(sum);
-    registers.parityOverflowFlag =
-        (((registers.A & 0x80) ^ (value & 0x80)) == 0) &&
-            (value & 0x80 != (result & 0x80));
+    parityOverflowFlag = (((A & 0x80) ^ (value & 0x80)) == 0) &&
+        (value & 0x80 != (result & 0x80));
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.addSubtractFlag = false;
+    addSubtractFlag = false;
 
     return result;
   }
 
   int incR8Value(int value) {
-    registers.parityOverflowFlag = value == 0x7F;
-    registers.halfCarryFlag = 1 + (value & 0x0F) > 0x0F;
+    parityOverflowFlag = value == 0x7F;
+    halfCarryFlag = 1 + (value & 0x0F) > 0x0F;
     var newValue = byte(value + 1);
     setZeroAndSignFlagsOn8BitResult(newValue);
-    registers.addSubtractFlag = false;
+    addSubtractFlag = false;
 
     return newValue;
   }
 
   int decR8Value(int value) {
-    registers.parityOverflowFlag = value == 0x80;
-    registers.halfCarryFlag = (value & 0x0F) - 1 < 0;
+    parityOverflowFlag = value == 0x80;
+    halfCarryFlag = (value & 0x0F) - 1 < 0;
     var newValue = byte(value - 1);
     setZeroAndSignFlagsOn8BitResult(newValue);
-    registers.addSubtractFlag = true;
+    addSubtractFlag = true;
 
     return newValue;
   }
 
-  int adcA(int value) => addA(value + (registers.carryFlag ? 1 : 0));
+  int adcA(int value) => addA(value + (carryFlag ? 1 : 0));
 
   int subA(int value) {
-    var diff = registers.A - value;
-    registers.carryFlag = diff < 0;
-    registers.halfCarryFlag = (registers.A & 0x0F) - (value & 0x0F) < 0;
+    var diff = A - value;
+    carryFlag = diff < 0;
+    halfCarryFlag = (A & 0x0F) - (value & 0x0F) < 0;
     var result = byte(diff);
-    registers.parityOverflowFlag =
-        !sameSign8(registers.A, value) && sameSign8(value, result);
+    parityOverflowFlag = !sameSign8(A, value) && sameSign8(value, result);
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.addSubtractFlag = true;
+    addSubtractFlag = true;
 
     return result;
   }
 
-  int sbcA(int value) => subA(value + (registers.carryFlag ? 1 : 0));
+  int sbcA(int value) => subA(value + (carryFlag ? 1 : 0));
 
   int andA(int value) {
-    var result = registers.A & value;
+    var result = A & value;
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.carryFlag = false;
-    registers.halfCarryFlag = true;
-    registers.addSubtractFlag = false;
-    registers.parityOverflowFlag = parity(result);
+    carryFlag = false;
+    halfCarryFlag = true;
+    addSubtractFlag = false;
+    parityOverflowFlag = parity(result);
 
     return result;
   }
 
   int xorA(int value) {
-    var result = registers.A ^ value;
+    var result = A ^ value;
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.carryFlag = false;
-    registers.halfCarryFlag = false;
-    registers.addSubtractFlag = false;
-    registers.parityOverflowFlag = parity(result);
+    carryFlag = false;
+    halfCarryFlag = false;
+    addSubtractFlag = false;
+    parityOverflowFlag = parity(result);
 
     return result;
   }
 
   int orA(int value) {
-    var result = registers.A | value;
+    var result = A | value;
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.carryFlag = false;
-    registers.halfCarryFlag = false;
-    registers.addSubtractFlag = false;
-    registers.parityOverflowFlag = parity(result);
+    carryFlag = false;
+    halfCarryFlag = false;
+    addSubtractFlag = false;
+    parityOverflowFlag = parity(result);
 
     return result;
   }
@@ -339,75 +399,75 @@ class Z80a {
 
   int rlOp(int value) {
     var b7 = (value & 0x80) >> 7;
-    var result = byte(value << 1) | (registers.carryFlag ? 0x01 : 0x00);
-    registers.carryFlag = b7 == 1;
-    registers.addSubtractFlag = false;
-    registers.halfCarryFlag = false;
+    var result = byte(value << 1) | (carryFlag ? 0x01 : 0x00);
+    carryFlag = b7 == 1;
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     return result;
   }
 
   int rl(int value) {
     var result = rlOp(value);
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.parityOverflowFlag = parity(result);
+    parityOverflowFlag = parity(result);
     return result;
   }
 
   int rrOp(int value) {
     var b0 = (value & 0x01);
-    var result = byte(value >> 1) | (registers.carryFlag ? 0x80 : 0x00);
-    registers.carryFlag = b0 == 1;
-    registers.addSubtractFlag = false;
-    registers.halfCarryFlag = false;
+    var result = byte(value >> 1) | (carryFlag ? 0x80 : 0x00);
+    carryFlag = b0 == 1;
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     return result;
   }
 
   int rr(int value) {
     var result = rrOp(value);
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.parityOverflowFlag = parity(result);
+    parityOverflowFlag = parity(result);
     return result;
   }
 
   int rlcOp(int value) {
     var b7 = (value & 0x80) >> 7;
     var result = byte(value << 1) | b7;
-    registers.carryFlag = b7 == 1;
-    registers.addSubtractFlag = false;
-    registers.halfCarryFlag = false;
+    carryFlag = b7 == 1;
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     return result;
   }
 
   int rlc(int value) {
     var result = rlcOp(value);
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.parityOverflowFlag = parity(result);
+    parityOverflowFlag = parity(result);
     return result;
   }
 
   int rrcOp(int value) {
     int b0 = (value & 0x01);
     var result = byte(value >> 1) | (b0 << 7);
-    registers.carryFlag = b0 == 1;
-    registers.addSubtractFlag = false;
-    registers.halfCarryFlag = false;
+    carryFlag = b0 == 1;
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     return result;
   }
 
   int rrc(int value) {
     var result = rrcOp(value);
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.parityOverflowFlag = parity(result);
+    parityOverflowFlag = parity(result);
     return result;
   }
 
   int sla(int value) {
-    registers.carryFlag = value & 0x80 == 0x80;
-    registers.addSubtractFlag = false;
-    registers.halfCarryFlag = false;
+    carryFlag = value & 0x80 == 0x80;
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     var result = byte(value << 1);
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.parityOverflowFlag = parity(result);
+    parityOverflowFlag = parity(result);
     return result;
   }
 
@@ -415,30 +475,30 @@ class Z80a {
     int b0 = (value & 0x01);
     var b7 = (value & 0x80);
     var result = byte(value >> 1) | b7;
-    registers.carryFlag = b0 == 1;
-    registers.addSubtractFlag = false;
-    registers.halfCarryFlag = false;
+    carryFlag = b0 == 1;
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.parityOverflowFlag = parity(result);
+    parityOverflowFlag = parity(result);
     return result;
   }
 
   int srl(int value) {
     int b0 = (value & 0x01);
     var result = byte(value >> 1);
-    registers.carryFlag = b0 == 1;
-    registers.addSubtractFlag = false;
-    registers.halfCarryFlag = false;
+    carryFlag = b0 == 1;
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.parityOverflowFlag = parity(result);
+    parityOverflowFlag = parity(result);
     return result;
   }
 
   void bitNR8Op(int bit, int value) {
     var mask = bitMask[bit];
-    registers.zeroFlag = value & mask == 0;
-    registers.halfCarryFlag = true;
-    registers.addSubtractFlag = false;
+    zeroFlag = value & mask == 0;
+    halfCarryFlag = true;
+    addSubtractFlag = false;
   }
 
   int resNR8Op(int bit, int value) {
@@ -456,17 +516,15 @@ class Z80a {
   }
 
   int daa(InstructionContext context) {
-    var sign = registers.addSubtractFlag ? -1 : 1;
-    if (registers.halfCarryFlag || (registers.A & 0x0F > 0x09))
-      registers.A = addA(0x06 * sign);
-    if (registers.carryFlag || (registers.A & 0xF0 > 0x90))
-      registers.A = addA(0x60 * sign);
+    var sign = addSubtractFlag ? -1 : 1;
+    if (halfCarryFlag || (A & 0x0F > 0x09)) A = addA(0x06 * sign);
+    if (carryFlag || (A & 0xF0 > 0x90)) A = addA(0x60 * sign);
 
     return context.instruction.tStates();
   }
 
   int rlca(InstructionContext context) {
-    registers.A = rlcOp(registers.A);
+    A = rlcOp(A);
     return context.instruction.tStates();
   }
 
@@ -513,52 +571,52 @@ class Z80a {
   }
 
   int rrca(InstructionContext context) {
-    registers.A = rrcOp(registers.A);
+    A = rrcOp(A);
     return context.instruction.tStates();
   }
 
   int rla(InstructionContext context) {
-    registers.A = rlOp(registers.A);
+    A = rlOp(A);
     return context.instruction.tStates();
   }
 
   int rra(InstructionContext context) {
-    registers.A = rrOp(registers.A);
+    A = rrOp(A);
     return context.instruction.tStates();
   }
 
   int cpl(InstructionContext context) {
-    registers.A = registers.A ^ 255;
-    this.registers.addSubtractFlag = true;
-    this.registers.halfCarryFlag = true;
+    A = A ^ 255;
+    addSubtractFlag = true;
+    halfCarryFlag = true;
     return context.instruction.tStates();
   }
 
   int scf(InstructionContext context) {
-    registers.F = registers.F & ~Registers.F_ADD_SUB | Registers.F_CARRY;
-    this.registers.addSubtractFlag = false;
-    this.registers.halfCarryFlag = false;
+    F = F & ~Registers.F_ADD_SUB | Registers.F_CARRY;
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     return context.instruction.tStates();
   }
 
   int ccf(InstructionContext context) {
-    registers.F = registers.F & ~Registers.F_ADD_SUB ^ Registers.F_CARRY;
+    F = F & ~Registers.F_ADD_SUB ^ Registers.F_CARRY;
     return context.instruction.tStates();
   }
 
   int djnz(InstructionContext context) {
     var d = fetch();
-    registers.B = byte(registers.B - 1);
-    bool cond = registers.B != 0;
+    B = byte(B - 1);
+    bool cond = B != 0;
     if (cond) {
-      this.PC = this.PC + signedByte(d);
+      PC = PC + signedByte(d);
     }
     return context.instruction.tStates(cond: cond);
   }
 
   int jr(InstructionContext context) {
     var d = fetch();
-    this.PC = this.PC + signedByte(d);
+    PC = PC + signedByte(d);
     return context.instruction.tStates();
   }
 
@@ -566,55 +624,55 @@ class Z80a {
     var d = fetch();
     var cond = getFlagCondition(bit345(context.opcode) - 4);
     if (cond) {
-      this.PC = this.PC + signedByte(d);
+      PC = PC + signedByte(d);
     }
     return context.instruction.tStates(cond: cond);
   }
 
   int ldmBCA(InstructionContext context) {
-    this.memory.poke(registers.BC, registers.A);
+    memory.poke(BC, A);
     return context.instruction.tStates();
   }
 
   int ldAmBC(InstructionContext context) {
-    registers.A = this.memory.peek(registers.BC);
+    A = memory.peek(BC);
     return context.instruction.tStates();
   }
 
   int ldAmDE(InstructionContext context) {
-    registers.A = this.memory.peek(registers.DE);
+    A = memory.peek(DE);
     return context.instruction.tStates();
   }
 
   int ldmDEA(InstructionContext context) {
-    this.memory.poke(registers.DE, registers.A);
+    memory.poke(DE, A);
     return context.instruction.tStates();
   }
 
   int exAFAFq(InstructionContext context) {
-    final af = registers.AF;
-    registers.AF = registers.AFt;
-    registers.AFt = af;
+    final af = AF;
+    AF = AFt;
+    AFt = af;
     return context.instruction.tStates();
   }
 
   int incR8(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
-    setR8Value(r8, incR8Value(this.r8Value(r8)));
+    setR8Value(r8, incR8Value(r8Value(r8)));
     return context.instruction.tStates();
   }
 
   int incmIXY(InstructionContext context) {
     var d = fetch();
-    this.memory.poke(iXYDisp(context.prefix, d),
-        incR8Value(this.memory.peek(iXYDisp(context.prefix, d))));
+    memory.poke(iXYDisp(context.prefix, d),
+        incR8Value(memory.peek(iXYDisp(context.prefix, d))));
     return context.instruction.tStates();
   }
 
   int decmIXY(InstructionContext context) {
     var d = fetch();
-    this.memory.poke(iXYDisp(context.prefix, d),
-        decR8Value(this.memory.peek(iXYDisp(context.prefix, d))));
+    memory.poke(iXYDisp(context.prefix, d),
+        decR8Value(memory.peek(iXYDisp(context.prefix, d))));
     return context.instruction.tStates();
   }
 
@@ -632,7 +690,7 @@ class Z80a {
 
   int decR8(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
-    setR8Value(r8, decR8Value(this.r8Value(r8)));
+    setR8Value(r8, decR8Value(r8Value(r8)));
     return context.instruction.tStates();
   }
 
@@ -650,7 +708,7 @@ class Z80a {
 
   int addHLR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
-    registers.HL = addWord(registers.HL, r16Value(r16));
+    HL = addWord(HL, r16Value(r16));
     return context.instruction.tStates();
   }
 
@@ -662,74 +720,74 @@ class Z80a {
 
   int ldR8mHL(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
-    setR8Value(r8, this.memory.peek(registers.HL));
+    setR8Value(r8, memory.peek(HL));
     return context.instruction.tStates();
   }
 
   int ldmnnHL(InstructionContext context) {
-    this.memory.poke2(fetch2(), registers.HL);
+    memory.poke2(fetch2(), HL);
     return context.instruction.tStates();
   }
 
   int ldHLmnn(InstructionContext context) {
-    registers.HL = this.memory.peek2(fetch2());
+    HL = memory.peek2(fetch2());
     return context.instruction.tStates();
   }
 
   int ldmnnA(InstructionContext context) {
-    this.memory.poke(fetch2(), registers.A);
+    memory.poke(fetch2(), A);
     return context.instruction.tStates();
   }
 
   int ldAmnn(InstructionContext context) {
-    registers.A = this.memory.peek(fetch2());
+    A = memory.peek(fetch2());
     return context.instruction.tStates();
   }
 
   int ldmHLnn(InstructionContext context) {
-    this.memory.poke(registers.HL, fetch());
+    memory.poke(HL, fetch());
     return context.instruction.tStates();
   }
 
   int addAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
-    registers.A = addA(r8Value(r8));
+    A = addA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int adcAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
-    registers.A = adcA(r8Value(r8));
+    A = adcA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int subAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
-    registers.A = subA(r8Value(r8));
+    A = subA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int sbcAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
-    registers.A = sbcA(r8Value(r8));
+    A = sbcA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int andAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
-    registers.A = andA(r8Value(r8));
+    A = andA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int xorAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
-    registers.A = xorA(r8Value(r8));
+    A = xorA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int orAR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
-    registers.A = orA(r8Value(r8));
+    A = orA(r8Value(r8));
     return context.instruction.tStates();
   }
 
@@ -740,37 +798,37 @@ class Z80a {
   }
 
   int addAn(InstructionContext context) {
-    registers.A = addA(fetch());
+    A = addA(fetch());
     return context.instruction.tStates();
   }
 
   int adcAn(InstructionContext context) {
-    registers.A = adcA(fetch());
+    A = adcA(fetch());
     return context.instruction.tStates();
   }
 
   int subAn(InstructionContext context) {
-    registers.A = subA(fetch());
+    A = subA(fetch());
     return context.instruction.tStates();
   }
 
   int sbcAn(InstructionContext context) {
-    registers.A = sbcA(fetch());
+    A = sbcA(fetch());
     return context.instruction.tStates();
   }
 
   int andAn(InstructionContext context) {
-    registers.A = andA(fetch());
+    A = andA(fetch());
     return context.instruction.tStates();
   }
 
   int xorAn(InstructionContext context) {
-    registers.A = xorA(fetch());
+    A = xorA(fetch());
     return context.instruction.tStates();
   }
 
   int orAn(InstructionContext context) {
-    registers.A = orA(fetch());
+    A = orA(fetch());
     return context.instruction.tStates();
   }
 
@@ -782,7 +840,7 @@ class Z80a {
   int ldR8R8(InstructionContext context) {
     int r8Dest = Registers.rBit345(context.opcode);
     int r8Source = Registers.rBit012(context.opcode);
-    this.setR8Value(r8Dest, r8Value(r8Source));
+    setR8Value(r8Dest, r8Value(r8Source));
     return context.instruction.tStates();
   }
 
@@ -794,75 +852,71 @@ class Z80a {
 
   int inR8C(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
-    var result = this.ports.inPort(registers.BC);
+    var result = ports.inPort(BC);
     setR8Value(r8, result);
     setZeroAndSignFlagsOn8BitResult(result);
-    registers.parityOverflowFlag = parity(result);
-    registers.addSubtractFlag = false;
-    registers.halfCarryFlag = false;
+    parityOverflowFlag = parity(result);
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     return context.instruction.tStates();
   }
 
   int outCR8(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
-    this.ports.outPort(registers.BC, r8Value(r8));
+    ports.outPort(BC, r8Value(r8));
     return context.instruction.tStates();
   }
 
   int sbcHLR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     int value = r16Value(r16);
-    int cf = (registers.carryFlag ? 1 : 0);
-    var result = registers.HL - value - cf;
-    registers.parityOverflowFlag =
-        (((registers.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
-            (value & 0x8000 != (result & 0x8000));
-    registers.carryFlag = result < 0;
-    registers.halfCarryFlag =
-        (registers.HL & 0x0FFF) - (value & 0x0FFF) - cf < 0x00;
-    registers.addSubtractFlag = true;
-    registers.HL = word(result);
-    setZeroAndSignFlagsOn16BitResult(registers.HL);
+    int cf = (carryFlag ? 1 : 0);
+    var result = HL - value - cf;
+    parityOverflowFlag = (((HL & 0x8000) ^ (value & 0x8000)) == 0) &&
+        (value & 0x8000 != (result & 0x8000));
+    carryFlag = result < 0;
+    halfCarryFlag = (HL & 0x0FFF) - (value & 0x0FFF) - cf < 0x00;
+    addSubtractFlag = true;
+    HL = word(result);
+    setZeroAndSignFlagsOn16BitResult(HL);
     return context.instruction.tStates();
   }
 
   int adcHLR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     int value = r16Value(r16);
-    int cf = (registers.carryFlag ? 1 : 0);
-    var result = registers.HL + value + cf;
-    registers.parityOverflowFlag =
-        (((registers.HL & 0x8000) ^ (value & 0x8000)) == 0) &&
-            (value & 0x8000 != (result & 0x8000));
-    registers.carryFlag = result > 65535;
-    registers.halfCarryFlag =
-        (registers.HL & 0x0FFF) + (value & 0x0FFF) + cf > 0x0FFF;
-    registers.addSubtractFlag = false;
-    registers.HL = word(result);
-    setZeroAndSignFlagsOn16BitResult(registers.HL);
+    int cf = (carryFlag ? 1 : 0);
+    var result = HL + value + cf;
+    parityOverflowFlag = (((HL & 0x8000) ^ (value & 0x8000)) == 0) &&
+        (value & 0x8000 != (result & 0x8000));
+    carryFlag = result > 65535;
+    halfCarryFlag = (HL & 0x0FFF) + (value & 0x0FFF) + cf > 0x0FFF;
+    addSubtractFlag = false;
+    HL = word(result);
+    setZeroAndSignFlagsOn16BitResult(HL);
     return context.instruction.tStates();
   }
 
   int ldmnnR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
-    this.memory.poke2(fetch2(), r16Value(r16));
+    memory.poke2(fetch2(), r16Value(r16));
     return context.instruction.tStates();
   }
 
   int ldR16mnn(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
     var a = fetch2();
-    setR16Value(r16, this.memory.peek2(a));
+    setR16Value(r16, memory.peek2(a));
     return context.instruction.tStates();
   }
 
   int neg(InstructionContext context) {
-    registers.carryFlag = registers.A != 0;
-    registers.parityOverflowFlag = registers.A == 0x80;
-    registers.halfCarryFlag = registers.A != 0;
-    registers.addSubtractFlag = true;
-    var result = byte(0 - registers.A);
-    registers.A = result;
+    carryFlag = A != 0;
+    parityOverflowFlag = A == 0x80;
+    halfCarryFlag = A != 0;
+    addSubtractFlag = true;
+    var result = byte(0 - A);
+    A = result;
     setZeroAndSignFlagsOn8BitResult(result);
     return context.instruction.tStates();
   }
@@ -870,12 +924,12 @@ class Z80a {
   int callnn(InstructionContext context) {
     var address = fetch2();
     push2(PC);
-    this.PC = address;
+    PC = address;
     return context.instruction.tStates();
   }
 
   int ret(InstructionContext context) {
-    this.PC = pop2();
+    PC = pop2();
     return context.instruction.tStates();
   }
 
@@ -883,7 +937,7 @@ class Z80a {
   int reti(InstructionContext context) => ret(context);
 
   int jpnn(InstructionContext context) {
-    this.PC = fetch2();
+    PC = fetch2();
     return context.instruction.tStates();
   }
 
@@ -892,7 +946,7 @@ class Z80a {
     var address = fetch2();
     if (cond) {
       push2(PC);
-      this.PC = address;
+      PC = address;
     }
     return context.instruction.tStates(cond: cond);
   }
@@ -900,7 +954,7 @@ class Z80a {
   int retcc(InstructionContext context) {
     var cond = getFlagCondition(bit345(context.opcode));
     if (cond) {
-      this.PC = pop2();
+      PC = pop2();
     }
     return context.instruction.tStates(cond: cond);
   }
@@ -909,57 +963,57 @@ class Z80a {
     var cond = getFlagCondition(bit345(context.opcode));
     var address = fetch2();
     if (cond) {
-      this.PC = address;
+      PC = address;
     }
     return context.instruction.tStates(cond: cond);
   }
 
   int outnA(InstructionContext context) {
-    var port = w(fetch(), registers.A);
-    this.ports.outPort(port, registers.A);
+    var port = w(fetch(), A);
+    ports.outPort(port, A);
     return context.instruction.tStates();
   }
 
   int inAn(InstructionContext context) {
-    var port = w(fetch(), registers.A);
-    registers.A = this.ports.inPort(port);
+    var port = w(fetch(), A);
+    A = ports.inPort(port);
     return context.instruction.tStates();
   }
 
   int exx(InstructionContext context) {
-    var bc = registers.BC;
-    var de = registers.DE;
-    var hl = registers.HL;
-    registers.BC = registers.BCt;
-    registers.DE = registers.DEt;
-    registers.HL = registers.HLt;
-    registers.BCt = bc;
-    registers.DEt = de;
-    registers.HLt = hl;
+    var bc = BC;
+    var de = DE;
+    var hl = HL;
+    BC = BCt;
+    DE = DEt;
+    HL = HLt;
+    BCt = bc;
+    DEt = de;
+    HLt = hl;
     return context.instruction.tStates();
   }
 
   int exSPHL(InstructionContext context) {
-    var msp = this.memory.peek2(registers.SP);
-    this.memory.poke2(registers.SP, registers.HL);
-    registers.HL = msp;
+    var msp = memory.peek2(SP);
+    memory.poke2(SP, HL);
+    HL = msp;
     return context.instruction.tStates();
   }
 
   int jpmHL(InstructionContext context) {
-    this.PC = registers.HL;
+    PC = HL;
     return context.instruction.tStates();
   }
 
   int exDEHL(InstructionContext context) {
-    var de = registers.DE;
-    registers.DE = registers.HL;
-    registers.HL = de;
+    var de = DE;
+    DE = HL;
+    HL = de;
     return context.instruction.tStates();
   }
 
   int ldSPHL(InstructionContext context) {
-    registers.SP = registers.HL;
+    SP = HL;
     return context.instruction.tStates();
   }
 
@@ -977,8 +1031,8 @@ class Z80a {
 
   int rstNN(InstructionContext context) {
     var rst = context.opcode & 0x38;
-    push2(this.PC);
-    this.PC = rst;
+    push2(PC);
+    PC = rst;
     return context.instruction.tStates();
   }
 
@@ -988,12 +1042,12 @@ class Z80a {
   }
 
   int ldmnnIXY(InstructionContext context) {
-    this.memory.poke2(fetch2(), getIXY(context.prefix));
+    memory.poke2(fetch2(), getIXY(context.prefix));
     return context.instruction.tStates();
   }
 
   int ldIXYmnn(InstructionContext context) {
-    setIXY(context.prefix, this.memory.peek2(fetch2()));
+    setIXY(context.prefix, memory.peek2(fetch2()));
     return context.instruction.tStates();
   }
 
@@ -1010,69 +1064,69 @@ class Z80a {
   int ldmIXYdn(InstructionContext context) {
     var d = fetch();
     var value = fetch();
-    this.memory.poke(iXYDisp(context.prefix, d), value);
+    memory.poke(iXYDisp(context.prefix, d), value);
     return context.instruction.tStates();
   }
 
   int ldR8mIXYd(InstructionContext context) {
     int r8 = Registers.rBit345(context.opcode);
     int d = fetch();
-    setR8Value(r8, this.memory.peek(iXYDisp(context.prefix, d)));
+    setR8Value(r8, memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int ldmIXYdR8(InstructionContext context) {
     int r8 = Registers.rBit012(context.opcode);
     int d = fetch();
-    this.memory.poke(iXYDisp(context.prefix, d), r8Value(r8));
+    memory.poke(iXYDisp(context.prefix, d), r8Value(r8));
     return context.instruction.tStates();
   }
 
   int addAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = addA(this.memory.peek(iXYDisp(context.prefix, d)));
+    A = addA(memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int adcAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = adcA(this.memory.peek(iXYDisp(context.prefix, d)));
+    A = adcA(memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int subAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = subA(this.memory.peek(iXYDisp(context.prefix, d)));
+    A = subA(memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int sbcAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = sbcA(this.memory.peek(iXYDisp(context.prefix, d)));
+    A = sbcA(memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int andAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = andA(this.memory.peek(iXYDisp(context.prefix, d)));
+    A = andA(memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int xorAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = xorA(this.memory.peek(iXYDisp(context.prefix, d)));
+    A = xorA(memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int orAIXYd(InstructionContext context) {
     var d = fetch();
-    registers.A = orA(this.memory.peek(iXYDisp(context.prefix, d)));
+    A = orA(memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int cpAIXYd(InstructionContext context) {
     var d = fetch();
-    cpA(this.memory.peek(iXYDisp(context.prefix, d)));
+    cpA(memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
@@ -1087,75 +1141,75 @@ class Z80a {
   }
 
   int jpmIXY(InstructionContext context) {
-    this.PC = getIXY(context.prefix);
+    PC = getIXY(context.prefix);
     return context.instruction.tStates();
   }
 
   int exmSPIXY(InstructionContext context) {
-    var msp = this.memory.peek2(registers.SP);
-    this.memory.poke2(registers.SP, getIXY(context.prefix));
+    var msp = memory.peek2(SP);
+    memory.poke2(SP, getIXY(context.prefix));
     setIXY(context.prefix, msp);
     return context.instruction.tStates();
   }
 
   int ldSPIXY(InstructionContext context) {
-    registers.SP = getIXY(context.prefix);
+    SP = getIXY(context.prefix);
     return context.instruction.tStates();
   }
 
   int rlcMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = iXYDisp(context.prefix, d);
-    this.memory.poke(address, rlc(this.memory.peek(address)));
+    memory.poke(address, rlc(memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int rrcMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = iXYDisp(context.prefix, d);
-    this.memory.poke(address, rrc(this.memory.peek(address)));
+    memory.poke(address, rrc(memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int rlMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = iXYDisp(context.prefix, d);
-    this.memory.poke(address, rl(this.memory.peek(address)));
+    memory.poke(address, rl(memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int rrMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = iXYDisp(context.prefix, d);
-    this.memory.poke(address, rr(this.memory.peek(address)));
+    memory.poke(address, rr(memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int slaMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = iXYDisp(context.prefix, d);
-    this.memory.poke(address, sla(this.memory.peek(address)));
+    memory.poke(address, sla(memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int sraMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = iXYDisp(context.prefix, d);
-    this.memory.poke(address, sra(this.memory.peek(address)));
+    memory.poke(address, sra(memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int srlMIXYd(InstructionContext context) {
     var d = context.displacement;
     var address = iXYDisp(context.prefix, d);
-    this.memory.poke(address, srl(this.memory.peek(address)));
+    memory.poke(address, srl(memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int bitnMIXYd(InstructionContext context) {
     var d = context.displacement;
     var bit = bit345(context.opcode);
-    bitNR8Op(bit, this.memory.peek(iXYDisp(context.prefix, d)));
+    bitNR8Op(bit, memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
@@ -1163,7 +1217,7 @@ class Z80a {
     var d = context.displacement;
     var bit = bit345(context.opcode);
     var address = iXYDisp(context.prefix, d);
-    this.memory.poke(address, resNR8Op(bit, this.memory.peek(address)));
+    memory.poke(address, resNR8Op(bit, memory.peek(address)));
     return context.instruction.tStates();
   }
 
@@ -1171,7 +1225,7 @@ class Z80a {
     var d = context.displacement;
     var bit = bit345(context.opcode);
     var address = iXYDisp(context.prefix, d);
-    this.memory.poke(address, setNR8Op(bit, this.memory.peek(address)));
+    memory.poke(address, setNR8Op(bit, memory.peek(address)));
     return context.instruction.tStates();
   }
 
@@ -1197,224 +1251,224 @@ class Z80a {
   }
 
   int im0(InstructionContext context) {
-    this._interruptMode = InterruptMode.im0;
+    _interruptMode = InterruptMode.im0;
     return context.instruction.tStates();
   }
 
   int im1(InstructionContext context) {
-    this._interruptMode = InterruptMode.im1;
+    _interruptMode = InterruptMode.im1;
     return context.instruction.tStates();
   }
 
   int im2(InstructionContext context) {
-    this._interruptMode = InterruptMode.im2;
+    _interruptMode = InterruptMode.im2;
     return context.instruction.tStates();
   }
 
   int di(InstructionContext context) {
-    this.interruptsEnabled = false;
+    interruptsEnabled = false;
     return context.instruction.tStates();
   }
 
   int ei(InstructionContext context) {
-    this.interruptsEnabled = true;
+    interruptsEnabled = true;
     return context.instruction.tStates();
   }
 
   int halt(InstructionContext context) {
-    this.halted = true;
+    halted = true;
     return context.instruction.tStates();
   }
 
   int ldAI(InstructionContext context) {
-    this.registers.A = this.registers.I;
-    setZeroAndSignFlagsOn8BitResult(this.registers.A);
-    this.registers.addSubtractFlag = false;
-    this.registers.halfCarryFlag = false;
+    A = I;
+    setZeroAndSignFlagsOn8BitResult(A);
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     return context.instruction.tStates();
   }
 
   int ldIA(InstructionContext context) {
-    this.registers.I = this.registers.A;
+    I = A;
     return context.instruction.tStates();
   }
 
   int ldAR(InstructionContext context) {
-    this.registers.A = this.registers.R;
-    setZeroAndSignFlagsOn8BitResult(this.registers.A);
-    this.registers.addSubtractFlag = false;
-    this.registers.halfCarryFlag = false;
+    A = R;
+    setZeroAndSignFlagsOn8BitResult(A);
+    addSubtractFlag = false;
+    halfCarryFlag = false;
     return context.instruction.tStates();
   }
 
   int ldRA(InstructionContext context) {
-    this.registers.R = this.registers.A;
+    R = A;
     return context.instruction.tStates();
   }
 
   int rld(InstructionContext context) {
-    int v1 = this.registers.A;
-    int v2 = this.memory.peek(this.registers.HL);
+    int v1 = A;
+    int v2 = memory.peek(HL);
 
-    this.registers.A = (v1 & 0xF0) | ((v2 & 0xF0) >> 4);
-    this.memory.poke(this.registers.HL, (v2 << 4) | (v1 & 0x0F));
+    A = (v1 & 0xF0) | ((v2 & 0xF0) >> 4);
+    memory.poke(HL, (v2 << 4) | (v1 & 0x0F));
 
-    this.registers.halfCarryFlag = false;
-    this.registers.addSubtractFlag = false;
-    this.registers.parityOverflowFlag = parity(this.registers.A);
-    setZeroAndSignFlagsOn8BitResult(this.registers.A);
+    halfCarryFlag = false;
+    addSubtractFlag = false;
+    parityOverflowFlag = parity(A);
+    setZeroAndSignFlagsOn8BitResult(A);
 
     return context.instruction.tStates();
   }
 
   int rrd(InstructionContext context) {
-    int v1 = this.registers.A;
-    int v2 = this.memory.peek(this.registers.HL);
+    int v1 = A;
+    int v2 = memory.peek(HL);
 
-    this.registers.A = (v1 & 0xF0) | (v2 & 0x0F);
-    this.memory.poke(this.registers.HL, (v2 >> 4) | ((v1 & 0x0F) << 4));
+    A = (v1 & 0xF0) | (v2 & 0x0F);
+    memory.poke(HL, (v2 >> 4) | ((v1 & 0x0F) << 4));
 
-    this.registers.halfCarryFlag = false;
-    this.registers.addSubtractFlag = false;
-    this.registers.parityOverflowFlag = parity(this.registers.A);
-    setZeroAndSignFlagsOn8BitResult(this.registers.A);
+    halfCarryFlag = false;
+    addSubtractFlag = false;
+    parityOverflowFlag = parity(A);
+    setZeroAndSignFlagsOn8BitResult(A);
 
     return context.instruction.tStates();
   }
 
   int ldi(InstructionContext context) {
-    this.memory.poke(this.registers.DE, this.memory.peek(this.registers.HL));
-    this.registers.HL = this.registers.HL + 1;
-    this.registers.DE = this.registers.DE + 1;
-    this.registers.BC = this.registers.BC - 1;
-    this.registers.halfCarryFlag = false;
-    this.registers.addSubtractFlag = false;
-    this.registers.parityOverflowFlag = this.registers.BC != 0;
+    memory.poke(DE, memory.peek(HL));
+    HL = HL + 1;
+    DE = DE + 1;
+    BC = BC - 1;
+    halfCarryFlag = false;
+    addSubtractFlag = false;
+    parityOverflowFlag = BC != 0;
     return context.instruction.tStates();
   }
 
   int ldd(InstructionContext context) {
-    this.memory.poke(this.registers.DE, this.memory.peek(this.registers.HL));
-    this.registers.HL = this.registers.HL - 1;
-    this.registers.DE = this.registers.DE - 1;
-    this.registers.BC = this.registers.BC - 1;
-    this.registers.halfCarryFlag = false;
-    this.registers.addSubtractFlag = false;
-    this.registers.parityOverflowFlag = this.registers.BC != 0;
+    memory.poke(DE, memory.peek(HL));
+    HL = HL - 1;
+    DE = DE - 1;
+    BC = BC - 1;
+    halfCarryFlag = false;
+    addSubtractFlag = false;
+    parityOverflowFlag = BC != 0;
     return context.instruction.tStates();
   }
 
   int cpi(InstructionContext context) {
-    subA(this.memory.peek(this.registers.HL));
-    this.registers.HL = this.registers.HL + 1;
-    this.registers.BC = this.registers.BC - 1;
-    this.registers.addSubtractFlag = false;
-    this.registers.parityOverflowFlag = this.registers.BC != 0;
+    subA(memory.peek(HL));
+    HL = HL + 1;
+    BC = BC - 1;
+    addSubtractFlag = false;
+    parityOverflowFlag = BC != 0;
     return context.instruction.tStates();
   }
 
   int cpd(InstructionContext context) {
-    subA(this.memory.peek(this.registers.HL));
-    this.registers.HL = this.registers.HL - 1;
-    this.registers.BC = this.registers.BC - 1;
-    this.registers.addSubtractFlag = false;
-    this.registers.parityOverflowFlag = this.registers.BC != 0;
+    subA(memory.peek(HL));
+    HL = HL - 1;
+    BC = BC - 1;
+    addSubtractFlag = false;
+    parityOverflowFlag = BC != 0;
     return context.instruction.tStates();
   }
 
   int ini(InstructionContext context) {
-    this.memory.poke(this.registers.HL, this.ports.inPort(registers.C));
-    this.registers.HL = this.registers.HL + 1;
-    this.registers.B = this.registers.B - 1;
-    this.registers.addSubtractFlag = true;
-    this.registers.zeroFlag = this.registers.B == 0;
+    memory.poke(HL, ports.inPort(C));
+    HL = HL + 1;
+    B = B - 1;
+    addSubtractFlag = true;
+    zeroFlag = B == 0;
     return context.instruction.tStates();
   }
 
   int ind(InstructionContext context) {
-    this.memory.poke(this.registers.HL, this.ports.inPort(registers.C));
-    this.registers.HL = this.registers.HL - 1;
-    this.registers.B = this.registers.B - 1;
-    this.registers.addSubtractFlag = true;
-    this.registers.zeroFlag = this.registers.B == 0;
+    memory.poke(HL, ports.inPort(C));
+    HL = HL - 1;
+    B = B - 1;
+    addSubtractFlag = true;
+    zeroFlag = B == 0;
     return context.instruction.tStates();
   }
 
   int outi(InstructionContext context) {
-    this.ports.outPort(registers.C, this.memory.peek(this.registers.HL));
-    this.registers.HL = this.registers.HL + 1;
-    this.registers.B = this.registers.B - 1;
-    this.registers.addSubtractFlag = true;
-    this.registers.zeroFlag = this.registers.B == 0;
+    ports.outPort(C, memory.peek(HL));
+    HL = HL + 1;
+    B = B - 1;
+    addSubtractFlag = true;
+    zeroFlag = B == 0;
     return context.instruction.tStates();
   }
 
   int outd(InstructionContext context) {
-    this.ports.outPort(registers.C, this.memory.peek(this.registers.HL));
-    this.registers.HL = this.registers.HL - 1;
-    this.registers.B = this.registers.B - 1;
-    this.registers.addSubtractFlag = true;
-    this.registers.zeroFlag = this.registers.B == 0;
+    ports.outPort(C, memory.peek(HL));
+    HL = HL - 1;
+    B = B - 1;
+    addSubtractFlag = true;
+    zeroFlag = B == 0;
     return context.instruction.tStates();
   }
 
   int ldir(InstructionContext context) {
     ldi(context);
-    var cond = this.registers.BC == 0;
-    if (!cond) this.PC = this.PC - 2;
+    var cond = BC == 0;
+    if (!cond) PC = PC - 2;
     return context.instruction.tStates(cond: cond);
   }
 
   int lddr(InstructionContext context) {
     ldd(context);
-    var cond = this.registers.BC == 0;
-    if (!cond) this.PC = this.PC - 2;
+    var cond = BC == 0;
+    if (!cond) PC = PC - 2;
     return context.instruction.tStates(cond: cond);
   }
 
   int cpir(InstructionContext context) {
     cpi(context);
-    var cond = this.registers.BC == 0 || this.registers.zeroFlag;
-    if (!cond) this.PC = this.PC - 2;
+    var cond = BC == 0 || zeroFlag;
+    if (!cond) PC = PC - 2;
     return context.instruction.tStates(cond: cond);
   }
 
   int cpdr(InstructionContext context) {
     cpd(context);
-    var cond = this.registers.BC == 0 || this.registers.zeroFlag;
-    if (!cond) this.PC = this.PC - 2;
+    var cond = BC == 0 || zeroFlag;
+    if (!cond) PC = PC - 2;
     return context.instruction.tStates(cond: cond);
   }
 
   int inir(InstructionContext context) {
     ini(context);
-    this.registers.zeroFlag = true;
-    var cond = this.registers.B == 0;
-    if (!cond) this.PC = this.PC - 2;
+    zeroFlag = true;
+    var cond = B == 0;
+    if (!cond) PC = PC - 2;
     return context.instruction.tStates(cond: cond);
   }
 
   int indr(InstructionContext context) {
     ind(context);
-    this.registers.zeroFlag = true;
-    var cond = this.registers.B == 0;
-    if (!cond) this.PC = this.PC - 2;
+    zeroFlag = true;
+    var cond = B == 0;
+    if (!cond) PC = PC - 2;
     return context.instruction.tStates(cond: cond);
   }
 
   int otir(InstructionContext context) {
     outi(context);
-    this.registers.zeroFlag = true;
-    var cond = this.registers.B == 0;
-    if (!cond) this.PC = this.PC - 2;
+    zeroFlag = true;
+    var cond = B == 0;
+    if (!cond) PC = PC - 2;
     return context.instruction.tStates(cond: cond);
   }
 
   int otdr(InstructionContext context) {
     outd(context);
-    this.registers.zeroFlag = true;
-    var cond = this.registers.B == 0;
-    if (!cond) this.PC = this.PC - 2;
+    zeroFlag = true;
+    var cond = B == 0;
+    if (!cond) PC = PC - 2;
     return context.instruction.tStates(cond: cond);
   }
 
@@ -1625,14 +1679,14 @@ class Z80a {
     switch (interruptMode) {
       case InterruptMode.im1:
         interruptsEnabled = false;
-        push2(this.PC);
-        this.PC = 0x38;
+        push2(PC);
+        PC = 0x38;
         break;
 
       case InterruptMode.im2:
         interruptsEnabled = false;
-        push2(this.PC);
-        this.PC = this.memory.peek2(this.registers.I * 256 + 254);
+        push2(PC);
+        PC = memory.peek2(I * 256 + 254);
         break;
 
       default:
