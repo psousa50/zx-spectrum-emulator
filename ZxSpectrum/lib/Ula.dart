@@ -71,9 +71,9 @@ class Ula with PortHandler {
       int p = 0;
       for (var spectrumColor in SpectrumColors) {
         var rgb = spectrumColor.toRgbColor();
-        palette[p++] = rgb.r;
-        palette[p++] = rgb.g;
         palette[p++] = rgb.b;
+        palette[p++] = rgb.g;
+        palette[p++] = rgb.r;
         palette[p++] = 0;
       }
     }
