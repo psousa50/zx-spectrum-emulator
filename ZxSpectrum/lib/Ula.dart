@@ -138,5 +138,9 @@ class Ula with PortHandler {
   }
 
   @override
-  void write(int port, int value) {}
+  void write(int port, int value) {
+    if (port & 0xFF == 0xFE) {
+      borderColor = SpectrumColors[value & 0x07];
+    }
+  }
 }

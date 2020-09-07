@@ -31,4 +31,18 @@ void main() {
 
     expect(ula.read(0xF7FD), 0x00);
   });
+
+  test("Reading from port other that 0xFE should returning 0", () {
+    var ula = newUla();
+
+    expect(ula.read(0xF7FD), 0x00);
+  });
+
+  test("Writing to port 0xFE should changer the border color", () {
+    var ula = newUla();
+
+    ula.write(0xFE, 2);
+
+    expect(ula.borderColor, SpectrumColors[2]);
+  });
 }
