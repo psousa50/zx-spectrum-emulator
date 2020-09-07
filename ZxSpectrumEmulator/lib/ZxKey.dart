@@ -4,24 +4,23 @@ import 'package:ZxSpectrum/ZxKeys.dart';
 
 typedef void OnKeyEvent(ZxKey zxKey, bool pressed);
 
-class ZxSpectrumKeyView extends StatefulWidget {
+class ZxKeyView extends StatefulWidget {
   final String text;
   final ZxKey zxKey;
   final OnKeyEvent onKeyEvent;
 
   final bool toggle;
 
-  ZxSpectrumKeyView(this.text, this.zxKey, this.onKeyEvent,
-      {this.toggle = false});
+  ZxKeyView(this.text, this.zxKey, this.onKeyEvent, {this.toggle = false});
 
   @override
-  _ZxSpectrumKeyViewState createState() => _ZxSpectrumKeyViewState();
+  _ZxKeyViewState createState() => _ZxKeyViewState();
 }
 
-class _ZxSpectrumKeyViewState extends State<ZxSpectrumKeyView> {
+class _ZxKeyViewState extends State<ZxKeyView> {
   bool pressed = false;
 
-  _ZxSpectrumKeyViewState();
+  _ZxKeyViewState();
 
   @override
   Widget build(BuildContext context) {

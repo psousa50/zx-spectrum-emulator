@@ -1,4 +1,3 @@
-import 'package:Z80a/Ports.dart';
 import 'package:Z80a/Cpu/Registers.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -124,7 +123,7 @@ class Scenario {
         reason: '${scenarioName(opcodes)}\nReason: RAM is wrong');
 
     expectedState.outPorts.forEach((port, value) {
-      expect(z80a.ports.readOutPort(port), value,
+      expect(ports.readOutPort(port), value,
           reason: '${scenarioName(opcodes)}\nReason: OutPort $port is wrong');
     });
 
@@ -173,7 +172,7 @@ class Scenario {
     return MemoryTest.fromBytes(memory);
   }
 
-  Ports setupPorts() {
+  PortsTest setupPorts() {
     var ports = PortsTest();
     initialState.inPorts.forEach((port, value) {
       ports.writeInPort(port, value);

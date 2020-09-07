@@ -14,10 +14,8 @@ class PortsTest extends Ports {
     outPorts[port] = value;
   }
 
-  @override
   int readOutPort(int port) => outPorts[port];
 
-  @override
   void writeInPort(int port, int value) {
     inPorts[port] = value;
   }
