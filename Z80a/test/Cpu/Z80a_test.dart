@@ -1,9 +1,9 @@
 import 'dart:typed_data';
+import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Z80a/Cpu/Registers.dart';
 import 'package:Z80a/Cpu/Z80Assembler.dart';
 import 'package:Z80a/Util.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:Z80a/Cpu/Z80a.dart';
 import '../MemoryTest.dart';
 import '../PortsTest.dart';
