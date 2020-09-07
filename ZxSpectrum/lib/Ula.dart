@@ -1,25 +1,25 @@
 import 'dart:typed_data';
-
-import 'package:Z80a/Memory.dart';
 import 'package:color/color.dart';
 
+import 'package:Z80a/Memory.dart';
+
 const SpectrumColors = [
-  '000000',
-  '0000D7',
-  'D70000',
-  'D700D7',
-  '00D700',
-  '00D7D7',
-  'D7D700',
-  'D7D7D7',
-  '000000',
-  '0000FF',
-  'FF0000',
-  'FF00FF',
-  '00FF00',
-  '00FFFF',
-  'FFFF00',
-  'FFFFFF',
+  Color.rgb(0x00, 0x00, 0x00),
+  Color.rgb(0x00, 0x00, 0xD7),
+  Color.rgb(0xD7, 0x00, 0x00),
+  Color.rgb(0xD7, 0x00, 0xD7),
+  Color.rgb(0x00, 0xD7, 0x00),
+  Color.rgb(0x00, 0xD7, 0xD7),
+  Color.rgb(0xD7, 0xD7, 0x00),
+  Color.rgb(0xD7, 0xD7, 0xD7),
+  Color.rgb(0x00, 0x00, 0x00),
+  Color.rgb(0x00, 0x00, 0xFF),
+  Color.rgb(0xFF, 0x00, 0x00),
+  Color.rgb(0xFF, 0x00, 0xFF),
+  Color.rgb(0x00, 0xFF, 0x00),
+  Color.rgb(0x00, 0xFF, 0xFF),
+  Color.rgb(0xFF, 0xFF, 0x00),
+  Color.rgb(0xFF, 0xFF, 0xFF),
 ];
 
 class Ula {
@@ -27,6 +27,8 @@ class Ula {
 
   Uint8List screen;
   Memory memory;
+
+  Color borderColor = Color.rgb(0, 0, 0);
 
   static const screenWidth = 256;
   static const screenHeight = 192;
@@ -44,9 +46,10 @@ class Ula {
       palette = Uint8List(paletteSize);
       int p = 0;
       for (var spectrumColor in SpectrumColors) {
-        palette[p++] = HexColor(spectrumColor).r;
-        palette[p++] = HexColor(spectrumColor).g;
-        palette[p++] = HexColor(spectrumColor).b;
+        var rgb = spectrumColor.toRgbColor();
+        palette[p++] = rgb.r;
+        palette[p++] = rgb.g;
+        palette[p++] = rgb.b;
         palette[p++] = 0;
       }
     }
