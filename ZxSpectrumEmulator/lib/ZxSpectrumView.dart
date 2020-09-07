@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:ZxSpectrum/Util.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:ZxSpectrumEmulator/Keyboard.dart';
 import 'package:flutter/services.dart';
@@ -54,17 +55,9 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   Widget build(BuildContext context) {
     return Column(children: [
       SizedBox(height: 30),
-      if (screen != null) Display(screen),
+      if (screen != null) Display(screen, zxSpectrum.ula.borderColor),
       SizedBox(height: 30),
       Keyboard(onKeyEvent),
-      RaisedButton(
-        onPressed: () {
-          zxSpectrum.startLog();
-        },
-        child: Text(
-          "Log",
-        ),
-      )
     ]);
   }
 }

@@ -11,8 +11,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  Z80a:
-    path: ../Z80a
   ZxSpectrum:
     path: ../ZxSpectrum
   cupertino_icons: ^0.1.3

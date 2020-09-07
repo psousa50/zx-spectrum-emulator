@@ -22,11 +22,118 @@ const SpectrumColors = [
   Color.rgb(0xFF, 0xFF, 0xFF),
 ];
 
+class KeyInfo {
+  final int address;
+  final int bitMask;
+
+  KeyInfo(this.address, this.bitMask);
+}
+
+enum Keys {
+  K_1,
+  K_2,
+  K_3,
+  K_4,
+  K_5,
+  K_6,
+  K_7,
+  K_8,
+  K_9,
+  K_0,
+
+  K_Q,
+  K_W,
+  K_E,
+  K_R,
+  K_T,
+  K_Y,
+  K_U,
+  K_I,
+  K_O,
+  K_P,
+
+  K_A,
+  K_S,
+  K_D,
+  K_F,
+  K_G,
+  K_H,
+  K_J,
+  K_K,
+  K_L,
+  K_ENTER,
+
+  K_CAPS,
+  K_Z,
+  K_X,
+  K_C,
+  K_V,
+  K_B,
+  K_N,
+  K_M,
+  K_SYM,
+  K_SPACE,
+}
+
+var keys = {
+  Keys.K_1: KeyInfo(0xF7FE, 0x01),
+  Keys.K_2: KeyInfo(0xF7FE, 0x02),
+  Keys.K_3: KeyInfo(0xF7FE, 0x04),
+  Keys.K_4: KeyInfo(0xF7FE, 0x08),
+  Keys.K_5: KeyInfo(0xF7FE, 0x10),
+  Keys.K_6: KeyInfo(0xEFFE, 0x10),
+  Keys.K_7: KeyInfo(0xEFFE, 0x08),
+  Keys.K_8: KeyInfo(0xEFFE, 0x04),
+  Keys.K_9: KeyInfo(0xEFFE, 0x02),
+  Keys.K_0: KeyInfo(0xEFFE, 0x01),
+  Keys.K_Q: KeyInfo(0xFBFE, 0x01),
+  Keys.K_W: KeyInfo(0xFBFE, 0x02),
+  Keys.K_E: KeyInfo(0xFBFE, 0x04),
+  Keys.K_R: KeyInfo(0xFBFE, 0x08),
+  Keys.K_T: KeyInfo(0xFBFE, 0x10),
+  Keys.K_Y: KeyInfo(0xDFFE, 0x10),
+  Keys.K_U: KeyInfo(0xDFFE, 0x08),
+  Keys.K_I: KeyInfo(0xDFFE, 0x04),
+  Keys.K_O: KeyInfo(0xDFFE, 0x02),
+  Keys.K_P: KeyInfo(0xDFFE, 0x01),
+  Keys.K_A: KeyInfo(0xFDFE, 0x01),
+  Keys.K_S: KeyInfo(0xFDFE, 0x02),
+  Keys.K_D: KeyInfo(0xFDFE, 0x04),
+  Keys.K_F: KeyInfo(0xFDFE, 0x08),
+  Keys.K_G: KeyInfo(0xFDFE, 0x10),
+  Keys.K_H: KeyInfo(0xBFFE, 0x10),
+  Keys.K_J: KeyInfo(0xBFFE, 0x08),
+  Keys.K_K: KeyInfo(0xBFFE, 0x04),
+  Keys.K_L: KeyInfo(0xBFFE, 0x02),
+  Keys.K_ENTER: KeyInfo(0xBFFE, 0x01),
+  Keys.K_CAPS: KeyInfo(0xFEFE, 0x01),
+  Keys.K_Z: KeyInfo(0xFEFE, 0x02),
+  Keys.K_X: KeyInfo(0xFEFE, 0x04),
+  Keys.K_C: KeyInfo(0xFEFE, 0x08),
+  Keys.K_V: KeyInfo(0xFEFE, 0x10),
+  Keys.K_B: KeyInfo(0x7FFE, 0x10),
+  Keys.K_N: KeyInfo(0x7FFE, 0x08),
+  Keys.K_M: KeyInfo(0x7FFE, 0x04),
+  Keys.K_SYM: KeyInfo(0x7FFE, 0x02),
+  Keys.K_SPACE: KeyInfo(0x7FFE, 0x01),
+};
+
 class Ula {
   static Uint8List palette;
 
   Uint8List screen;
   Memory memory;
+
+  var keyStates = {
+    0xF7FE: 0xFF,
+    0xEFFE: 0xFF,
+    0xFBFE: 0xFF,
+    0xDFFE: 0xFF,
+    0xFDFE: 0xFF,
+    0xBFFE: 0xFF,
+    0xFEFE: 0xFF,
+    0x7FFE: 0xFF,
+  };
 
   Color borderColor = Color.rgb(0, 0, 0);
 
@@ -39,6 +146,21 @@ class Ula {
 
   void refreshScreen(int currentFrame) {
     screen = buildImage(memory.range(16384, end: 16384 + 6912), currentFrame);
+  }
+
+  void keyDown(Keys key) {
+    var k = keys[key];
+    keyStates[k.address] = keyStates[k.address] & (0xFF ^ k.bitMask);
+  }
+
+  void keyUp(Keys key) {
+    var k = keys[key];
+    keyStates[k.address] = keyStates[k.address] | (k.bitMask);
+  }
+
+  int inPort(int address) {
+    var value = keyStates[address];
+    return value == null ? 0 : value;
   }
 
   Uint8List buildImage(Uint8List zxScreen, int currentFrame) {
