@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:ZxSpectrum/Ula.dart';
+import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:ZxSpectrumEmulator/Keyboard.dart';
 import 'package:flutter/services.dart';
@@ -41,7 +41,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     });
   }
 
-  void onKeyEvent(Keys zxKey, bool pressed) =>
+  void onKeyEvent(ZxKey zxKey, bool pressed) =>
       pressed ? zxSpectrum.ula.keyDown(zxKey) : zxSpectrum.ula.keyUp(zxKey);
 
   @override

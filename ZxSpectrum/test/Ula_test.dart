@@ -1,5 +1,6 @@
 import 'package:Z80a/Util.dart';
 import 'package:ZxSpectrum/Memory48K.dart';
+import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ZxSpectrum/Ula.dart';
@@ -10,15 +11,15 @@ void main() {
   test("Reading from port 0xFE should return key states", () {
     var ula = newUla();
 
-    ula.keyDown(Keys.K_1);
-    ula.keyDown(Keys.K_4);
-    ula.keyDown(Keys.K_SYM);
+    ula.keyDown(ZxKey.K_1);
+    ula.keyDown(ZxKey.K_4);
+    ula.keyDown(ZxKey.K_SYM);
 
     expect(ula.inPort(0xF7FE), binary("11110110"));
     expect(ula.inPort(0x7FFE), binary("11111101"));
 
-    ula.keyUp(Keys.K_4);
-    ula.keyUp(Keys.K_SYM);
+    ula.keyUp(ZxKey.K_4);
+    ula.keyUp(ZxKey.K_SYM);
 
     expect(ula.inPort(0xF7FE), binary("11111110"));
     expect(ula.inPort(0x7FFE), binary("11111111"));

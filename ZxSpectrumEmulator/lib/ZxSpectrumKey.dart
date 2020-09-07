@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:ZxSpectrum/Ula.dart';
 
-typedef void OnKeyEvent(Keys zxKey, bool pressed);
+import 'package:ZxSpectrum/ZxKeys.dart';
+
+typedef void OnKeyEvent(ZxKey zxKey, bool pressed);
 
 class ZxSpectrumKeyView extends StatefulWidget {
   final String text;
-  final Keys zxKey;
+  final ZxKey zxKey;
   final OnKeyEvent onKeyEvent;
 
   final bool toggle;
