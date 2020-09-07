@@ -1,12 +1,12 @@
 import 'dart:typed_data';
-import 'package:ZxSpectrum/Util.dart';
+
+import 'package:ZxSpectrum/Ula.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:ZxSpectrumEmulator/Keyboard.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import 'Display.dart';
-import 'ZxSpectrumKey.dart';
 
 class ZxSpectrumView extends StatefulWidget {
   @override
@@ -41,21 +41,16 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     });
   }
 
-  void onKeyEvent(ZxSpectrumKeyState keyState) {
-    print("${keyState.text} ${keyState.pressed ? 'PRESSED' : 'NOT PRESSED'}");
-    int port = keyState.port * 256 + 0xFE;
-    int portValue = zxSpectrum.z80a.ports.inPort(port);
-    int finalPortValue = keyState.pressed
-        ? portValue & (0xFF ^ keyState.bitMask)
-        : portValue | keyState.bitMask;
-    zxSpectrum.z80a.ports.writeInPort(port, finalPortValue);
-  }
+  void onKeyEvent(Keys zxKey, bool pressed) =>
+      pressed ? zxSpectrum.ula.keyDown(zxKey) : zxSpectrum.ula.keyUp(zxKey);
 
   @override
   Widget build(BuildContext context) {
+    var rgb = zxSpectrum.ula.borderColor.toRgbColor();
+    Color borderColor = Color.fromRGBO(rgb.r, rgb.g, rgb.b, 1);
     return Column(children: [
       SizedBox(height: 30),
-      if (screen != null) Display(screen, zxSpectrum.ula.borderColor),
+      if (screen != null) Display(screen, borderColor),
       SizedBox(height: 30),
       Keyboard(onKeyEvent),
     ]);

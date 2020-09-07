@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:ZxSpectrum/Ula.dart';
 import 'ZxSpectrumKey.dart';
 
 class Keyboard extends StatelessWidget {
@@ -11,59 +12,57 @@ class Keyboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       Row(children: [
-        ZxSpectrumKeyView(ZxSpectrumKeyState("1", 0xF7, 0x01), onKeyPress),
-        ZxSpectrumKeyView(ZxSpectrumKeyState("2", 0xF7, 0x02), onKeyPress),
-        ZxSpectrumKeyView(ZxSpectrumKeyState("3", 0xF7, 0x04), onKeyPress),
-        ZxSpectrumKeyView(ZxSpectrumKeyState("4", 0xF7, 0x08), onKeyPress),
-        ZxSpectrumKeyView(ZxSpectrumKeyState("5", 0xF7, 0x10), onKeyPress),
-        ZxSpectrumKeyView(ZxSpectrumKeyState("6", 0xEF, 0x10), onKeyPress),
-        ZxSpectrumKeyView(ZxSpectrumKeyState("7", 0xEF, 0x08), onKeyPress),
-        ZxSpectrumKeyView(ZxSpectrumKeyState("8", 0xEF, 0x04), onKeyPress),
-        ZxSpectrumKeyView(ZxSpectrumKeyState("9", 0xEF, 0x02), onKeyPress),
-        ZxSpectrumKeyView(ZxSpectrumKeyState("0", 0xEF, 0x01), onKeyPress),
+        ZxSpectrumKeyView("1", Keys.K_1, onKeyPress),
+        ZxSpectrumKeyView("2", Keys.K_2, onKeyPress),
+        ZxSpectrumKeyView("3", Keys.K_3, onKeyPress),
+        ZxSpectrumKeyView("4", Keys.K_4, onKeyPress),
+        ZxSpectrumKeyView("5", Keys.K_5, onKeyPress),
+        ZxSpectrumKeyView("6", Keys.K_6, onKeyPress),
+        ZxSpectrumKeyView("7", Keys.K_7, onKeyPress),
+        ZxSpectrumKeyView("8", Keys.K_8, onKeyPress),
+        ZxSpectrumKeyView("9", Keys.K_9, onKeyPress),
+        ZxSpectrumKeyView("0", Keys.K_0, onKeyPress),
       ]),
       Row(
         children: [
-          ZxSpectrumKeyView(ZxSpectrumKeyState("Q", 0xFB, 0x01), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("W", 0xFB, 0x02), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("E", 0xFB, 0x04), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("R", 0xFB, 0x08), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("T", 0xFB, 0x10), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("Y", 0xDF, 0x10), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("U", 0xDF, 0x08), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("I", 0xDF, 0x04), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("O", 0xDF, 0x02), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("P", 0xDF, 0x01), onKeyPress),
+          ZxSpectrumKeyView("Q", Keys.K_Q, onKeyPress),
+          ZxSpectrumKeyView("W", Keys.K_W, onKeyPress),
+          ZxSpectrumKeyView("E", Keys.K_E, onKeyPress),
+          ZxSpectrumKeyView("R", Keys.K_R, onKeyPress),
+          ZxSpectrumKeyView("T", Keys.K_T, onKeyPress),
+          ZxSpectrumKeyView("Y", Keys.K_Y, onKeyPress),
+          ZxSpectrumKeyView("U", Keys.K_U, onKeyPress),
+          ZxSpectrumKeyView("I", Keys.K_I, onKeyPress),
+          ZxSpectrumKeyView("O", Keys.K_O, onKeyPress),
+          ZxSpectrumKeyView("P", Keys.K_P, onKeyPress),
         ],
       ),
       Row(
         children: [
-          ZxSpectrumKeyView(ZxSpectrumKeyState("A", 0xFD, 0x01), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("S", 0xFD, 0x02), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("D", 0xFD, 0x04), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("F", 0xFD, 0x08), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("G", 0xFD, 0x10), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("H", 0xBF, 0x10), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("J", 0xBF, 0x08), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("K", 0xBF, 0x04), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("L", 0xBF, 0x02), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("<-", 0xBF, 0x01), onKeyPress),
+          ZxSpectrumKeyView("A", Keys.K_A, onKeyPress),
+          ZxSpectrumKeyView("S", Keys.K_S, onKeyPress),
+          ZxSpectrumKeyView("D", Keys.K_D, onKeyPress),
+          ZxSpectrumKeyView("F", Keys.K_F, onKeyPress),
+          ZxSpectrumKeyView("G", Keys.K_G, onKeyPress),
+          ZxSpectrumKeyView("H", Keys.K_H, onKeyPress),
+          ZxSpectrumKeyView("J", Keys.K_J, onKeyPress),
+          ZxSpectrumKeyView("K", Keys.K_K, onKeyPress),
+          ZxSpectrumKeyView("L", Keys.K_L, onKeyPress),
+          ZxSpectrumKeyView("<-", Keys.K_ENTER, onKeyPress),
         ],
       ),
       Row(
         children: [
-          ZxSpectrumKeyView(
-              ZxSpectrumKeyState("cs", 0xFE, 0x01, toggle: true), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("Z", 0xFE, 0x02), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("X", 0xFE, 0x04), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("C", 0xFE, 0x08), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("V", 0xFE, 0x10), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("B", 0x7F, 0x10), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("N", 0x7F, 0x08), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("M", 0x7F, 0x04), onKeyPress),
-          ZxSpectrumKeyView(
-              ZxSpectrumKeyState("ss", 0x7F, 0x02, toggle: true), onKeyPress),
-          ZxSpectrumKeyView(ZxSpectrumKeyState("b", 0x7F, 0x01), onKeyPress),
+          ZxSpectrumKeyView("cs", Keys.K_CAPS, onKeyPress, toggle: true),
+          ZxSpectrumKeyView("Z", Keys.K_Z, onKeyPress),
+          ZxSpectrumKeyView("X", Keys.K_X, onKeyPress),
+          ZxSpectrumKeyView("C", Keys.K_C, onKeyPress),
+          ZxSpectrumKeyView("V", Keys.K_V, onKeyPress),
+          ZxSpectrumKeyView("B", Keys.K_B, onKeyPress),
+          ZxSpectrumKeyView("N", Keys.K_N, onKeyPress),
+          ZxSpectrumKeyView("M", Keys.K_M, onKeyPress),
+          ZxSpectrumKeyView("ss", Keys.K_SYM, onKeyPress, toggle: true),
+          ZxSpectrumKeyView("b", Keys.K_SPACE, onKeyPress),
         ],
       )
     ]);
