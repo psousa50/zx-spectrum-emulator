@@ -21,6 +21,8 @@ class Z80Assembler {
   static Uint8List ldR16nn(int r16, int nn) =>
       u([0x01 | (Registers.r16SPTableBack[r16] << 4), lo(nn), hi(nn)]);
 
+  static Uint8List inAC() => u([Z80a.EXTENDED_OPCODES, 0x78]);
+
   static Uint8List im0() => u([Z80a.EXTENDED_OPCODES, 0x46]);
   static Uint8List im1() => u([Z80a.EXTENDED_OPCODES, 0x56]);
   static Uint8List im2() => u([Z80a.EXTENDED_OPCODES, 0x5E]);

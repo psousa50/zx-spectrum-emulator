@@ -1505,8 +1505,8 @@ class Z80a {
 
   void buildExtendedOpcodes() {
     extendedOpcodes = Z80Instructions();
-    extendedOpcodes.buildM8C8(0x40, "IN [rb345], C", inR8C, 12);
-    extendedOpcodes.buildM8C8(0x41, "OUT C, [rb345]", outCR8, 12);
+    extendedOpcodes.buildM8C8(0x40, "IN [rb345], (C)", inR8C, 12);
+    extendedOpcodes.buildM8C8(0x41, "OUT (C), [rb345]", outCR8, 12);
     extendedOpcodes.buildM16C4(0x42, "SBC HL, [r16]", sbcHLR16, 15);
     extendedOpcodes.buildM16C4(0x43, "LD (nn), [r16]", ldmnnR16, 20);
     extendedOpcodes.buildM16C4(0x44, "NEG", neg, 8);
