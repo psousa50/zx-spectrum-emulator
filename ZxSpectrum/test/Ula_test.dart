@@ -7,7 +7,7 @@ import 'package:ZxSpectrum/Ula.dart';
 Ula newUla() => Ula(Memory48K());
 
 void main() {
-  test("Port 0xFE should return key states", () {
+  test("Reading from port 0xFE should return key states", () {
     var ula = newUla();
 
     ula.keyDown(Keys.K_1);
@@ -24,7 +24,7 @@ void main() {
     expect(ula.inPort(0x7FFE), binary("11111111"));
   });
 
-  test("Reading from port other that 0cFE should returning 0", () {
+  test("Reading from port other that 0xFE should returning 0", () {
     var ula = newUla();
 
     expect(ula.inPort(0xF7FD), 0x00);
