@@ -1,7 +1,7 @@
 import 'dart:typed_data';
+
 import 'package:ZxSpectrum/PortHandler.dart';
 import 'package:color/color.dart';
-
 import 'package:Z80/Memory.dart';
 
 import 'ZxKeys.dart';

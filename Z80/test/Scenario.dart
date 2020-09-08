@@ -1,5 +1,5 @@
 import 'package:Z80/Cpu/Registers.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 import 'package:Z80/Memory.dart';
 import 'package:Z80/Util.dart';

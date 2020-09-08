@@ -21,7 +21,7 @@ class Z80 {
   final Memory memory;
   final Ports ports;
 
-  InterruptMode _interruptMode;
+  InterruptMode interruptMode;
   bool interruptsEnabled = false;
   bool halted = false;
   var registers = Registers();
@@ -114,8 +114,6 @@ class Z80 {
   set halfCarryFlag(bool b) => registers.halfCarryFlag = b;
   set zeroFlag(bool b) => registers.zeroFlag = b;
   set signFlag(bool b) => registers.signFlag = b;
-
-  InterruptMode get interruptMode => _interruptMode;
 
   int fetch() {
     final v = memory.peek(PC);
@@ -1251,17 +1249,17 @@ class Z80 {
   }
 
   int im0(InstructionContext context) {
-    _interruptMode = InterruptMode.im0;
+    interruptMode = InterruptMode.im0;
     return context.instruction.tStates();
   }
 
   int im1(InstructionContext context) {
-    _interruptMode = InterruptMode.im1;
+    interruptMode = InterruptMode.im1;
     return context.instruction.tStates();
   }
 
   int im2(InstructionContext context) {
-    _interruptMode = InterruptMode.im2;
+    interruptMode = InterruptMode.im2;
     return context.instruction.tStates();
   }
 

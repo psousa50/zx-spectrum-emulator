@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 import 'package:Z80/Util.dart';
 import 'package:ZxSpectrum/Memory48K.dart';

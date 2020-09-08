@@ -19,6 +19,8 @@ int lo(int w) => w % 256;
 int hi(int w) => w ~/ 256;
 int w(int lo, int hi) => lo + 256 * hi;
 
+int bit01(int byte) => byte & 0x03;
 int bit012(int byte) => byte & 0x07;
+int bit123(int byte) => byte & 0x0E;
 int bit345(int byte) => (byte & 0x38) >> 3;
 int bit45(int byte) => (byte & 0x30) >> 4;
