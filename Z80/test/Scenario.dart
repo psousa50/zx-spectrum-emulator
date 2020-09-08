@@ -1,9 +1,9 @@
-import 'package:Z80a/Cpu/Registers.dart';
+import 'package:Z80/Cpu/Registers.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Z80a/Memory.dart';
-import 'package:Z80a/Util.dart';
-import 'package:Z80a/Cpu/Z80a.dart';
+import 'package:Z80/Memory.dart';
+import 'package:Z80/Util.dart';
+import 'package:Z80/Cpu/Z80.dart';
 
 import 'MemoryTest.dart';
 import 'PortsTest.dart';
@@ -87,16 +87,16 @@ class Scenario {
 
     var memory = setupMemory();
     var ports = setupPorts();
-    var z80a = Z80a(memory, ports);
+    var z80 = Z80(memory, ports);
 
-    setZ80Registers(z80a, initialRegisterValues);
+    setZ80Registers(z80, initialRegisterValues);
 
-    var tStates = z80a.step();
+    var tStates = z80.step();
 
     expect(tStates != null, true,
         reason: "Opcode not processed => ${opcodesToString(opcodes)}");
 
-    Map<int, int> actualRegisterValues = getZ80Registers(z80a);
+    Map<int, int> actualRegisterValues = getZ80Registers(z80);
 
     for (var r = 0; r < Registers.R_COUNT; r++) {
       if (![Registers.R_F, Registers.R_S, Registers.R_P].contains(r)) {
@@ -107,19 +107,17 @@ class Scenario {
     }
 
     checkFlag(
-        z80a.registers.carryFlag, Registers.F_CARRY, expectedRegisterValues);
-    checkFlag(z80a.registers.addSubtractFlag, Registers.F_ADD_SUB,
+        z80.registers.carryFlag, Registers.F_CARRY, expectedRegisterValues);
+    checkFlag(z80.registers.addSubtractFlag, Registers.F_ADD_SUB,
         expectedRegisterValues);
-    checkFlag(z80a.registers.parityOverflowFlag, Registers.F_PARITY,
+    checkFlag(z80.registers.parityOverflowFlag, Registers.F_PARITY,
         expectedRegisterValues);
-    checkFlag(z80a.registers.halfCarryFlag, Registers.F_HALF_CARRY,
+    checkFlag(z80.registers.halfCarryFlag, Registers.F_HALF_CARRY,
         expectedRegisterValues);
-    checkFlag(
-        z80a.registers.zeroFlag, Registers.F_ZERO, expectedRegisterValues);
-    checkFlag(
-        z80a.registers.signFlag, Registers.F_SIGN, expectedRegisterValues);
+    checkFlag(z80.registers.zeroFlag, Registers.F_ZERO, expectedRegisterValues);
+    checkFlag(z80.registers.signFlag, Registers.F_SIGN, expectedRegisterValues);
 
-    expect(z80a.memory.range(10), expectedState.ram,
+    expect(z80.memory.range(10), expectedState.ram,
         reason: '${scenarioName(opcodes)}\nReason: RAM is wrong');
 
     expectedState.outPorts.forEach((port, value) {
@@ -128,7 +126,7 @@ class Scenario {
     });
 
     expect(
-        z80a.registers.SP,
+        z80.registers.SP,
         256 * expectedRegisterValues[Registers.R_SP] +
             expectedRegisterValues[Registers.R_SP + 1],
         reason: '${scenarioName(opcodes)}\nReason: SP is wrong');
@@ -136,24 +134,24 @@ class Scenario {
     var expectedPC = expectedState.pc == null
         ? initialState.pc + opcodes.length
         : expectedState.pc;
-    expect(z80a.PC, expectedPC,
+    expect(z80.PC, expectedPC,
         reason: '${scenarioName(opcodes)}\nReason: PC is wrong');
   }
 
-  Map<int, int> getZ80Registers(Z80a z80a) {
+  Map<int, int> getZ80Registers(Z80 z80) {
     Map<int, int> actualRegisterValues = {};
     for (var r = 0; r < Registers.R_COUNT; r++) {
-      actualRegisterValues[r] = z80a.r8Value(r);
+      actualRegisterValues[r] = z80.r8Value(r);
     }
     return actualRegisterValues;
   }
 
-  void setZ80Registers(Z80a z80a, Map<int, int> initialRegisterValues) {
+  void setZ80Registers(Z80 z80, Map<int, int> initialRegisterValues) {
     initialRegisterValues.keys.forEach((r) {
-      z80a.setR8Value(r, initialRegisterValues[r]);
+      z80.setR8Value(r, initialRegisterValues[r]);
     });
 
-    z80a.PC = initialState.pc;
+    z80.PC = initialState.pc;
   }
 
   void run() {

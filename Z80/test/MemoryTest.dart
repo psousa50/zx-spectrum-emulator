@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:Z80a/Memory.dart';
-import 'package:Z80a/Util.dart';
+import 'package:Z80/Memory.dart';
+import 'package:Z80/Util.dart';
 
 class MemoryTest extends Memory {
   List<int> bytes;

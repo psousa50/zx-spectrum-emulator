@@ -11,8 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  Z80a:
-    path: ../Z80a
+  Z80:
+    path: ../Z80
   color: any
 
 dev_dependencies:

@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:Z80a/Cpu/Registers.dart';
-import 'package:Z80a/Cpu/Z80Assembler.dart';
-import 'package:Z80a/Util.dart';
+import 'package:Z80/Cpu/Registers.dart';
+import 'package:Z80/Cpu/Z80Assembler.dart';
+import 'package:Z80/Util.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test("Reading from port 0xFE should returning key state", () {
     var zx = ZxSpectrum();
-    var z80 = zx.z80a;
+    var z80 = zx.z80;
     var ula = zx.ula;
 
     ula.keyDown(ZxKey.K_W);

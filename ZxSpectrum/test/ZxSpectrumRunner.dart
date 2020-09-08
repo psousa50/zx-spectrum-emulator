@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Z80a/Util.dart';
+import 'package:Z80/Util.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 
@@ -21,23 +21,23 @@ class ZxSpectrumRunner {
   }
 
   void log(String s) {
-    var z80a = zxSpectrum.z80a;
+    var z80 = zxSpectrum.z80;
 
-    var state = "#${toHex2(z80a.PC)} " +
-        " A:${toHex(z80a.registers.A)}" +
-        " BC:${toHex2(z80a.registers.BC)}" +
-        " DE:${toHex2(z80a.registers.DE)}" +
-        " HL:${toHex2(z80a.registers.HL)}" +
-        " ${z80a.registers.signFlag ? "S" : " "}" +
-        " ${z80a.registers.zeroFlag ? "Z" : " "}" +
-        " ${z80a.registers.halfCarryFlag ? "H" : " "}" +
-        " ${z80a.registers.parityOverflowFlag ? "P" : " "}" +
-        " ${z80a.registers.addSubtractFlag ? "N" : " "}" +
-        " ${z80a.registers.carryFlag ? "C" : " "}" +
+    var state = "#${toHex2(z80.PC)} " +
+        " A:${toHex(z80.registers.A)}" +
+        " BC:${toHex2(z80.registers.BC)}" +
+        " DE:${toHex2(z80.registers.DE)}" +
+        " HL:${toHex2(z80.registers.HL)}" +
+        " ${z80.registers.signFlag ? "S" : " "}" +
+        " ${z80.registers.zeroFlag ? "Z" : " "}" +
+        " ${z80.registers.halfCarryFlag ? "H" : " "}" +
+        " ${z80.registers.parityOverflowFlag ? "P" : " "}" +
+        " ${z80.registers.addSubtractFlag ? "N" : " "}" +
+        " ${z80.registers.carryFlag ? "C" : " "}" +
         " K0:${toHex(zxSpectrum.ports.inPort(0xFBFE))}" +
         " K1:${toHex(zxSpectrum.ports.inPort(0xBFFE))}" +
-        " ${toHex(z80a.memory.peek(z80a.registers.IY))}" +
-        " ${toHex(z80a.memory.peek(z80a.registers.IY + 1))}";
+        " ${toHex(z80.memory.peek(z80.registers.IY))}" +
+        " ${toHex(z80.memory.peek(z80.registers.IY + 1))}";
 
     printBuffer.add("$state       $s");
 
@@ -58,14 +58,14 @@ class ZxSpectrumRunner {
   }
 
   void onInterrupt(ZxSpectrum zx) {
-    log("Interrupt ${zx.z80a.interruptsEnabled}");
+    log("Interrupt ${zx.z80.interruptsEnabled}");
   }
 
   void onInstruction(ZxSpectrum zx) {
     instructionCount++;
 
-    var i = zx.z80a.getInstruction();
-    // if (zx.z80a.PC >= 0x0F2C && zx.z80a.PC < 0x11B7) {
+    var i = zx.z80.getInstruction();
+    // if (zx.z80.PC >= 0x0F2C && zx.z80.PC < 0x11B7) {
     if (i != null) {
       log("${i.name}");
     } else {
@@ -73,7 +73,7 @@ class ZxSpectrumRunner {
     }
     // }
 
-    if (zx.z80a.PC == 0x0F38) {
+    if (zx.z80.PC == 0x0F38) {
       log("KeyCount: $keyCount");
       switch (keyCount) {
         case 0:

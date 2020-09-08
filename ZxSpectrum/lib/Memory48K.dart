@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:Z80a/Memory.dart';
+import 'package:Z80/Memory.dart';
 
 import 'Util.dart';
 

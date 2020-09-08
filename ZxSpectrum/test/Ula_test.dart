@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Z80a/Util.dart';
+import 'package:Z80/Util.dart';
 import 'package:ZxSpectrum/Memory48K.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 

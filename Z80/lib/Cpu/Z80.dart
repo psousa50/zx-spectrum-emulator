@@ -1,9 +1,9 @@
-library z80a;
+library z80;
 
-import 'package:Z80a/Cpu/Z80Instructions.dart';
-import 'package:Z80a/Memory.dart';
-import 'package:Z80a/Ports.dart';
-import 'package:Z80a/Util.dart';
+import 'package:Z80/Cpu/Z80Instructions.dart';
+import 'package:Z80/Memory.dart';
+import 'package:Z80/Ports.dart';
+import 'package:Z80/Util.dart';
 
 import 'InstructionContext.dart';
 import 'Registers.dart';
@@ -17,7 +17,7 @@ enum InterruptMode {
   im2,
 }
 
-class Z80a {
+class Z80 {
   final Memory memory;
   final Ports ports;
 
@@ -41,7 +41,7 @@ class Z80a {
 
   static List<int> bitMask = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
 
-  Z80a(this.memory, this.ports) {
+  Z80(this.memory, this.ports) {
     buildUnprefixedOpcodes();
     buildExtendedOpcodes();
     buildBitOpcodes();

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:Z80a/Ports.dart';
+import 'package:Z80/Ports.dart';
 
 class PortsTest extends Ports {
   Uint8List inPorts = Uint8List(65536);

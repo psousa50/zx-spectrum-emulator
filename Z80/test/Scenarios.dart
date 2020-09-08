@@ -1,6 +1,6 @@
-import 'package:Z80a/Cpu/Registers.dart';
-import 'package:Z80a/Util.dart';
-import 'package:Z80a/Cpu/Z80a.dart';
+import 'package:Z80/Cpu/Registers.dart';
+import 'package:Z80/Util.dart';
+import 'package:Z80/Cpu/Z80.dart';
 import 'Scenario.dart';
 
 log(String m, value) {
@@ -16,8 +16,8 @@ bool isMIXIY(int rhxy) => rhxy == Registers.R_MIXd || rhxy == Registers.R_MIYd;
 int rMIXY(int rxy) => rxy == Registers.R_MIXd ? Registers.R_IX : Registers.R_IY;
 
 List<int> ixyPrefix(int rhxy) => [
-      if (rhxy == Registers.R_IX) Z80a.IX_PREFIX,
-      if (rhxy == Registers.R_IY) Z80a.IY_PREFIX
+      if (rhxy == Registers.R_IX) Z80.IX_PREFIX,
+      if (rhxy == Registers.R_IY) Z80.IY_PREFIX
     ];
 
 List<Scenario> nop(int opcode) => [
@@ -479,31 +479,31 @@ List<Scenario> srlR8Spec(String name, int opcode, int r8, {int prefix}) => [
     ];
 
 List<Scenario> rlcR8(int opcode, int r8) =>
-    rlcR8Spec("RLC", opcode, r8, prefix: Z80a.BIT_OPCODES);
+    rlcR8Spec("RLC", opcode, r8, prefix: Z80.BIT_OPCODES);
 
 List<Scenario> rrcR8(int opcode, int r8) =>
-    rrcR8Spec("RRC", opcode, r8, prefix: Z80a.BIT_OPCODES);
+    rrcR8Spec("RRC", opcode, r8, prefix: Z80.BIT_OPCODES);
 
 List<Scenario> rlR8(int opcode, int r8) =>
-    rlR8Spec("RL", opcode, r8, prefix: Z80a.BIT_OPCODES);
+    rlR8Spec("RL", opcode, r8, prefix: Z80.BIT_OPCODES);
 
 List<Scenario> rrR8(int opcode, int r8) =>
-    rrR8Spec("RR", opcode, r8, prefix: Z80a.BIT_OPCODES);
+    rrR8Spec("RR", opcode, r8, prefix: Z80.BIT_OPCODES);
 
 List<Scenario> slaR8(int opcode, int r8) =>
-    slaR8Spec("SLA", opcode, r8, prefix: Z80a.BIT_OPCODES);
+    slaR8Spec("SLA", opcode, r8, prefix: Z80.BIT_OPCODES);
 
 List<Scenario> sraR8(int opcode, int r8) =>
-    sraR8Spec("SRA", opcode, r8, prefix: Z80a.BIT_OPCODES);
+    sraR8Spec("SRA", opcode, r8, prefix: Z80.BIT_OPCODES);
 
 List<Scenario> srlR8(int opcode, int r8) =>
-    srlR8Spec("SRL", opcode, r8, prefix: Z80a.BIT_OPCODES);
+    srlR8Spec("SRL", opcode, r8, prefix: Z80.BIT_OPCODES);
 
 Scenario rldrrdSpec(String name, int opcode, int a, int mHL, int aResult,
         int mHlResult, String flags) =>
     Scenario(
       name,
-      [Z80a.EXTENDED_OPCODES, opcode],
+      [Z80.EXTENDED_OPCODES, opcode],
       initialState: State(
         register8Values: {Registers.R_A: a},
         register16Values: {Registers.R_HL: Scenario.RAM_START},
@@ -636,9 +636,9 @@ Scenario retSpec(String name, int opcode, {int prefix}) => Scenario(
 
 List<Scenario> ret(int opcode) => [retSpec("RET", opcode)];
 List<Scenario> retn(int opcode) =>
-    [retSpec("RETN", opcode, prefix: Z80a.EXTENDED_OPCODES)];
+    [retSpec("RETN", opcode, prefix: Z80.EXTENDED_OPCODES)];
 List<Scenario> reti(int opcode) =>
-    [retSpec("RETI", opcode, prefix: Z80a.EXTENDED_OPCODES)];
+    [retSpec("RETI", opcode, prefix: Z80.EXTENDED_OPCODES)];
 
 Scenario callCCNNJump(int opcode, String flag) => Scenario(
       "CALL $flag, NN",
@@ -1384,7 +1384,7 @@ List<Scenario> ldMIXYdR8(int opcode, int r8, int rxy) => [
 
 Scenario inR8CSpec(int opcode, int r8, int value, String flags) => Scenario(
       'IN ${Registers.r8Names[r8]}, (C) => ($value)',
-      [Z80a.EXTENDED_OPCODES, opcode],
+      [Z80.EXTENDED_OPCODES, opcode],
       initialState: State(
         register16Values: {Registers.R_BC: 12345},
         inPorts: {12345: value},
@@ -1404,7 +1404,7 @@ List<Scenario> inR8C(int opcode, int r8) => [
 List<Scenario> outCR8(int opcode, int r8) => [
       Scenario(
         'OUT (C) ${Registers.r8Names[r8]}',
-        [Z80a.EXTENDED_OPCODES, opcode],
+        [Z80.EXTENDED_OPCODES, opcode],
         initialState: State(
           register8Values: {
             Registers.R_B: 10,
@@ -1452,69 +1452,69 @@ List<Scenario> sbcHLR16(int opcode, int r16) => r16 == Registers.R_HL
     ? [
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000, 0,
             "~S Z ~H ~P N ~C",
-            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "~C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000,
             65535, "S ~Z H P N C",
-            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "C", prefix: Z80.EXTENDED_OPCODES),
       ]
     : [
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 12000,
             18000, "~S ~Z H ~P N ~C",
-            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "~C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000, 0,
             "~S Z ~H ~P N ~C",
-            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "~C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 40000,
             55536, "S ~Z H ~P N C",
-            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "~C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 12000,
             17999, "~S ~Z H ~P N ~C",
-            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("SBC", opcode, Registers.R_HL, r16, 30000, 30000,
             65535, "S ~Z H P N C",
-            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "C", prefix: Z80.EXTENDED_OPCODES),
       ];
 
 List<Scenario> adcHLR16(int opcode, int r16) => r16 == Registers.R_HL
     ? [
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 40000, 40000,
             14464, "~S ~Z H P ~N C",
-            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "~C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 32768, 32768, 0,
             "~S Z ~H P ~N C",
-            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "~C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 10000, 10000,
             20001, "~S ~Z ~H ~P ~N ~C",
-            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "C", prefix: Z80.EXTENDED_OPCODES),
       ]
     : [
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 20000, 12000,
             32000, "~S ~Z H ~P ~N ~C",
-            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "~C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 30000, 20000,
             50000, "S ~Z H P ~N ~C",
-            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "~C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 30000, 42000, 6464,
             "~S ~Z ~H ~P ~N C",
-            inFlags: "~C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "~C", prefix: Z80.EXTENDED_OPCODES),
         changeR16R16Spec("ADC", opcode, Registers.R_HL, r16, 30000, 42000, 6465,
             "~S ~Z ~H ~P ~N C",
-            inFlags: "C", prefix: Z80a.EXTENDED_OPCODES),
+            inFlags: "C", prefix: Z80.EXTENDED_OPCODES),
       ];
 
 List<Scenario> neg(int opcode) => [
       changeR8("NEG", opcode, Registers.R_A, 3, 253, "S ~Z H ~P N C",
-          prefix: Z80a.EXTENDED_OPCODES),
+          prefix: Z80.EXTENDED_OPCODES),
       changeR8("NEG", opcode, Registers.R_A, 0, 0, "~S Z ~H ~P N ~C",
-          prefix: Z80a.EXTENDED_OPCODES),
+          prefix: Z80.EXTENDED_OPCODES),
       changeR8("NEG", opcode, Registers.R_A, 0x80, 0x80, "S ~Z H P N C",
-          prefix: Z80a.EXTENDED_OPCODES),
+          prefix: Z80.EXTENDED_OPCODES),
     ];
 
 Scenario bitNR8R8Spec(int opcode, int bit, int r8, int value, String flags) =>
     Scenario(
       "BIT $bit, ${Registers.r8Names[r8]} (${toBinary8(value)})",
-      [Z80a.BIT_OPCODES, opcode],
+      [Z80.BIT_OPCODES, opcode],
       initialState: State(
         register8Values: {r8: value},
       ),
@@ -1523,7 +1523,7 @@ Scenario bitNR8R8Spec(int opcode, int bit, int r8, int value, String flags) =>
 
 Scenario bitNR8HLSpec(int opcode, int bit, int value, String flags) => Scenario(
       "BIT $bit, (HL) (${toBinary8(value)})",
-      [Z80a.BIT_OPCODES, opcode],
+      [Z80.BIT_OPCODES, opcode],
       initialState: State(
         register16Values: {Registers.R_HL: Scenario.RAM_START + 1},
         ram: [0, value],
@@ -1536,11 +1536,11 @@ Scenario bitNR8HLSpec(int opcode, int bit, int value, String flags) => Scenario(
 
 Scenario bitNR8Spec(int opcode, int bit, int r8, int value, String flags) =>
     changeR8("BIT $bit", opcode, r8, value, value, flags,
-        prefix: Z80a.BIT_OPCODES);
+        prefix: Z80.BIT_OPCODES);
 
 List<Scenario> bitNR8(int opcode, int bit, int r8) => [
-      bitNR8Spec(opcode, bit, r8, 0xFF ^ Z80a.bitMask[bit], "Z H ~N"),
-      bitNR8Spec(opcode, bit, r8, Z80a.bitMask[bit], "~Z H ~N")
+      bitNR8Spec(opcode, bit, r8, 0xFF ^ Z80.bitMask[bit], "Z H ~N"),
+      bitNR8Spec(opcode, bit, r8, Z80.bitMask[bit], "~Z H ~N")
     ];
 
 List<Scenario> bit0R8(int opcode, int r8) => bitNR8(opcode, 0, r8);
@@ -1554,10 +1554,10 @@ List<Scenario> bit7R8(int opcode, int r8) => bitNR8(opcode, 7, r8);
 
 Scenario resNR8Spec(int opcode, int bit, int r8, int value, int result) =>
     changeR8("RES $bit", opcode, r8, value, result, "",
-        prefix: Z80a.BIT_OPCODES);
+        prefix: Z80.BIT_OPCODES);
 
 List<Scenario> resNR8(int opcode, int bit, int r8) => [
-      resNR8Spec(opcode, bit, r8, Z80a.bitMask[bit], 0x00),
+      resNR8Spec(opcode, bit, r8, Z80.bitMask[bit], 0x00),
       resNR8Spec(opcode, bit, r8, 0x00, 0x00),
     ];
 
@@ -1572,11 +1572,11 @@ List<Scenario> res7R8(int opcode, int r8) => resNR8(opcode, 7, r8);
 
 Scenario setNR8Spec(int opcode, int bit, int r8, int value, int result) =>
     changeR8("SET $bit", opcode, r8, value, result, "",
-        prefix: Z80a.BIT_OPCODES);
+        prefix: Z80.BIT_OPCODES);
 
 List<Scenario> setNR8(int opcode, int bit, int r8) => [
-      resNR8Spec(opcode, bit, r8, 0x00, Z80a.bitMask[bit]),
-      resNR8Spec(opcode, bit, r8, Z80a.bitMask[bit], Z80a.bitMask[bit]),
+      resNR8Spec(opcode, bit, r8, 0x00, Z80.bitMask[bit]),
+      resNR8Spec(opcode, bit, r8, Z80.bitMask[bit], Z80.bitMask[bit]),
     ];
 
 List<Scenario> set0R8(int opcode, int r8) => setNR8(opcode, 0, r8);
@@ -1591,7 +1591,7 @@ List<Scenario> set7R8(int opcode, int r8) => setNR8(opcode, 7, r8);
 List<Scenario> ldIA(int opcode) => [
       Scenario(
         'LD I, A',
-        [Z80a.EXTENDED_OPCODES, opcode],
+        [Z80.EXTENDED_OPCODES, opcode],
         initialState: State(
           register8Values: {Registers.R_A: 12},
         ),
@@ -1603,7 +1603,7 @@ List<Scenario> ldIA(int opcode) => [
 
 Scenario ldAISpec(int opcode, int value, String flags) => Scenario(
       'LD A, I ($value)',
-      [Z80a.EXTENDED_OPCODES, opcode],
+      [Z80.EXTENDED_OPCODES, opcode],
       initialState: State(
         register8Values: {Registers.R_I: value},
       ),
@@ -1622,7 +1622,7 @@ List<Scenario> ldAI(int opcode) => [
 List<Scenario> ldRA(int opcode) => [
       Scenario(
         'LD R, A',
-        [Z80a.EXTENDED_OPCODES, opcode],
+        [Z80.EXTENDED_OPCODES, opcode],
         initialState: State(
           register8Values: {Registers.R_A: 12},
         ),
@@ -1634,7 +1634,7 @@ List<Scenario> ldRA(int opcode) => [
 
 Scenario ldARSpec(int opcode, int value, String flags) => Scenario(
       'LD A, R ($value)',
-      [Z80a.EXTENDED_OPCODES, opcode],
+      [Z80.EXTENDED_OPCODES, opcode],
       initialState: State(
         register8Values: {Registers.R_R: value},
       ),
@@ -1654,7 +1654,7 @@ Scenario ldIncDecSpec(String name, int opcode, int inc, int bc, String flags,
         {int finalPC}) =>
     Scenario(
       name,
-      [Z80a.EXTENDED_OPCODES, opcode],
+      [Z80.EXTENDED_OPCODES, opcode],
       initialState: State(
         register16Values: {
           Registers.R_HL: Scenario.RAM_START + 2,
@@ -1690,7 +1690,7 @@ Scenario cpIncDecSpec(String name, int opcode, int inc, int a, int value,
         {int finalPC}) =>
     Scenario(
       name,
-      [Z80a.EXTENDED_OPCODES, opcode],
+      [Z80.EXTENDED_OPCODES, opcode],
       initialState: State(
         register8Values: {Registers.R_A: a},
         register16Values: {
@@ -1728,7 +1728,7 @@ Scenario inIncDecSpec(String name, int opcode, int inc, int b, String flags,
         {int finalPC}) =>
     Scenario(
       name,
-      [Z80a.EXTENDED_OPCODES, opcode],
+      [Z80.EXTENDED_OPCODES, opcode],
       initialState: State(
         register8Values: {Registers.R_B: b, Registers.R_C: 254},
         register16Values: {Registers.R_HL: Scenario.RAM_START + 1},
@@ -1758,7 +1758,7 @@ Scenario outIncDecSpec(String name, int opcode, int inc, int b, String flags,
         {int finalPC}) =>
     Scenario(
       name,
-      [Z80a.EXTENDED_OPCODES, opcode],
+      [Z80.EXTENDED_OPCODES, opcode],
       initialState: State(
         register8Values: {Registers.R_B: b, Registers.R_C: 254},
         register16Values: {Registers.R_HL: Scenario.RAM_START + 1},
