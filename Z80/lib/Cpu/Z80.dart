@@ -117,13 +117,13 @@ class Z80 {
 
   int fetch() {
     final v = memory.peek(PC);
-    PC = PC + 1;
+    PC = word(PC + 1);
     return v;
   }
 
   int fetch2() {
     final v = memory.peek2(PC);
-    PC = PC + 2;
+    PC = word(PC + 2);
     return v;
   }
 
@@ -607,14 +607,14 @@ class Z80 {
     B = byte(B - 1);
     bool cond = B != 0;
     if (cond) {
-      PC = PC + signedByte(d);
+      PC = word(PC + signedByte(d));
     }
     return context.instruction.tStates(cond: cond);
   }
 
   int jr(InstructionContext context) {
     var d = fetch();
-    PC = PC + signedByte(d);
+    PC = word(PC + signedByte(d));
     return context.instruction.tStates();
   }
 
@@ -622,7 +622,7 @@ class Z80 {
     var d = fetch();
     var cond = getFlagCondition(bit345(context.opcode) - 4);
     if (cond) {
-      PC = PC + signedByte(d);
+      PC = word(PC + signedByte(d));
     }
     return context.instruction.tStates(cond: cond);
   }
@@ -1666,7 +1666,7 @@ class Z80 {
 
     iXYbitOpcodes.buildM8C8(0x46, "BIT [bit], (IXY + d)", bitnMIXYd, 20);
     iXYbitOpcodes.buildM8C8(0x86, "RES [bit], (IXY + d)", resnMIXYd, 20);
-    iXYbitOpcodes.buildM8C8(0xC6, "RES [bit], (IXY + d)", setnMIXYd, 20);
+    iXYbitOpcodes.buildM8C8(0xC6, "SET [bit], (IXY + d)", setnMIXYd, 20);
   }
 
   void maskableInterrupt() {
