@@ -16,13 +16,13 @@ var allScenarios = [
   ...ldAR16(0x0A, Registers.R_BC),
   ...ldAR16(0x1A, Registers.R_DE),
   ...exAFAFt(0x08),
-  ...ldR8NN(0x06, Registers.R_B),
-  ...ldR8NN(0x0E, Registers.R_C),
-  ...ldR8NN(0x16, Registers.R_D),
-  ...ldR8NN(0x1E, Registers.R_E),
-  ...ldR8NN(0x26, Registers.R_H),
-  ...ldR8NN(0x2E, Registers.R_L),
-  ...ldR8NN(0x3E, Registers.R_A),
+  ...ldR8N(0x06, Registers.R_B),
+  ...ldR8N(0x0E, Registers.R_C),
+  ...ldR8N(0x16, Registers.R_D),
+  ...ldR8N(0x1E, Registers.R_E),
+  ...ldR8N(0x26, Registers.R_H),
+  ...ldR8N(0x2E, Registers.R_L),
+  ...ldR8N(0x3E, Registers.R_A),
   ...ldR8MHL(0x46, Registers.R_B),
   ...ldR8MHL(0x4E, Registers.R_C),
   ...ldR8MHL(0x56, Registers.R_D),
@@ -261,6 +261,21 @@ var allScenarios = [
   ...inAN(0xDB),
 
 // IX IY
+  ...incR8(0x24, Registers.R_IX_H),
+  ...decR8(0x25, Registers.R_IX_H),
+
+  ...incR8(0x24, Registers.R_IY_H),
+  ...decR8(0x25, Registers.R_IY_H),
+
+  ...ldR8N(0x26, Registers.R_IX_H),
+  ...ldR8N(0x26, Registers.R_IY_H),
+
+  ...incR8(0x2C, Registers.R_IX_L),
+  ...decR8(0x2D, Registers.R_IX_L),
+
+  ...ldR8N(0x2E, Registers.R_IX_L),
+  ...ldR8N(0x2E, Registers.R_IY_L),
+
   ...incR8(0x34, Registers.R_MIXd),
   ...incR8(0x34, Registers.R_MIYd),
   ...decR8(0x35, Registers.R_MIXd),
@@ -285,6 +300,65 @@ var allScenarios = [
   ...ldIXYMN(0x2A, Registers.R_IY),
   ...ldMIXYdN(0x36, Registers.R_IX),
   ...ldMIXYdN(0x36, Registers.R_IY),
+
+  ...ldR8R8(0x44, Registers.R_B, Registers.R_IX_H),
+  ...ldR8R8(0x4C, Registers.R_C, Registers.R_IX_H),
+  ...ldR8R8(0x54, Registers.R_D, Registers.R_IX_H),
+  ...ldR8R8(0x5C, Registers.R_E, Registers.R_IX_H),
+  ...ldR8R8(0x64, Registers.R_IX_H, Registers.R_IX_H),
+  ...ldR8R8(0x6C, Registers.R_IX_L, Registers.R_IX_H),
+
+  ...ldR8R8(0x45, Registers.R_B, Registers.R_IX_L),
+  ...ldR8R8(0x4D, Registers.R_C, Registers.R_IX_L),
+  ...ldR8R8(0x55, Registers.R_D, Registers.R_IX_L),
+  ...ldR8R8(0x5D, Registers.R_E, Registers.R_IX_L),
+  ...ldR8R8(0x65, Registers.R_IX_H, Registers.R_IX_L),
+  ...ldR8R8(0x6D, Registers.R_IX_L, Registers.R_IX_L),
+
+  ...ldR8R8(0x60, Registers.R_IX_H, Registers.R_B),
+  ...ldR8R8(0x61, Registers.R_IX_H, Registers.R_C),
+  ...ldR8R8(0x62, Registers.R_IX_H, Registers.R_D),
+  ...ldR8R8(0x63, Registers.R_IX_H, Registers.R_E),
+  ...ldR8R8(0x64, Registers.R_IX_H, Registers.R_IX_H),
+  ...ldR8R8(0x65, Registers.R_IX_H, Registers.R_IX_L),
+  ...ldR8R8(0x67, Registers.R_IX_H, Registers.R_A),
+
+  ...ldR8R8(0x44, Registers.R_B, Registers.R_IY_H),
+  ...ldR8R8(0x4C, Registers.R_C, Registers.R_IY_H),
+  ...ldR8R8(0x54, Registers.R_D, Registers.R_IY_H),
+  ...ldR8R8(0x5C, Registers.R_E, Registers.R_IY_H),
+  ...ldR8R8(0x64, Registers.R_IY_H, Registers.R_IY_H),
+  ...ldR8R8(0x6C, Registers.R_IY_L, Registers.R_IY_H),
+
+  ...ldR8R8(0x45, Registers.R_B, Registers.R_IY_L),
+  ...ldR8R8(0x4D, Registers.R_C, Registers.R_IY_L),
+  ...ldR8R8(0x55, Registers.R_D, Registers.R_IY_L),
+  ...ldR8R8(0x5D, Registers.R_E, Registers.R_IY_L),
+  ...ldR8R8(0x65, Registers.R_IY_H, Registers.R_IY_L),
+  ...ldR8R8(0x6D, Registers.R_IY_L, Registers.R_IY_L),
+
+  ...ldR8R8(0x60, Registers.R_IY_H, Registers.R_B),
+  ...ldR8R8(0x61, Registers.R_IY_H, Registers.R_C),
+  ...ldR8R8(0x62, Registers.R_IY_H, Registers.R_D),
+  ...ldR8R8(0x63, Registers.R_IY_H, Registers.R_E),
+  ...ldR8R8(0x64, Registers.R_IY_H, Registers.R_IY_H),
+  ...ldR8R8(0x65, Registers.R_IY_H, Registers.R_IY_L),
+  ...ldR8R8(0x67, Registers.R_IY_H, Registers.R_A),
+
+  ...ldR8R8(0x68, Registers.R_IX_L, Registers.R_B),
+  ...ldR8R8(0x69, Registers.R_IX_L, Registers.R_C),
+  ...ldR8R8(0x6A, Registers.R_IX_L, Registers.R_D),
+  ...ldR8R8(0x6B, Registers.R_IX_L, Registers.R_E),
+  ...ldR8R8(0x6C, Registers.R_IX_L, Registers.R_IX_H),
+  ...ldR8R8(0x6D, Registers.R_IX_L, Registers.R_IX_L),
+  ...ldR8R8(0x6F, Registers.R_IX_L, Registers.R_A),
+
+  ...ldR8R8(0x7C, Registers.R_A, Registers.R_IX_H),
+  ...ldR8R8(0x7D, Registers.R_A, Registers.R_IX_L),
+
+  ...ldR8R8(0x7C, Registers.R_A, Registers.R_IY_H),
+  ...ldR8R8(0x7D, Registers.R_A, Registers.R_IY_L),
+
   ...ldR8MIXYd(0x46, Registers.R_B, Registers.R_IX),
   ...ldR8MIXYd(0x4E, Registers.R_C, Registers.R_IX),
   ...ldR8MIXYd(0x56, Registers.R_D, Registers.R_IX),
@@ -313,22 +387,48 @@ var allScenarios = [
   ...ldMIXYdR8(0x74, Registers.R_H, Registers.R_IY),
   ...ldMIXYdR8(0x75, Registers.R_L, Registers.R_IY),
   ...ldMIXYdR8(0x77, Registers.R_A, Registers.R_IY),
+
+  ...addAR8(0x84, Registers.R_IX_H),
+  ...addAR8(0x85, Registers.R_IX_L),
   ...addAR8(0x86, Registers.R_MIXd),
-  ...addAR8(0x86, Registers.R_MIYd),
+
+  ...adcAR8(0x8C, Registers.R_IX_H),
+  ...adcAR8(0x8D, Registers.R_IX_L),
   ...adcAR8(0x8E, Registers.R_MIXd),
-  ...adcAR8(0x8E, Registers.R_MIYd),
+
+  ...subAR8(0x94, Registers.R_IX_H),
+  ...subAR8(0x95, Registers.R_IX_L),
   ...subAR8(0x96, Registers.R_MIXd),
-  ...subAR8(0x96, Registers.R_MIYd),
+
+  ...sbcAR8(0x9C, Registers.R_IX_H),
+  ...sbcAR8(0x9D, Registers.R_IX_L),
   ...sbcAR8(0x9E, Registers.R_MIXd),
-  ...sbcAR8(0x9E, Registers.R_MIYd),
+
+  ...andR8(0xA4, Registers.R_IX_H),
+  ...andR8(0xA5, Registers.R_IX_L),
   ...andR8(0xA6, Registers.R_MIXd),
-  ...andR8(0xA6, Registers.R_MIYd),
+
+  ...xorR8(0xAC, Registers.R_IX_H),
+  ...xorR8(0xAD, Registers.R_IX_L),
   ...xorR8(0xAE, Registers.R_MIXd),
-  ...xorR8(0xAE, Registers.R_MIYd),
+
+  ...orR8(0xB4, Registers.R_IX_H),
+  ...orR8(0xB5, Registers.R_IX_L),
   ...orR8(0xB6, Registers.R_MIXd),
-  ...orR8(0xB6, Registers.R_MIYd),
+
+  ...cpR8(0xBC, Registers.R_IX_H),
+  ...cpR8(0xBD, Registers.R_IX_L),
   ...cpR8(0xBE, Registers.R_MIXd),
+
+  ...addAR8(0x86, Registers.R_MIYd),
+  ...adcAR8(0x8E, Registers.R_MIYd),
+  ...subAR8(0x96, Registers.R_MIYd),
+  ...sbcAR8(0x9E, Registers.R_MIYd),
+  ...andR8(0xA6, Registers.R_MIYd),
+  ...xorR8(0xAE, Registers.R_MIYd),
+  ...orR8(0xB6, Registers.R_MIYd),
   ...cpR8(0xBE, Registers.R_MIYd),
+
   ...popR16(0xE1, Registers.R_IX),
   ...popR16(0xE1, Registers.R_IY),
   ...pushR16(0xE5, Registers.R_IX),
@@ -774,7 +874,7 @@ void main() {
 
   test("One Scenario", () {
     print("RUNNING ONLY ONE SCENARIO");
-    var scenarios = exAFAFt(0x08);
+    var scenarios = ldR8R8(0x60, Registers.R_IX_H, Registers.R_B);
     scenarios.forEach((scenario) {
       scenario.run();
     });

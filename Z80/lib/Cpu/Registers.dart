@@ -80,8 +80,8 @@ class Registers {
   static const R_COUNT = 24;
 
   static const R_MHL = 1000;
-  static const R_MIXd = 2000;
-  static const R_MIYd = 3000;
+  static const R_MIXd = 1001;
+  static const R_MIYd = 1002;
 
   static const R_AF = R_A;
   static const R_BC = R_B;
@@ -170,10 +170,10 @@ class Registers {
   int get L => registers[R_L];
   int get S => registers[R_S];
   int get P => registers[R_P];
-  int get IX_L => registers[R_IX_L];
   int get IX_H => registers[R_IX_H];
-  int get IY_L => registers[R_IY_L];
+  int get IX_L => registers[R_IX_L];
   int get IY_H => registers[R_IY_H];
+  int get IY_L => registers[R_IY_L];
   int get I => registers[R_I];
   int get R => registers[R_R];
 

@@ -57,6 +57,10 @@ class Z80 {
   int get E => registers.E;
   int get H => registers.H;
   int get L => registers.L;
+  int get IX_H => registers.IX_H;
+  int get IX_L => registers.IX_L;
+  int get IY_H => registers.IY_H;
+  int get IY_L => registers.IY_L;
   int get I => registers.I;
   int get R => registers.R;
 
@@ -232,14 +236,24 @@ class Z80 {
 
   void setIXY(int prefix, int w) => prefix == IX_PREFIX ? IX = w : IY = w;
 
+  int getRIXY(int r8, int prefix) => prefix == IX_PREFIX
+      ? r8 == Registers.R_H
+          ? Registers.R_IX_H
+          : r8 == Registers.R_L ? Registers.R_IX_L : r8
+      : prefix == IY_PREFIX
+          ? r8 == Registers.R_H
+              ? Registers.R_IY_H
+              : r8 == Registers.R_L ? Registers.R_IY_L : r8
+          : r8;
+
   int iXYDisp(int prefix, int d) => getIXY(prefix) + signedByte(d);
 
   int r8Value(int r) => r == Registers.R_MHL ? memory.peek(HL) : registers[r];
 
-  int r16Value(int r) => 256 * registers[r] + registers[r + 1];
-
   void setR8Value(int r, int b) =>
       r == Registers.R_MHL ? memory.poke(HL, byte(b)) : registers[r] = byte(b);
+
+  int r16Value(int r) => 256 * registers[r] + registers[r + 1];
 
   void setR16Value(int r, int w) {
     registers[r] = hi(w);
@@ -655,7 +669,7 @@ class Z80 {
   }
 
   int incR8(InstructionContext context) {
-    int r8 = Registers.rBit345(context.opcode);
+    int r8 = getRIXY(Registers.rBit345(context.opcode), context.prefix);
     setR8Value(r8, incR8Value(r8Value(r8)));
     return context.instruction.tStates();
   }
@@ -687,7 +701,7 @@ class Z80 {
   }
 
   int decR8(InstructionContext context) {
-    int r8 = Registers.rBit345(context.opcode);
+    int r8 = getRIXY(Registers.rBit345(context.opcode), context.prefix);
     setR8Value(r8, decR8Value(r8Value(r8)));
     return context.instruction.tStates();
   }
@@ -711,7 +725,7 @@ class Z80 {
   }
 
   int ldR8n(InstructionContext context) {
-    int r8 = Registers.rBit345(context.opcode);
+    int r8 = getRIXY(Registers.rBit345(context.opcode), context.prefix);
     setR8Value(r8, fetch());
     return context.instruction.tStates();
   }
@@ -748,49 +762,49 @@ class Z80 {
   }
 
   int addAR8(InstructionContext context) {
-    int r8 = Registers.rBit012(context.opcode);
+    int r8 = getRIXY(Registers.rBit012(context.opcode), context.prefix);
     A = addA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int adcAR8(InstructionContext context) {
-    int r8 = Registers.rBit012(context.opcode);
+    int r8 = getRIXY(Registers.rBit012(context.opcode), context.prefix);
     A = adcA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int subAR8(InstructionContext context) {
-    int r8 = Registers.rBit012(context.opcode);
+    int r8 = getRIXY(Registers.rBit012(context.opcode), context.prefix);
     A = subA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int sbcAR8(InstructionContext context) {
-    int r8 = Registers.rBit012(context.opcode);
+    int r8 = getRIXY(Registers.rBit012(context.opcode), context.prefix);
     A = sbcA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int andAR8(InstructionContext context) {
-    int r8 = Registers.rBit012(context.opcode);
+    int r8 = getRIXY(Registers.rBit012(context.opcode), context.prefix);
     A = andA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int xorAR8(InstructionContext context) {
-    int r8 = Registers.rBit012(context.opcode);
+    int r8 = getRIXY(Registers.rBit012(context.opcode), context.prefix);
     A = xorA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int orAR8(InstructionContext context) {
-    int r8 = Registers.rBit012(context.opcode);
+    int r8 = getRIXY(Registers.rBit012(context.opcode), context.prefix);
     A = orA(r8Value(r8));
     return context.instruction.tStates();
   }
 
   int cpAR8(InstructionContext context) {
-    int r8 = Registers.rBit012(context.opcode);
+    int r8 = getRIXY(Registers.rBit012(context.opcode), context.prefix);
     subA(r8Value(r8));
     return context.instruction.tStates();
   }
@@ -836,8 +850,8 @@ class Z80 {
   }
 
   int ldR8R8(InstructionContext context) {
-    int r8Dest = Registers.rBit345(context.opcode);
-    int r8Source = Registers.rBit012(context.opcode);
+    int r8Dest = getRIXY(Registers.rBit345(context.opcode), context.prefix);
+    int r8Source = getRIXY(Registers.rBit012(context.opcode), context.prefix);
     setR8Value(r8Dest, r8Value(r8Source));
     return context.instruction.tStates();
   }
@@ -1606,6 +1620,31 @@ class Z80 {
     iXYOpcodes.build(0x39, "ADD IXY, SP", addIXYR16, 15);
     iXYOpcodes.build(0x29, "ADD IXY, IXY", addIXYIXY, 15);
 
+    iXYOpcodes.build(0x24, "INC IXYH", incR8, 8);
+    iXYOpcodes.build(0x25, "DEC IXYH", decR8, 8);
+
+    iXYOpcodes.build(0x26, "LD IXYH, n", ldR8n, 11);
+
+    iXYOpcodes.build(0x2C, "INC IXYL", incR8, 8);
+    iXYOpcodes.build(0x2D, "DEC IXYL", decR8, 8);
+
+    iXYOpcodes.build(0x2E, "LD IXYL, n", ldR8n, 11);
+
+    iXYOpcodes.build(0x44, "LD [rb345], IXH", ldR8R8, 8,
+        count: 4, multiplier: 8);
+
+    iXYOpcodes.build(0x45, "LD [rb345], IXL", ldR8R8, 8,
+        count: 4, multiplier: 8);
+
+    iXYOpcodes.build(0x60, "LD IXYH, [rb012]", ldR8R8, 8, count: 6);
+    iXYOpcodes.build(0x67, "LD IXYH, [rb012]", ldR8R8, 8);
+
+    iXYOpcodes.build(0x68, "LD IXYL, [rb012]", ldR8R8, 8, count: 6);
+    iXYOpcodes.build(0x6F, "LD IXYL, [rb012]", ldR8R8, 8);
+
+    iXYOpcodes.build(0x7C, "LD A, IXYH", ldR8R8, 8);
+    iXYOpcodes.build(0x7D, "LD A, IXYL", ldR8R8, 8);
+
     iXYOpcodes.build(0x34, "INC (IXY + d)", incmIXY, 23);
     iXYOpcodes.build(0x35, "DEC (IXY + d)", decmIXY, 23);
 
@@ -1621,13 +1660,36 @@ class Z80 {
 
     iXYOpcodes.build(0x36, "LD (IXY + d), n", ldmIXYdn, 23);
 
+    iXYOpcodes.build(0x84, "ADD A, IXYH", addAR8, 8);
+    iXYOpcodes.build(0x85, "ADD A, IXYL", addAR8, 8);
     iXYOpcodes.build(0x86, "ADD A, (IXY + d)", addAIXYd, 19);
+
+    iXYOpcodes.build(0x8C, "ADC A, IXYH", adcAR8, 8);
+    iXYOpcodes.build(0x8D, "ADC A, IXYL", adcAR8, 8);
     iXYOpcodes.build(0x8E, "ADC A, (IXY + d)", adcAIXYd, 19);
+
+    iXYOpcodes.build(0x94, "SUB IXYH", subAR8, 8);
+    iXYOpcodes.build(0x95, "SUB IXYL", subAR8, 8);
     iXYOpcodes.build(0x96, "SUB (IXY + d)", subAIXYd, 19);
+
+    iXYOpcodes.build(0x9C, "SBC A, IXYH", sbcAR8, 8);
+    iXYOpcodes.build(0x9D, "SBC A, IXYL", sbcAR8, 8);
     iXYOpcodes.build(0x9E, "SBC A, (IXY + d)", sbcAIXYd, 19);
+
+    iXYOpcodes.build(0xA4, "AND IXYH", andAR8, 8);
+    iXYOpcodes.build(0xA5, "AND IXYL", andAR8, 8);
     iXYOpcodes.build(0xA6, "AND (IXY + d)", andAIXYd, 19);
+
+    iXYOpcodes.build(0xAC, "XOR IXYH", xorAR8, 8);
+    iXYOpcodes.build(0xAD, "XOR IXYL", xorAR8, 8);
     iXYOpcodes.build(0xAE, "XOR (IXY + d)", xorAIXYd, 19);
+
+    iXYOpcodes.build(0xB4, "OR IXYH", orAR8, 8);
+    iXYOpcodes.build(0xB5, "OR IXYL", orAR8, 8);
     iXYOpcodes.build(0xB6, "OR (IXY + d)", orAIXYd, 19);
+
+    iXYOpcodes.build(0xBC, "CP IXYH", cpAR8, 8);
+    iXYOpcodes.build(0xBD, "CP IXYL", cpAR8, 8);
     iXYOpcodes.build(0xBE, "CP (IXY + d)", cpAIXYd, 19);
 
     iXYOpcodes.build(0xE1, "POP IXY", popIXY, 19);

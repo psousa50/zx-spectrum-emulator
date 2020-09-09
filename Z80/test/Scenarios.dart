@@ -9,16 +9,27 @@ log(String m, value) {
   return value;
 }
 
-bool isIXIY(int rhxy) => rhxy == Registers.R_IX || rhxy == Registers.R_IY;
+bool isIX(int rhxy) =>
+    [Registers.R_IX, Registers.R_IX_H, Registers.R_IX_L].contains(rhxy);
+
+bool isIY(int rhxy) =>
+    [Registers.R_IY, Registers.R_IY_H, Registers.R_IY_L].contains(rhxy);
+
+bool isIXIY(int rhxy) => isIX(rhxy) || isIY(rhxy);
 
 bool isMIXIY(int rhxy) => rhxy == Registers.R_MIXd || rhxy == Registers.R_MIYd;
 
 int rMIXY(int rxy) => rxy == Registers.R_MIXd ? Registers.R_IX : Registers.R_IY;
 
 List<int> ixyPrefix(int rhxy) => [
-      if (rhxy == Registers.R_IX) Z80.IX_PREFIX,
-      if (rhxy == Registers.R_IY) Z80.IY_PREFIX
+      if ([Registers.R_IX, Registers.R_IX_H, Registers.R_IX_L].contains(rhxy))
+        Z80.IX_PREFIX,
+      if ([Registers.R_IY, Registers.R_IY_H, Registers.R_IY_L].contains(rhxy))
+        Z80.IY_PREFIX,
     ];
+
+List<int> ixyPrefix2(int rhxy1, int rhxy2) =>
+    Set.of([...ixyPrefix(rhxy1), ...ixyPrefix(rhxy2)]).toList();
 
 List<Scenario> nop(int opcode) => [
       Scenario(
@@ -29,10 +40,10 @@ List<Scenario> nop(int opcode) => [
       )
     ];
 
-List<Scenario> ldR8NN(int opcode, int r8) => [
+List<Scenario> ldR8N(int opcode, int r8) => [
       Scenario(
         'LD ${Registers.r8Names[r8]}, NN',
-        [opcode, 12],
+        [...ixyPrefix(r8), opcode, 12],
         initialState: State(),
         expectedState: State(
           register8Values: {r8: 12},
@@ -209,7 +220,7 @@ Scenario changeR8R8(
         {String inFlags = "", int prefix}) =>
     Scenario(
       '$name ${Registers.r8Names[r8]} ($value $result)',
-      [if (prefix != null) prefix, opcode],
+      [...ixyPrefix(r8), if (prefix != null) prefix, opcode],
       initialState: State(
         register8Values: {r8: value},
         flags: inFlags,
@@ -536,7 +547,7 @@ List<Scenario> rrd(int opcode) => [
 List<Scenario> ldR8R8(int opcode, int r8Dest, int r8Source) => [
       Scenario(
         'LD ${Registers.r8Names[r8Dest]}, ${Registers.r8Names[r8Source]}',
-        [opcode],
+        [...ixyPrefix2(r8Source, r8Dest), opcode],
         initialState: State(
           register8Values: {r8Source: 10, r8Dest: r8Source == r8Dest ? 10 : 5},
         ),
@@ -929,7 +940,7 @@ Scenario r8r8Operation(String name, int opcode, int r8, int aValue, int r8Value,
         {String inFlags = ""}) =>
     Scenario(
       '$name ${Registers.r8Names[r8]} -> ($aValue)',
-      [opcode],
+      [...ixyPrefix(r8), opcode],
       initialState: State(
         register8Values: {
           Registers.R_A: aValue,
@@ -1575,8 +1586,8 @@ Scenario setNR8Spec(int opcode, int bit, int r8, int value, int result) =>
         prefix: Z80.BIT_OPCODES);
 
 List<Scenario> setNR8(int opcode, int bit, int r8) => [
-      resNR8Spec(opcode, bit, r8, 0x00, Z80.bitMask[bit]),
-      resNR8Spec(opcode, bit, r8, Z80.bitMask[bit], Z80.bitMask[bit]),
+      setNR8Spec(opcode, bit, r8, 0x00, Z80.bitMask[bit]),
+      setNR8Spec(opcode, bit, r8, Z80.bitMask[bit], Z80.bitMask[bit]),
     ];
 
 List<Scenario> set0R8(int opcode, int r8) => setNR8(opcode, 0, r8);
