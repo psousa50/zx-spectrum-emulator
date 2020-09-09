@@ -18,12 +18,13 @@ class ZxSpectrumPorts extends Ports {
   }
 
   PortHandler handler(int port) {
-    var h = bindings.firstWhere((b) => (port & b.bitMask) == b.value);
-    return h == null ? null : h.portHandler;
+    var h = bindings.firstWhere((b) => (port & b.bitMask) == b.value,
+        orElse: () => null);
+    return h == null ? nullPortHandler : h.portHandler;
   }
 
   @override
-  int inPort(int port) => handler(port)?.read(port);
+  int inPort(int port) => handler(port).read(port);
 
   @override
   void outPort(int port, int value) => handler(port)?.write(port, value);

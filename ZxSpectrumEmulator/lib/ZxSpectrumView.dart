@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:ZxSpectrum/Util.dart';
+import 'package:ZxSpectrum/Z80Snapshot.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:ZxSpectrumEmulator/Keyboard.dart';
@@ -7,6 +10,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import 'Display.dart';
+
+class KeyToSend {
+  int delayMs;
+  ZxKey key;
+
+  KeyToSend(this.delayMs, this.key);
+}
 
 class ZxSpectrumView extends StatefulWidget {
   @override
@@ -16,6 +26,19 @@ class ZxSpectrumView extends StatefulWidget {
 class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   ZxSpectrum zxSpectrum;
   Uint8List screen;
+
+  void sendKeys(List<KeyToSend> keysToSend) {
+    if (keysToSend.length > 0) {
+      var keyToSend = keysToSend.first;
+      Timer(Duration(milliseconds: keyToSend.delayMs), () {
+        onKeyEvent(keyToSend.key, true);
+        Timer(Duration(milliseconds: 50), () {
+          onKeyEvent(keyToSend.key, false);
+        });
+        sendKeys(keysToSend.sublist(1));
+      });
+    }
+  }
 
   void getScreen() async {
     var s = await rootBundle.load('assets/google.scr');
@@ -28,11 +51,25 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     zxSpectrum.start();
   }
 
+  void loadGameAndStart() async {
+    var s = await rootBundle.load('assets/games/JetSetWilly.z80');
+    var z80 = Z80Snapshot(s.buffer.asUint8List());
+    z80.load(zxSpectrum);
+    zxSpectrum.start();
+  }
+
   @override
   void initState() {
     super.initState();
     zxSpectrum = ZxSpectrum(onFrame: refreshScreen);
-    loadRomAndStart();
+    loadGameAndStart();
+    sendKeys([
+      KeyToSend(1000, ZxKey.K_1),
+      KeyToSend(500, ZxKey.K_1),
+      KeyToSend(500, ZxKey.K_1),
+      KeyToSend(500, ZxKey.K_1),
+      KeyToSend(500, ZxKey.K_ENTER),
+    ]);
   }
 
   void refreshScreen(ZxSpectrum zx, int currentFrame) {
@@ -46,6 +83,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   @override
   Widget build(BuildContext context) {
+    var style = TextStyle(fontSize: 20, decoration: TextDecoration.none);
     var rgb = zxSpectrum.ula.borderColor.toRgbColor();
     Color borderColor = Color.fromRGBO(rgb.r, rgb.g, rgb.b, 1);
     return Column(children: [
@@ -53,6 +91,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
       if (screen != null) Display(screen, borderColor),
       SizedBox(height: 30),
       Keyboard(onKeyEvent),
+      Text(toHex(zxSpectrum.z80.PC), style: style),
     ]);
   }
 }

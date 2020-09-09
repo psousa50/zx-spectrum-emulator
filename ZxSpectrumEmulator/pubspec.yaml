@@ -24,3 +24,6 @@ flutter:
   assets:
     - assets/google.scr
     - assets/48.rom
+    - assets/games/pacman.z80
+    - assets/games/JetSetWilly.z80
+    - assets/games/ManicMiner.z80

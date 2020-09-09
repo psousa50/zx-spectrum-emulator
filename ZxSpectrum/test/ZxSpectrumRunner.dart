@@ -1,8 +1,16 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:Z80/Util.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
+
+class KeyToSend {
+  int delayMs;
+  ZxKey key;
+
+  KeyToSend(this.delayMs, this.key);
+}
 
 class ZxSpectrumRunner {
   ZxSpectrum zxSpectrum;
@@ -20,6 +28,24 @@ class ZxSpectrumRunner {
     );
   }
 
+  void sendKeys(List<KeyToSend> keysToSend) {
+    if (keysToSend.length > 0) {
+      var keyToSend = keysToSend.first;
+      log("KEY ${keyToSend.key}");
+      Timer(Duration(milliseconds: keyToSend.delayMs), () {
+        sendKeyEvent(keyToSend.key, true);
+        Timer(Duration(milliseconds: 50), () {
+          sendKeyEvent(keyToSend.key, false);
+        });
+        sendKeys(keysToSend.sublist(1));
+      });
+    }
+  }
+
+  void sendKeyEvent(ZxKey key, bool pressed) {
+    pressed ? zxSpectrum.ula.keyDown(key) : zxSpectrum.ula.keyUp(key);
+  }
+
   void log(String s) {
     var z80 = zxSpectrum.z80;
 
@@ -34,10 +60,7 @@ class ZxSpectrumRunner {
         " ${z80.registers.parityOverflowFlag ? "P" : " "}" +
         " ${z80.registers.addSubtractFlag ? "N" : " "}" +
         " ${z80.registers.carryFlag ? "C" : " "}" +
-        " K0:${toHex(zxSpectrum.ports.inPort(0xFBFE))}" +
-        " K1:${toHex(zxSpectrum.ports.inPort(0xBFFE))}" +
-        " ${toHex(z80.memory.peek(z80.registers.IY))}" +
-        " ${toHex(z80.memory.peek(z80.registers.IY + 1))}";
+        " ${z80.memory.range(z80.PC, end: z80.PC + 4).map(toHex)}";
 
     printBuffer.add("$state       $s");
 
@@ -104,7 +127,13 @@ class ZxSpectrumRunner {
   }
 
   void start() {
-    loadRom();
+    sendKeys([
+      KeyToSend(2000, ZxKey.K_1),
+      KeyToSend(500, ZxKey.K_1),
+      KeyToSend(500, ZxKey.K_1),
+      KeyToSend(500, ZxKey.K_1),
+      KeyToSend(500, ZxKey.K_ENTER),
+    ]);
     zxSpectrum.start();
   }
 }

@@ -22,5 +22,6 @@ int w(int lo, int hi) => lo + 256 * hi;
 int bit01(int byte) => byte & 0x03;
 int bit012(int byte) => byte & 0x07;
 int bit123(int byte) => byte & 0x0E;
+int bit5(int byte) => byte & 0x20;
 int bit345(int byte) => (byte & 0x38) >> 3;
 int bit45(int byte) => (byte & 0x30) >> 4;
