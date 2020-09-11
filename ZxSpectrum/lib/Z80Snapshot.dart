@@ -88,6 +88,8 @@ class Z80Snapshot {
     z80.IX = IX;
 
     z80.interruptsEnabled = interruptsEnabled;
+    z80.interruptMode = interruptMode;
+
     switch (version) {
       case Version.v1:
         loadV1(zx);
