@@ -13,16 +13,17 @@ class Display extends StatelessWidget {
     if (screen == null) {
       return Text("No Screen!");
     }
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(width: 40, color: borderColor),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Image.memory(
-        screen,
-        width: 256,
-        height: 192,
-        gaplessPlayback: true,
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(width: 40, color: borderColor),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Image.memory(
+          screen,
+          gaplessPlayback: true,
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }
