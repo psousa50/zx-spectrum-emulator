@@ -7,11 +7,13 @@ import 'ZxSpectrumRunner.dart';
 void main() {
   var zxSpectrumRunner = ZxSpectrumRunner();
 
-  var snapshot = File('assets/games/JetSetWilly.z80').readAsBytesSync();
+  var snapshot = File('assets/games/ADayInTheLife.z80').readAsBytesSync();
 
   var z80Sna = Z80Snapshot(snapshot);
 
   z80Sna.load(zxSpectrumRunner.zxSpectrum);
+
+  zxSpectrumRunner.loadRom();
 
   zxSpectrumRunner.start();
 }

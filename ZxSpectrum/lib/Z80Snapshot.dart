@@ -102,8 +102,36 @@ class Z80Snapshot {
     }
   }
 
+  Uint8List decompress(Uint8List b) {
+    var decompressed = List<int>();
+
+    List<int> fetch(int start, int size) =>
+        start + size <= b.length ? b.sublist(start, start + size).toList() : [];
+
+    var p = 0;
+    bool done = false;
+    while (!done) {
+      done = p >= b.length ||
+          p == b.length - 4 && eq(fetch(p, 4), [0x00, 0xED, 0xED, 0x00]);
+      if (!done) {
+        if (eq(fetch(p, 2), [0xED, 0xED])) {
+          var repeat = b[p + 2];
+          var byte = b[p + 3];
+          decompressed.addAll(List.filled(repeat, byte));
+          p = p + 4;
+        } else {
+          decompressed.add(b[p]);
+          p = p + 1;
+        }
+      }
+    }
+
+    return Uint8List.fromList(decompressed);
+  }
+
   void loadV1(ZxSpectrum zx) {
-    zx.load(0x4000, bytes.sublist(30));
+    var b = compressed ? decompress(bytes.sublist(30)) : bytes.sublist(30);
+    zx.load(0x4000, b);
   }
 
   void loadV2(ZxSpectrum zx) {

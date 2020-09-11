@@ -8,7 +8,7 @@ import 'package:ZxSpectrum/Z80Snapshot.dart';
 
 void main() {
   test("", () {
-    var snapshot = File('assets/games/ManicMiner.z80').readAsBytesSync();
+    var snapshot = File('assets/games/ADayInTheLife.z80').readAsBytesSync();
 
     var z80Sna = Z80Snapshot(snapshot);
 

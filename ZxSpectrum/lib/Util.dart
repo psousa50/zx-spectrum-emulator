@@ -1,3 +1,7 @@
+import 'package:collection/collection.dart';
+
+Function eq = const ListEquality().equals;
+
 int binary(String b) => int.parse(b, radix: 2);
 
 String toBinary8(int b) {

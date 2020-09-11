@@ -34,7 +34,7 @@ class ZxSpectrumRunner {
       log("KEY ${keyToSend.key}");
       Timer(Duration(milliseconds: keyToSend.delayMs), () {
         sendKeyEvent(keyToSend.key, true);
-        Timer(Duration(milliseconds: 50), () {
+        Timer(Duration(milliseconds: 500), () {
           sendKeyEvent(keyToSend.key, false);
         });
         sendKeys(keysToSend.sublist(1));
@@ -128,11 +128,8 @@ class ZxSpectrumRunner {
 
   void start() {
     sendKeys([
-      KeyToSend(2000, ZxKey.K_1),
-      KeyToSend(500, ZxKey.K_1),
-      KeyToSend(500, ZxKey.K_1),
-      KeyToSend(500, ZxKey.K_1),
-      KeyToSend(500, ZxKey.K_ENTER),
+      KeyToSend(1000, ZxKey.K_0),
+      KeyToSend(2000, ZxKey.K_ENTER),
     ]);
     zxSpectrum.start();
   }
