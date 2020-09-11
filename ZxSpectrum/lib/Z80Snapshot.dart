@@ -94,6 +94,7 @@ class Z80Snapshot {
         break;
 
       case Version.v2:
+      case Version.v3:
         loadV2(zx);
         break;
 
@@ -130,8 +131,9 @@ class Z80Snapshot {
   }
 
   void loadV1(ZxSpectrum zx) {
-    var b = compressed ? decompress(bytes.sublist(30)) : bytes.sublist(30);
-    zx.load(0x4000, b);
+    var b = bytes.sublist(30);
+    var uncompressed = compressed ? decompress(b) : b;
+    zx.load(0x4000, uncompressed);
   }
 
   void loadV2(ZxSpectrum zx) {
@@ -143,7 +145,9 @@ class Z80Snapshot {
       var start = pages[pageNumber];
       if (start != null) {
         var data = p + 3;
-        zx.load(start, bytes.sublist(data, data + length - 1));
+        var b = bytes.sublist(data, data + length - 1);
+        var uncompressed = compressed ? decompress(b) : b;
+        zx.load(start, uncompressed);
       }
       p = p + 3 + length;
     }
