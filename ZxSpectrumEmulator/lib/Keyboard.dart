@@ -13,6 +13,7 @@ class Keyboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       Row(children: [
+        Spacer(),
         ZxKeyView("1", ZxKey.K_1, onKeyPress),
         ZxKeyView("2", ZxKey.K_2, onKeyPress),
         ZxKeyView("3", ZxKey.K_3, onKeyPress),
@@ -23,9 +24,11 @@ class Keyboard extends StatelessWidget {
         ZxKeyView("8", ZxKey.K_8, onKeyPress),
         ZxKeyView("9", ZxKey.K_9, onKeyPress),
         ZxKeyView("0", ZxKey.K_0, onKeyPress),
+        Spacer(),
       ]),
       Row(
         children: [
+          Spacer(),
           ZxKeyView("Q", ZxKey.K_Q, onKeyPress),
           ZxKeyView("W", ZxKey.K_W, onKeyPress),
           ZxKeyView("E", ZxKey.K_E, onKeyPress),
@@ -36,10 +39,12 @@ class Keyboard extends StatelessWidget {
           ZxKeyView("I", ZxKey.K_I, onKeyPress),
           ZxKeyView("O", ZxKey.K_O, onKeyPress),
           ZxKeyView("P", ZxKey.K_P, onKeyPress),
+          Spacer(),
         ],
       ),
       Row(
         children: [
+          Spacer(),
           ZxKeyView("A", ZxKey.K_A, onKeyPress),
           ZxKeyView("S", ZxKey.K_S, onKeyPress),
           ZxKeyView("D", ZxKey.K_D, onKeyPress),
@@ -50,10 +55,12 @@ class Keyboard extends StatelessWidget {
           ZxKeyView("K", ZxKey.K_K, onKeyPress),
           ZxKeyView("L", ZxKey.K_L, onKeyPress),
           ZxKeyView("<-", ZxKey.K_ENTER, onKeyPress),
+          Spacer(),
         ],
       ),
       Row(
         children: [
+          Spacer(),
           ZxKeyView("cs", ZxKey.K_CAPS, onKeyPress, toggle: true),
           ZxKeyView("Z", ZxKey.K_Z, onKeyPress),
           ZxKeyView("X", ZxKey.K_X, onKeyPress),
@@ -64,6 +71,7 @@ class Keyboard extends StatelessWidget {
           ZxKeyView("M", ZxKey.K_M, onKeyPress),
           ZxKeyView("ss", ZxKey.K_SYM, onKeyPress, toggle: true),
           ZxKeyView("b", ZxKey.K_SPACE, onKeyPress),
+          Spacer(),
         ],
       )
     ]);

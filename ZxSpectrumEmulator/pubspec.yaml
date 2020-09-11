@@ -26,4 +26,6 @@ flutter:
     - assets/48.rom
     - assets/games/pacman.z80
     - assets/games/JetSetWilly.z80
+    - assets/games/ADayInTheLife.z80
+    - assets/games/3DDeathChase.z80
     - assets/games/ManicMiner.z80
