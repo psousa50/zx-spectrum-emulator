@@ -142,18 +142,22 @@ class Z80 {
       case IX_PREFIX:
       case IY_PREFIX:
         tStates = processIXYOpcodes(opcode);
+        R = R + 2;
         break;
 
       case EXTENDED_OPCODES:
         tStates = processOpcode(InstructionContext(fetch()), extendedOpcodes);
+        R = R + 2;
         break;
 
       case BIT_OPCODES:
         tStates = processOpcode(InstructionContext(fetch()), bitOpcodes);
+        R = R + 2;
         break;
 
       default:
         tStates = processOpcode(InstructionContext(opcode), unPrefixedOpcodes);
+        R = R + 1;
         break;
     }
 

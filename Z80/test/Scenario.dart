@@ -99,7 +99,8 @@ class Scenario {
     Map<int, int> actualRegisterValues = getZ80Registers(z80);
 
     for (var r = 0; r < Registers.R_COUNT; r++) {
-      if (![Registers.R_F, Registers.R_S, Registers.R_P].contains(r)) {
+      if (![Registers.R_R, Registers.R_F, Registers.R_S, Registers.R_P]
+          .contains(r)) {
         // FLAGS are checked later, individually
         expect(actualRegisterValues[r], expectedRegisterValues[r],
             reason: wrongRegister(opcodes, r));

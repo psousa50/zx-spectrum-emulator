@@ -1082,4 +1082,34 @@ void main() {
     z80.step();
     expect(z80.registers.B, 123);
   }, skip: !runAll);
+
+  group("Refresh Register", () {
+    test("Increase by 1 for unprefixed opcodes", () {
+      var z80 = newCPU();
+      z80.memory.setRange(z80.PC, Z80Assembler.jr(2));
+      z80.step();
+      expect(z80.registers.R, 1);
+    }, skip: !runAll);
+
+    test("Increase by 2 for bit opcodes", () {
+      var z80 = newCPU();
+      z80.memory.setRange(z80.PC, Z80Assembler.bitBR8(0, Registers.R_B));
+      z80.step();
+      expect(z80.registers.R, 2);
+    }, skip: !runAll);
+
+    test("Increase by 2 for IXY opcodes", () {
+      var z80 = newCPU();
+      z80.memory.setRange(z80.PC, Z80Assembler.ldIXnn(12345));
+      z80.step();
+      expect(z80.registers.R, 2);
+    }, skip: !runAll);
+
+    test("Increase by 2 for IXY bit opcodes", () {
+      var z80 = newCPU();
+      z80.memory.setRange(z80.PC, Z80Assembler.bitBIXd(2, 3));
+      z80.step();
+      expect(z80.registers.R, 2);
+    }, skip: !runAll);
+  });
 }

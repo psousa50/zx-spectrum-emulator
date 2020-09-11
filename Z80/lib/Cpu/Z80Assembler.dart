@@ -12,6 +12,15 @@ class Z80Assembler {
   static Uint8List ldR8n(int r8, int n) =>
       u([0x06 | (Registers.r8TableBack[r8] << 3), n]);
 
+  static Uint8List bitBR8(int bit, int r8) =>
+      u([Z80.BIT_OPCODES, 0x40 | (bit << 3) | (Registers.r8TableBack[r8])]);
+
+  static Uint8List bitBIXd(int bit, int d) => u([
+        Z80.IX_PREFIX,
+        d,
+        0x40 | (bit << 3) | (Registers.r8TableBack[Registers.R_MHL])
+      ]);
+
   static Uint8List incA() => u([0x3C]);
   static Uint8List jr(int n) => u([0x18, n]);
   static Uint8List djnz(int n) => u([0x10, n]);
@@ -26,6 +35,8 @@ class Z80Assembler {
   static Uint8List im0() => u([Z80.EXTENDED_OPCODES, 0x46]);
   static Uint8List im1() => u([Z80.EXTENDED_OPCODES, 0x56]);
   static Uint8List im2() => u([Z80.EXTENDED_OPCODES, 0x5E]);
+
+  static Uint8List ldIXnn(int nn) => u([Z80.IX_PREFIX, 0x21, lo(nn), hi(nn)]);
 
   static Uint8List halt() => u([0x76]);
   static Uint8List di() => u([0xF3]);
