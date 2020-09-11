@@ -16,7 +16,7 @@ class Display extends StatelessWidget {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(width: 40, color: borderColor),
+          border: Border.all(width: 60, color: borderColor),
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         child: Image.memory(

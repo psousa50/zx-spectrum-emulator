@@ -32,6 +32,10 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   var keyRight = ZxKey.K_0;
   var keyFire = ZxKey.K_M;
 
+  double sx = 0;
+  double sy = 0;
+  double x = 0;
+  double y = 0;
   bool movingLeft = false;
   bool movingRight = false;
   bool movingUp = false;
@@ -63,7 +67,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/3DDeathChase.z80');
+    var s = await rootBundle.load('assets/games/galaxian.z80');
     var z80 = Z80Snapshot(s.buffer.asUint8List());
     z80.load(zxSpectrum);
     zxSpectrum.load(0, rom.buffer.asUint8List());
@@ -92,34 +96,44 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   @override
   Widget build(BuildContext context) {
-    var style = TextStyle(fontSize: 20, decoration: TextDecoration.none);
+    // var style = TextStyle(fontSize: 20, decoration: TextDecoration.none);
     var rgb = zxSpectrum.ula.borderColor.toRgbColor();
     Color borderColor = Color.fromRGBO(rgb.r, rgb.g, rgb.b, 1);
 
-    if (movingLeft) {
+    int tx = 5;
+    double dx = x - sx;
+    int ty = 5;
+    double dy = y - sy;
+    if (dx > -tx && dx < tx) {
+      zxSpectrum.ula.keyUp(keyLeft);
+      zxSpectrum.ula.keyUp(keyRight);
+      zxSpectrum.kempston.stopHorizontal();
+    }
+    if (dx < -tx) {
       zxSpectrum.ula.keyDown(keyLeft);
+      zxSpectrum.ula.keyUp(keyRight);
+      zxSpectrum.kempston.left();
     }
-    if (movingRight) {
+    if (dx > tx) {
       zxSpectrum.ula.keyDown(keyRight);
-    }
-    if (movingUp) {
-      zxSpectrum.ula.keyDown(keyUp);
-    }
-    if (movingDown) {
-      zxSpectrum.ula.keyDown(keyDown);
+      zxSpectrum.ula.keyUp(keyLeft);
+      zxSpectrum.kempston.right();
     }
 
-    if (!movingLeft) {
-      zxSpectrum.ula.keyUp(keyLeft);
-    }
-    if (!movingRight) {
-      zxSpectrum.ula.keyUp(keyRight);
-    }
-    if (!movingUp) {
+    if (dy > -ty && dy < ty) {
       zxSpectrum.ula.keyUp(keyUp);
-    }
-    if (!movingDown) {
       zxSpectrum.ula.keyUp(keyDown);
+      zxSpectrum.kempston.stopVertical();
+    }
+    if (dy > 0) {
+      zxSpectrum.ula.keyDown(keyUp);
+      zxSpectrum.ula.keyUp(keyDown);
+      zxSpectrum.kempston.up();
+    }
+    if (dy < 0) {
+      zxSpectrum.ula.keyDown(keyDown);
+      zxSpectrum.ula.keyUp(keyUp);
+      zxSpectrum.kempston.down();
     }
 
     return Column(children: [
@@ -136,9 +150,11 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
         GestureDetector(
           onTapDown: (_) {
             zxSpectrum.ula.keyDown(keyFire);
+            zxSpectrum.kempston.fire();
           },
           onTapUp: (_) {
             zxSpectrum.ula.keyUp(keyFire);
+            zxSpectrum.kempston.stopFire();
           },
           child: Container(
             padding: EdgeInsets.all(50.0),
@@ -150,27 +166,17 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
         Spacer(),
         GestureDetector(
           // When the child is tapped, show a snackbar.
-          onPanEnd: (_) {
-            movingRight = false;
-            movingLeft = false;
+          onPanStart: (details) {
+            sx = details.localPosition.dx;
+            sy = details.localPosition.dy;
           },
-          onPanUpdate: (d) {
-            if (d.delta.dx > 1) {
-              movingLeft = false;
-              movingRight = true;
-            }
-            if (d.delta.dx < -1) {
-              movingLeft = true;
-              movingRight = false;
-            }
-            if (d.delta.dy > 1) {
-              movingDown = true;
-              movingUp = false;
-            }
-            if (d.delta.dy < -1) {
-              movingDown = false;
-              movingUp = true;
-            }
+          onPanEnd: (_) {
+            x = sx;
+            y = sy;
+          },
+          onPanUpdate: (details) {
+            x = details.localPosition.dx;
+            y = details.localPosition.dy;
           },
           child: Container(
             padding: EdgeInsets.fromLTRB(100, 50, 100, 50),
