@@ -14,15 +14,19 @@ class Display extends StatelessWidget {
       return Text("No Screen!");
     }
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(width: 60, color: borderColor),
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        child: Image.memory(
-          screen,
-          gaplessPlayback: true,
-          fit: BoxFit.contain,
+      child: AspectRatio(
+        aspectRatio: 352 / 296,
+        child: Container(
+          color: borderColor,
+          child: FractionallySizedBox(
+            widthFactor: 1 - 48 / 352,
+            heightFactor: 1 - 48 / 296,
+            child: Image.memory(
+              screen,
+              gaplessPlayback: true,
+              fit: BoxFit.contain,
+            ),
+          ),
         ),
       ),
     );

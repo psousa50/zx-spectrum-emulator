@@ -32,3 +32,5 @@ flutter:
     - assets/games/3DDeathChase.z80
     - assets/games/ManicMiner.z80
     - assets/games/Jetpac.z80
+    - assets/games/elite.z80
+    - assets/games/ChuckieEgg.z80

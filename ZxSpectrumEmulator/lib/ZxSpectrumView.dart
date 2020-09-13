@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:ZxSpectrum/Z80Snapshot.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
+import 'package:ZxSpectrumEmulator/Joystick.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
@@ -28,9 +29,9 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   var keyDown = ZxKey.K_8;
   var keyUp = ZxKey.K_9;
-  var keyLeft = ZxKey.K_1;
-  var keyRight = ZxKey.K_0;
-  var keyFire = ZxKey.K_M;
+  var keyLeft = ZxKey.K_Q;
+  var keyRight = ZxKey.K_W;
+  var keyFire = ZxKey.K_P;
 
   double sx = 0;
   double sy = 0;
@@ -38,8 +39,6 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   double y = 0;
   bool movingLeft = false;
   bool movingRight = false;
-  bool movingUp = false;
-  bool movingDown = false;
 
   void sendKeys(List<KeyToSend> keysToSend) {
     if (keysToSend.length > 0) {
@@ -67,7 +66,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/galaxian.z80');
+    var s = await rootBundle.load('assets/games/3DDeathChase.z80');
     var z80 = Z80Snapshot(s.buffer.asUint8List());
     z80.load(zxSpectrum);
     zxSpectrum.load(0, rom.buffer.asUint8List());
@@ -80,8 +79,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     zxSpectrum = ZxSpectrum(onFrame: refreshScreen);
     loadGameAndStart();
     // sendKeys([
-    //   KeyToSend(1000, ZxKey.K_0),
-    //   KeyToSend(2000, ZxKey.K_ENTER),
+    //   KeyToSend(3000, ZxKey.K_S),
     // ]);
   }
 
@@ -91,8 +89,39 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     });
   }
 
-  void onKeyEvent(ZxKey zxKey, bool pressed) =>
-      pressed ? zxSpectrum.ula.keyDown(zxKey) : zxSpectrum.ula.keyUp(zxKey);
+  void onKeyEvent(ZxKey zxKey, bool pressed) {
+    pressed ? zxSpectrum.ula.keyDown(zxKey) : zxSpectrum.ula.keyUp(zxKey);
+  }
+
+  void onJoyStickEvent(ZxKey zxKey, JoystickState state) =>
+      state == JoystickState.On
+          ? zxSpectrum.ula.keyDown(zxKey)
+          : zxSpectrum.ula.keyUp(zxKey);
+
+  void left(JoystickState state) {
+    zxSpectrum.kempston.left(state == JoystickState.On);
+    onJoyStickEvent(keyLeft, state);
+  }
+
+  void right(JoystickState state) {
+    zxSpectrum.kempston.right(state == JoystickState.On);
+    onJoyStickEvent(keyRight, state);
+  }
+
+  void up(JoystickState state) {
+    zxSpectrum.kempston.up(state == JoystickState.On);
+    onJoyStickEvent(keyUp, state);
+  }
+
+  void down(JoystickState state) {
+    zxSpectrum.kempston.down(state == JoystickState.On);
+    onJoyStickEvent(keyDown, state);
+  }
+
+  void fire(JoystickState state) {
+    zxSpectrum.kempston.fire(state == JoystickState.On);
+    onJoyStickEvent(keyFire, state);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,93 +129,16 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     var rgb = zxSpectrum.ula.borderColor.toRgbColor();
     Color borderColor = Color.fromRGBO(rgb.r, rgb.g, rgb.b, 1);
 
-    int tx = 5;
-    double dx = x - sx;
-    int ty = 5;
-    double dy = y - sy;
-    if (dx > -tx && dx < tx) {
-      zxSpectrum.ula.keyUp(keyLeft);
-      zxSpectrum.ula.keyUp(keyRight);
-      zxSpectrum.kempston.stopHorizontal();
-    }
-    if (dx < -tx) {
-      zxSpectrum.ula.keyDown(keyLeft);
-      zxSpectrum.ula.keyUp(keyRight);
-      zxSpectrum.kempston.left();
-    }
-    if (dx > tx) {
-      zxSpectrum.ula.keyDown(keyRight);
-      zxSpectrum.ula.keyUp(keyLeft);
-      zxSpectrum.kempston.right();
-    }
-
-    if (dy > -ty && dy < ty) {
-      zxSpectrum.ula.keyUp(keyUp);
-      zxSpectrum.ula.keyUp(keyDown);
-      zxSpectrum.kempston.stopVertical();
-    }
-    if (dy > 0) {
-      zxSpectrum.ula.keyDown(keyUp);
-      zxSpectrum.ula.keyUp(keyDown);
-      zxSpectrum.kempston.up();
-    }
-    if (dy < 0) {
-      zxSpectrum.ula.keyDown(keyDown);
-      zxSpectrum.ula.keyUp(keyUp);
-      zxSpectrum.kempston.down();
-    }
-
     return Column(children: [
       SizedBox(height: 30),
       if (screen != null) Display(screen, borderColor),
       SizedBox(height: 30),
       Keyboard(onKeyEvent),
+      Expanded(
+        child: Joystick(left, right, up, down, fire),
+      ),
       // Text(toHex(zxSpectrum.z80.PC), style: style),
       // Text(toHex(zxSpectrum.z80.ports.inPort(0xF7FE)), style: style),
-      // Text(dy.toString(), style: style),
-
-      Row(children: [
-        Spacer(),
-        GestureDetector(
-          onTapDown: (_) {
-            zxSpectrum.ula.keyDown(keyFire);
-            zxSpectrum.kempston.fire();
-          },
-          onTapUp: (_) {
-            zxSpectrum.ula.keyUp(keyFire);
-            zxSpectrum.kempston.stopFire();
-          },
-          child: Container(
-            padding: EdgeInsets.all(50.0),
-            decoration: BoxDecoration(
-              color: Colors.grey,
-            ),
-          ),
-        ),
-        Spacer(),
-        GestureDetector(
-          // When the child is tapped, show a snackbar.
-          onPanStart: (details) {
-            sx = details.localPosition.dx;
-            sy = details.localPosition.dy;
-          },
-          onPanEnd: (_) {
-            x = sx;
-            y = sy;
-          },
-          onPanUpdate: (details) {
-            x = details.localPosition.dx;
-            y = details.localPosition.dy;
-          },
-          child: Container(
-            padding: EdgeInsets.fromLTRB(100, 50, 100, 50),
-            decoration: BoxDecoration(
-              color: Colors.blueGrey,
-            ),
-          ),
-        ),
-        Spacer(),
-      ]),
     ]);
   }
 }
