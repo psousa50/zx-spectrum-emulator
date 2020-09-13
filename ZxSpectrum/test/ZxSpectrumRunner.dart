@@ -31,8 +31,8 @@ class ZxSpectrumRunner {
   void sendKeys(List<KeyToSend> keysToSend) {
     if (keysToSend.length > 0) {
       var keyToSend = keysToSend.first;
-      log("KEY ${keyToSend.key}");
       Timer(Duration(milliseconds: keyToSend.delayMs), () {
+        log("KEY ${keyToSend.key}");
         sendKeyEvent(keyToSend.key, true);
         Timer(Duration(milliseconds: 500), () {
           sendKeyEvent(keyToSend.key, false);
@@ -128,8 +128,9 @@ class ZxSpectrumRunner {
 
   void start() {
     sendKeys([
-      KeyToSend(1000, ZxKey.K_0),
-      KeyToSend(2000, ZxKey.K_ENTER),
+      KeyToSend(3000, ZxKey.K_S),
+      KeyToSend(3000, ZxKey.K_S),
+      KeyToSend(3000, ZxKey.K_S),
     ]);
     zxSpectrum.start();
   }

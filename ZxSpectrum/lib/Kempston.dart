@@ -11,46 +11,37 @@ class Kempston with PortHandler {
 
   @override
   int read(int port) {
-    // print(state);
     return state;
   }
 
   @override
   void write(int port, int value) {}
 
-  void up() {
-    state = state | K_UP;
-    state = state & (0xFF - K_DOWN);
+  void update(bool active, int bit) {
+    state = active ? state | bit : state & (0xFF ^ bit);
   }
 
-  void down() {
-    state = state | K_DOWN;
-    state = state & (0xFF - K_UP);
+  void up(bool active) {
+    update(active, K_UP);
+    if (active) update(!active, K_DOWN);
   }
 
-  void left() {
-    state = state | K_LEFT;
-    state = state & (0xFF - K_RIGHT);
+  void down(bool active) {
+    update(active, K_DOWN);
+    if (active) update(!active, K_UP);
   }
 
-  void right() {
-    state = state | K_RIGHT;
-    state = state & (0xFF - K_LEFT);
+  void left(bool active) {
+    update(active, K_LEFT);
+    if (active) update(!active, K_RIGHT);
   }
 
-  void fire() {
-    state = state | K_FIRE;
+  void right(bool active) {
+    update(active, K_RIGHT);
+    if (active) update(!active, K_LEFT);
   }
 
-  void stopHorizontal() {
-    state = state & (0xFF - K_LEFT) & (0xFF - K_RIGHT);
-  }
-
-  void stopVertical() {
-    state = state & (0xFF - K_UP) & (0xFF - K_DOWN);
-  }
-
-  void stopFire() {
-    state = state & (0xFF - K_FIRE);
+  void fire(bool active) {
+    update(active, K_FIRE);
   }
 }

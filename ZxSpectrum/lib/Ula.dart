@@ -134,8 +134,6 @@ class Ula with PortHandler {
   @override
   int read(int port) {
     var value = keyStates[port];
-    // print(toHex2(port));
-    // print(value);
     return value == null ? 0xFF : value;
   }
 
