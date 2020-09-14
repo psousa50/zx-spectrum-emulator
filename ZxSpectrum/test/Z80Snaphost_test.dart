@@ -8,7 +8,7 @@ import 'package:ZxSpectrum/Z80Snapshot.dart';
 
 void main() {
   test("", () {
-    var snapshot = File('assets/games/ADayInTheLife.z80').readAsBytesSync();
+    var snapshot = File('assets/games/pacman.z80').readAsBytesSync();
 
     var z80Sna = Z80Snapshot(snapshot);
 
@@ -16,12 +16,5 @@ void main() {
 
     var zx = ZxSpectrum();
     z80Sna.load(zx);
-
-    var z80 = zx.z80;
-
-    print("PC ${toHex2(z80.PC)}");
-    print("SP ${toHex2(z80.SP)}");
-
-    print(z80.memory.range(z80.PC, end: z80.PC + 10).map(toHex));
   });
 }

@@ -147,7 +147,13 @@ class Z80Snapshot {
       var start = pages[pageNumber];
       if (start != null) {
         var data = p + 3;
-        var b = bytes.sublist(data, data + length - 1);
+        var b = bytes.sublist(data, data + length);
+        var compressed = true;
+        if (length == 0xFFFF) {
+          length = 0x4000;
+          compressed = false;
+        }
+
         var uncompressed = compressed ? decompress(b) : b;
         zx.load(start, uncompressed);
       }
