@@ -30,7 +30,7 @@ class _JoystickState extends State<Joystick> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.blue,
+      color: Colors.transparent,
       child: Row(children: [
         Expanded(
             flex: 1,
@@ -42,7 +42,7 @@ class _JoystickState extends State<Joystick> {
                 widget.fire(JoystickState.Off);
               },
               child: Container(
-                color: Colors.blue,
+                color: Colors.transparent,
               ),
             )),
         Expanded(
@@ -100,7 +100,7 @@ class _JoystickState extends State<Joystick> {
               sx = x;
               sy = y;
             },
-            child: Container(color: Colors.white),
+            child: Container(color: Colors.transparent),
           ),
         )
       ]),

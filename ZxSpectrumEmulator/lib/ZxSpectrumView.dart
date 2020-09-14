@@ -27,11 +27,11 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   ZxSpectrum zxSpectrum;
   Uint8List screen;
 
-  var keyDown = ZxKey.K_8;
-  var keyUp = ZxKey.K_9;
-  var keyLeft = ZxKey.K_Q;
-  var keyRight = ZxKey.K_W;
-  var keyFire = ZxKey.K_P;
+  var keyDown = ZxKey.K_6;
+  var keyUp = ZxKey.K_7;
+  var keyLeft = ZxKey.K_5;
+  var keyRight = ZxKey.K_8;
+  var keyFire = ZxKey.K_0;
 
   double sx = 0;
   double sy = 0;
@@ -66,7 +66,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/3DDeathChase.z80');
+    var s = await rootBundle.load('assets/games/JetSetWilly.z80');
     var z80 = Z80Snapshot(s.buffer.asUint8List());
     z80.load(zxSpectrum);
     zxSpectrum.load(0, rom.buffer.asUint8List());
@@ -78,9 +78,13 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     super.initState();
     zxSpectrum = ZxSpectrum(onFrame: refreshScreen);
     loadGameAndStart();
-    // sendKeys([
-    //   KeyToSend(3000, ZxKey.K_S),
-    // ]);
+    sendKeys([
+      KeyToSend(1000, ZxKey.K_1),
+      KeyToSend(1000, ZxKey.K_1),
+      KeyToSend(1000, ZxKey.K_1),
+      KeyToSend(1000, ZxKey.K_1),
+      KeyToSend(1000, ZxKey.K_ENTER),
+    ]);
   }
 
   void refreshScreen(ZxSpectrum zx, int currentFrame) {
@@ -129,14 +133,11 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     var rgb = zxSpectrum.ula.borderColor.toRgbColor();
     Color borderColor = Color.fromRGBO(rgb.r, rgb.g, rgb.b, 1);
 
-    return Column(children: [
-      SizedBox(height: 30),
-      if (screen != null) Display(screen, borderColor),
-      SizedBox(height: 30),
-      Keyboard(onKeyEvent),
-      Expanded(
-        child: Joystick(left, right, up, down, fire),
-      ),
+    return Stack(children: [
+      // SizedBox(height: 30),
+      Display(screen, borderColor),
+      // Keyboard(onKeyEvent),
+      Joystick(left, right, up, down, fire),
       // Text(toHex(zxSpectrum.z80.PC), style: style),
       // Text(toHex(zxSpectrum.z80.ports.inPort(0xF7FE)), style: style),
     ]);
