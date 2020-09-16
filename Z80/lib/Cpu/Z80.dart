@@ -1660,7 +1660,7 @@ class Z80 {
     iXYOpcodes.build(0x36, "LD (IXY + d), n", ldmIXYdn, 23);
 
     iXYOpcodes.buildM8C8(0x46, "LD [rb345], (IXY + d)", ldR8mIXYd, 19);
-    iXYOpcodes.buildM1C8(0x70, "LD (IXY + d), [rb345]", ldmIXYdR8, 19);
+    iXYOpcodes.buildM1C8(0x70, "LD (IXY + d), [rb012]", ldmIXYdR8, 19);
 
     iXYOpcodes.build(0x36, "LD (IXY + d), n", ldmIXYdn, 23);
 
