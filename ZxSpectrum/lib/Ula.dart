@@ -113,7 +113,7 @@ class Ula with PortHandler {
         var flash = zxColor & 0x80 == 0x80;
         var brightIdx = zxColor & 0x40 == 0x40 ? 8 : 0;
         var inkColorIdx = zxColor & 0x07 + brightIdx;
-        var paperColorIdx = (zxColor & 0x38) >> 3 + brightIdx;
+        var paperColorIdx = ((zxColor & 0x38) >> 3) + brightIdx;
         if (flash && (currentFrame ~/ 32) % 2 == 1) {
           var s = inkColorIdx;
           inkColorIdx = paperColorIdx;
