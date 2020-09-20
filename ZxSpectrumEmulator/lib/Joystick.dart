@@ -44,9 +44,6 @@ class _JoystickState extends State<Joystick> {
               onTapCancel: () {
                 widget.fire(JoystickState.Off);
               },
-              onPanCancel: () {
-                widget.fire(JoystickState.Off);
-              },
               onPanEnd: (_) {
                 widget.fire(JoystickState.Off);
               },
