@@ -10,8 +10,8 @@ class KeymapJoystick with JoystickListener {
   final ZxKey down;
   final ZxKey fire;
 
-  KeymapJoystick(this.keyboardOperator, this.left, this.right, this.up,
-      this.down, this.fire);
+  KeymapJoystick(this.keyboardOperator,
+      {this.left, this.right, this.up, this.down, this.fire});
 
   void onAction(ZxKey key, bool active) {
     active ? keyboardOperator.keyDown(key) : keyboardOperator.keyUp(key);

@@ -82,11 +82,11 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
     keymapJoystick = KeymapJoystick(
       zxSpectrum.ula,
-      ZxKey.K_6,
-      ZxKey.K_7,
-      ZxKey.K_5,
-      ZxKey.K_8,
-      ZxKey.K_0,
+      left: ZxKey.K_6,
+      right: ZxKey.K_7,
+      up: ZxKey.K_5,
+      down: ZxKey.K_8,
+      fire: ZxKey.K_0,
     );
 
     loadGameAndStart();
