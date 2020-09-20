@@ -40,6 +40,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   double y = 0;
   bool movingLeft = false;
   bool movingRight = false;
+  bool keyboardVisible = true;
 
   void sendKeys(List<KeyToSend> keysToSend) {
     if (keysToSend.length > 0) {
@@ -122,12 +123,16 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
       Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          KeyboardPanel([zxSpectrum.ula])
+          keyboardVisible
+              ? KeyboardPanel([zxSpectrum.ula])
+              : SizedBox(height: 10),
+          MaterialButton(
+            height: 10,
+            color: Colors.grey,
+            onPressed: () => keyboardVisible = !keyboardVisible,
+            child: Text(keyboardVisible ? "Hide Keyboard" : "Show Keyboard"),
+          )
         ],
-      ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [SizedBox(height: 20)],
       ),
       // Text(toHex(zxSpectrum.z80.PC), style: style),
       // Text(toHex(zxSpectrum.z80.ports.inPort(0xF7FE)), style: style),
