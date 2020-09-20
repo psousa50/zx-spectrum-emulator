@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:Z80/Util.dart';
+import 'package:ZxSpectrum/Logger.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 
@@ -14,7 +14,7 @@ class KeyToSend {
 
 class ZxSpectrumRunner {
   ZxSpectrum zxSpectrum;
-  var printBuffer = List<String>();
+  Logger logger;
 
   int currentFrame = 0;
   int instructionCount = 0;
@@ -26,6 +26,7 @@ class ZxSpectrumRunner {
       onInstruction: onInstruction,
       onInterrupt: onInterrupt,
     );
+    logger = Logger();
   }
 
   void sendKeys(List<KeyToSend> keysToSend) {
@@ -46,29 +47,7 @@ class ZxSpectrumRunner {
     pressed ? zxSpectrum.ula.keyDown(key) : zxSpectrum.ula.keyUp(key);
   }
 
-  void log(String s) {
-    var z80 = zxSpectrum.z80;
-
-    var state = "#${toHex2(z80.PC)} " +
-        " A:${toHex(z80.registers.A)}" +
-        " BC:${toHex2(z80.registers.BC)}" +
-        " DE:${toHex2(z80.registers.DE)}" +
-        " HL:${toHex2(z80.registers.HL)}" +
-        " ${z80.registers.signFlag ? "S" : " "}" +
-        " ${z80.registers.zeroFlag ? "Z" : " "}" +
-        " ${z80.registers.halfCarryFlag ? "H" : " "}" +
-        " ${z80.registers.parityOverflowFlag ? "P" : " "}" +
-        " ${z80.registers.addSubtractFlag ? "N" : " "}" +
-        " ${z80.registers.carryFlag ? "C" : " "}" +
-        " ${z80.memory.range(z80.PC, end: z80.PC + 4).map(toHex)}";
-
-    printBuffer.add("$state       $s");
-
-    if (printBuffer.length > 1000) {
-      print("\n${printBuffer.join("\n")}");
-      printBuffer.clear();
-    }
-  }
+  void log([String s = ""]) => logger.z80State(zxSpectrum, s);
 
   void clearKeys() {
     ZxKey.values.forEach((k) {
@@ -87,38 +66,7 @@ class ZxSpectrumRunner {
   void onInstruction(ZxSpectrum zx) {
     instructionCount++;
 
-    var i = zx.z80.getInstruction();
-    // if (zx.z80.PC >= 0x0F2C && zx.z80.PC < 0x11B7) {
-    if (i != null) {
-      log("${i.name}");
-    } else {
-      log("Invalid Instruction");
-    }
-    // }
-
-    if (zx.z80.PC == 0x0F38) {
-      log("KeyCount: $keyCount");
-      switch (keyCount) {
-        case 0:
-          clearKeys();
-          log("PRESSED E (REM)");
-          zx.ula.keyDown(ZxKey.K_E);
-          keyCount++;
-          break;
-
-        case 1:
-          clearKeys();
-          log("PRESSED ENTER");
-          zx.ula.keyDown(ZxKey.K_ENTER);
-          keyCount++;
-          break;
-
-        case 2:
-          clearKeys();
-          keyCount++;
-          break;
-      }
-    }
+    log();
   }
 
   void loadRom() async {
@@ -128,9 +76,15 @@ class ZxSpectrumRunner {
 
   void start() {
     sendKeys([
-      KeyToSend(3000, ZxKey.K_S),
-      KeyToSend(3000, ZxKey.K_S),
-      KeyToSend(3000, ZxKey.K_S),
+      // KeyToSend(2000, ZxKey.K_6),
+      // KeyToSend(2000, ZxKey.K_6),
+      // KeyToSend(2000, ZxKey.K_6),
+      // KeyToSend(2000, ZxKey.K_6),
+      // KeyToSend(2000, ZxKey.K_6),
+      // KeyToSend(2000, ZxKey.K_6),
+      // KeyToSend(2000, ZxKey.K_ENTER),
+      // KeyToSend(2000, ZxKey.K_7),
+      // KeyToSend(2000, ZxKey.K_ENTER),
     ]);
     zxSpectrum.start();
   }

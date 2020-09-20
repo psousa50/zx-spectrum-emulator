@@ -1,0 +1,43 @@
+import 'package:ZxSpectrum/ZxSpectrum.dart';
+
+import 'Util.dart';
+
+class Logger {
+  final bool disabled;
+
+  Logger([bool this.disabled = true]);
+
+  var printBuffer = List<String>();
+
+  void z80State(ZxSpectrum zx, String s) {
+    if (disabled) return;
+
+    var z80 = zx.z80;
+    var state = "#${toHex2(z80.PC)} " +
+        " A:${toHex(z80.registers.A)}" +
+        " BC:${toHex2(z80.registers.BC)}" +
+        " DE:${toHex2(z80.registers.DE)}" +
+        " HL:${toHex2(z80.registers.HL)}" +
+        " IX:${toHex2(z80.registers.IX)}" +
+        " IY:${toHex2(z80.registers.IY)}" +
+        " SP:${toHex2(z80.registers.SP)}" +
+        " MSP:${toHex2(zx.memory.peek2(z80.registers.SP))}" +
+        " ${z80.registers.signFlag ? "S" : " "}" +
+        " ${z80.registers.zeroFlag ? "Z" : " "}" +
+        " ${z80.registers.halfCarryFlag ? "H" : " "}" +
+        " ${z80.registers.parityOverflowFlag ? "P" : " "}" +
+        " ${z80.registers.addSubtractFlag ? "N" : " "}" +
+        " ${z80.registers.carryFlag ? "C" : " "}" +
+        " ${z80.memory.range(z80.PC, end: z80.PC + 4).map(toHex)}";
+
+    var i = zx.z80.getInstruction();
+    var opcode = i != null ? i.name : "Invalid Instruction";
+
+    printBuffer.add("$state       $opcode                 $s");
+
+    if (printBuffer.length > 1000) {
+      print("\n${printBuffer.join("\n")}");
+      printBuffer.clear();
+    }
+  }
+}

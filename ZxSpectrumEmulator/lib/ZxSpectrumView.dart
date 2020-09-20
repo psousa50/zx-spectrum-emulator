@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:ZxSpectrum/Logger.dart';
 import 'package:ZxSpectrum/Z80Snapshot.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
@@ -26,6 +27,7 @@ class ZxSpectrumView extends StatefulWidget {
 class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   ZxSpectrum zxSpectrum;
   Uint8List screen;
+  final logger = Logger(true);
 
   var keyDown = ZxKey.K_6;
   var keyUp = ZxKey.K_7;
@@ -70,20 +72,19 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     var z80 = Z80Snapshot(s.buffer.asUint8List());
     z80.load(zxSpectrum);
     zxSpectrum.load(0, rom.buffer.asUint8List());
+    zxSpectrum.memory.poke(35899, 0);
     zxSpectrum.start();
   }
 
   @override
   void initState() {
     super.initState();
-    zxSpectrum = ZxSpectrum(onFrame: refreshScreen);
+    zxSpectrum =
+        ZxSpectrum(onFrame: refreshScreen, onInstruction: onInstruction);
     loadGameAndStart();
     sendKeys([
-      KeyToSend(1000, ZxKey.K_1),
-      KeyToSend(1000, ZxKey.K_1),
-      KeyToSend(1000, ZxKey.K_1),
-      KeyToSend(1000, ZxKey.K_1),
-      KeyToSend(1000, ZxKey.K_ENTER),
+      KeyToSend(1000, ZxKey.K_2),
+      KeyToSend(1000, ZxKey.K_0),
     ]);
   }
 
@@ -91,6 +92,10 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     setState(() {
       screen = zx.ula.screen;
     });
+  }
+
+  void onInstruction(ZxSpectrum zx) {
+    logger.z80State(zx, "");
   }
 
   void onKeyEvent(ZxKey zxKey, bool pressed) {
@@ -136,8 +141,15 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     return Stack(children: [
       // SizedBox(height: 30),
       Display(screen, borderColor),
-      // Keyboard(onKeyEvent),
       Joystick(left, right, up, down, fire),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [Keyboard(onKeyEvent)],
+      ),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [SizedBox(height: 20)],
+      ),
       // Text(toHex(zxSpectrum.z80.PC), style: style),
       // Text(toHex(zxSpectrum.z80.ports.inPort(0xF7FE)), style: style),
     ]);
