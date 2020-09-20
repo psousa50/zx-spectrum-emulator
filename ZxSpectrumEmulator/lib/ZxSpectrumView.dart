@@ -5,7 +5,7 @@ import 'package:ZxSpectrum/Logger.dart';
 import 'package:ZxSpectrum/Z80Snapshot.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
-import 'package:ZxSpectrumEmulator/Joystick.dart';
+import 'package:ZxSpectrumEmulator/JoystickPanel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
@@ -141,7 +141,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     return Stack(children: [
       // SizedBox(height: 30),
       Display(screen, borderColor),
-      Joystick(left, right, up, down, fire),
+      JoystickPanel(left, right, up, down, fire),
       Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [Keyboard(onKeyEvent)],

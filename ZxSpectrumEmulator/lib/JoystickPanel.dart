@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 enum JoystickState { On, Off }
 typedef void JoystickAction(JoystickState state);
 
-class Joystick extends StatefulWidget {
+class JoystickPanel extends StatefulWidget {
   final JoystickAction left;
   final JoystickAction right;
   final JoystickAction up;
   final JoystickAction down;
   final JoystickAction fire;
 
-  Joystick(
+  JoystickPanel(
     this.left,
     this.right,
     this.up,
@@ -18,12 +18,12 @@ class Joystick extends StatefulWidget {
     this.fire,
   );
   @override
-  _JoystickState createState() => _JoystickState();
+  _JoystickPanelState createState() => _JoystickPanelState();
 }
 
 const threshold = 1;
 
-class _JoystickState extends State<Joystick> {
+class _JoystickPanelState extends State<JoystickPanel> {
   double sx = 0;
   double sy = 0;
 
