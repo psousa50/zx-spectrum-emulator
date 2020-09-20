@@ -1,22 +1,12 @@
 import 'package:flutter/material.dart';
 
-enum JoystickState { On, Off }
-typedef void JoystickAction(JoystickState state);
+import 'package:ZxSpectrum/JoystickListener.dart';
 
 class JoystickPanel extends StatefulWidget {
-  final JoystickAction left;
-  final JoystickAction right;
-  final JoystickAction up;
-  final JoystickAction down;
-  final JoystickAction fire;
+  final List<JoystickListener> listeners;
 
-  JoystickPanel(
-    this.left,
-    this.right,
-    this.up,
-    this.down,
-    this.fire,
-  );
+  JoystickPanel(this.listeners);
+
   @override
   _JoystickPanelState createState() => _JoystickPanelState();
 }
@@ -27,6 +17,12 @@ class _JoystickPanelState extends State<JoystickPanel> {
   double sx = 0;
   double sy = 0;
 
+  void onAction(JoystickAction action, bool active) {
+    widget.listeners.forEach((l) {
+      l.onJoystickAction(action, active);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,16 +32,16 @@ class _JoystickPanelState extends State<JoystickPanel> {
             flex: 1,
             child: GestureDetector(
               onTapDown: (_) {
-                widget.fire(JoystickState.On);
+                onAction(JoystickAction.fire, true);
               },
               onTapUp: (_) {
-                widget.fire(JoystickState.Off);
+                onAction(JoystickAction.fire, false);
               },
               onTapCancel: () {
-                widget.fire(JoystickState.Off);
+                onAction(JoystickAction.fire, false);
               },
               onPanEnd: (_) {
-                widget.fire(JoystickState.Off);
+                onAction(JoystickAction.fire, false);
               },
               child: Container(
                 color: Colors.transparent,
@@ -61,10 +57,10 @@ class _JoystickPanelState extends State<JoystickPanel> {
               });
             },
             onPanEnd: (details) {
-              widget.left(JoystickState.Off);
-              widget.right(JoystickState.Off);
-              widget.up(JoystickState.Off);
-              widget.down(JoystickState.Off);
+              onAction(JoystickAction.left, false);
+              onAction(JoystickAction.right, false);
+              onAction(JoystickAction.up, false);
+              onAction(JoystickAction.down, false);
             },
             onPanUpdate: (details) {
               double x = details.localPosition.dx;
@@ -74,33 +70,33 @@ class _JoystickPanelState extends State<JoystickPanel> {
               double dy = y - sy;
 
               if (dy.abs() > threshold && dx.abs() < threshold) {
-                widget.left(JoystickState.Off);
-                widget.right(JoystickState.Off);
+                onAction(JoystickAction.left, false);
+                onAction(JoystickAction.right, false);
               }
 
               if (dx.abs() > threshold && dy.abs() < threshold) {
-                widget.up(JoystickState.Off);
-                widget.down(JoystickState.Off);
+                onAction(JoystickAction.up, false);
+                onAction(JoystickAction.down, false);
               }
 
               if (dx > threshold) {
-                widget.right(JoystickState.On);
-                widget.left(JoystickState.Off);
+                onAction(JoystickAction.right, true);
+                onAction(JoystickAction.left, false);
               }
 
               if (dx < -threshold) {
-                widget.left(JoystickState.On);
-                widget.right(JoystickState.Off);
+                onAction(JoystickAction.left, true);
+                onAction(JoystickAction.right, false);
               }
 
               if (dy < -threshold) {
-                widget.up(JoystickState.On);
-                widget.down(JoystickState.Off);
+                onAction(JoystickAction.up, true);
+                onAction(JoystickAction.down, false);
               }
 
               if (dy > threshold) {
-                widget.down(JoystickState.On);
-                widget.up(JoystickState.Off);
+                onAction(JoystickAction.down, true);
+                onAction(JoystickAction.up, false);
               }
 
               sx = x;

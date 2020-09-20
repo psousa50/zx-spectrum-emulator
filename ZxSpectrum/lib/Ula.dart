@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:ZxSpectrum/KeyboardListener.dart';
 import 'package:ZxSpectrum/PortHandler.dart';
 import 'package:color/color.dart';
 import 'package:Z80/Memory.dart';
@@ -25,7 +26,7 @@ const SpectrumColors = [
   Color.rgb(0xFF, 0xFF, 0xFF),
 ];
 
-class Ula with PortHandler {
+class Ula with PortHandler, KeyboardListener {
   static Uint8List palette;
 
   Uint8List screen;
@@ -53,16 +54,6 @@ class Ula with PortHandler {
 
   void refreshScreen(int currentFrame) {
     screen = buildImage(memory.range(16384, end: 16384 + 6912), currentFrame);
-  }
-
-  void keyDown(ZxKey key) {
-    var k = keys[key];
-    keyStates[k.address] = keyStates[k.address] & (0xFF ^ k.bitMask);
-  }
-
-  void keyUp(ZxKey key) {
-    var k = keys[key];
-    keyStates[k.address] = keyStates[k.address] | (k.bitMask);
   }
 
   Uint8List buildImage(Uint8List zxScreen, int currentFrame) {
@@ -142,5 +133,17 @@ class Ula with PortHandler {
     if (port & 0xFF == 0xFE) {
       borderColor = SpectrumColors[value & 0x07];
     }
+  }
+
+  @override
+  void keyDown(ZxKey key) {
+    var k = keys[key];
+    keyStates[k.address] = keyStates[k.address] & (0xFF ^ k.bitMask);
+  }
+
+  @override
+  void keyUp(ZxKey key) {
+    var k = keys[key];
+    keyStates[k.address] = keyStates[k.address] | (k.bitMask);
   }
 }

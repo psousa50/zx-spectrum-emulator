@@ -13,7 +13,7 @@ class PortBinding {
 class ZxSpectrumPorts extends Ports {
   var bindings = List<PortBinding>();
 
-  void bindPort(int bitMask, int value, PortHandler handler) {
+  void bind(int bitMask, int value, PortHandler handler) {
     bindings.add(PortBinding(bitMask, value, handler));
   }
 

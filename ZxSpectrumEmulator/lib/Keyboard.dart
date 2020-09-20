@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 
+import 'package:ZxSpectrum/KeyboardListener.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 
 import 'ZxKey.dart';
 
-class Keyboard extends StatelessWidget {
-  final OnKeyEvent onKeyPress;
+class KeyboardPanel extends StatelessWidget {
+  final List<KeyboardListener> listeners;
 
-  Keyboard(this.onKeyPress);
+  KeyboardPanel(this.listeners);
+
+  void onKeyPress(ZxKey key, bool pressed) {
+    listeners.forEach((l) {
+      pressed ? l.keyDown(key) : l.keyUp(key);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
