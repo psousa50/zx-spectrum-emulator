@@ -38,7 +38,7 @@ class Z80Snapshot {
   int get PC => version == Version.v1 ? gw(6) : gw(32);
   int get SP => gw(8);
   int get I => gb(10);
-  int get R => gb(11) | (byte12 & 0x80);
+  int get R => gb(11) | ((byte12 & 0x01) << 7);
   int get borderColor => bit123(byte12);
   bool get compressed => bit5(byte12) != 0;
   int get DE => gw(13);
