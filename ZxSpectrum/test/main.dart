@@ -7,7 +7,7 @@ import 'ZxSpectrumRunner.dart';
 void main() {
   var zxSpectrumRunner = ZxSpectrumRunner();
 
-  var snapshot = File('assets/games/pacman96.z80').readAsBytesSync();
+  var snapshot = File('assets/games/GreenBeret.z80').readAsBytesSync();
 
   var z80Sna = Z80Snapshot(snapshot);
 

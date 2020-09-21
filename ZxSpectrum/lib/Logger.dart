@@ -3,9 +3,13 @@ import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'Util.dart';
 
 class Logger {
-  final bool disabled;
+  bool disabled;
+  int bufferlength;
 
-  Logger([bool this.disabled = true]);
+  Logger({bool this.disabled = false, int this.bufferlength = 1000});
+
+  void setActive(bool active) => disabled = !active;
+  bool isActive() => !disabled;
 
   var printBuffer = List<String>();
 
@@ -35,7 +39,7 @@ class Logger {
 
     printBuffer.add("$state       $opcode                 $s");
 
-    if (printBuffer.length > 1000) {
+    if (printBuffer.length > bufferlength) {
       print("\n${printBuffer.join("\n")}");
       printBuffer.clear();
     }

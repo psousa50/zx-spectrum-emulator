@@ -2,16 +2,21 @@ import 'package:ZxSpectrum/JoystickListener.dart';
 import 'package:ZxSpectrum/KeyboardListener.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 
-class KeymapJoystick with JoystickListener {
-  final KeyboardListener keyboardOperator;
+class KeyMap {
   final ZxKey left;
   final ZxKey right;
   final ZxKey up;
   final ZxKey down;
   final ZxKey fire;
 
-  KeymapJoystick(this.keyboardOperator,
-      {this.left, this.right, this.up, this.down, this.fire});
+  KeyMap({this.left, this.right, this.up, this.down, this.fire});
+}
+
+class KeymapJoystick with JoystickListener {
+  final KeyboardListener keyboardOperator;
+  final KeyMap keyMap;
+
+  KeymapJoystick(this.keyboardOperator, this.keyMap);
 
   void onAction(ZxKey key, bool active) {
     active ? keyboardOperator.keyDown(key) : keyboardOperator.keyUp(key);
@@ -21,19 +26,19 @@ class KeymapJoystick with JoystickListener {
   void onJoystickAction(JoystickAction action, bool active) {
     switch (action) {
       case JoystickAction.left:
-        onAction(left, active);
+        onAction(keyMap.left, active);
         break;
       case JoystickAction.right:
-        onAction(right, active);
+        onAction(keyMap.right, active);
         break;
       case JoystickAction.up:
-        onAction(up, active);
+        onAction(keyMap.up, active);
         break;
       case JoystickAction.down:
-        onAction(down, active);
+        onAction(keyMap.down, active);
         break;
       case JoystickAction.fire:
-        onAction(fire, active);
+        onAction(keyMap.fire, active);
         break;
     }
   }

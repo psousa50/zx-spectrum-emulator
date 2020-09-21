@@ -14,6 +14,13 @@ import 'package:flutter/material.dart';
 import 'Display.dart';
 import 'Keyboard.dart';
 
+KeyMap chuckieEggKeyMap = KeyMap(
+    left: ZxKey.K_9,
+    right: ZxKey.K_0,
+    up: ZxKey.K_2,
+    down: ZxKey.K_W,
+    fire: ZxKey.K_M);
+
 class KeyToSend {
   int delayMs;
   ZxKey key;
@@ -32,7 +39,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   KempstonJoystick kempstonJoystick;
   KeymapJoystick keymapJoystick;
 
-  final logger = Logger(true);
+  final logger = Logger(disabled: true, bufferlength: 1);
 
   double sx = 0;
   double sy = 0;
@@ -63,7 +70,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/ADayInTheLife.z80');
+    var s = await rootBundle.load('assets/games/ChuckieEgg.z80');
     var z80 = Z80Snapshot(s.buffer.asUint8List());
     z80.load(zxSpectrum);
     zxSpectrum.load(0, rom.buffer.asUint8List());
@@ -82,11 +89,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
     keymapJoystick = KeymapJoystick(
       zxSpectrum.ula,
-      left: ZxKey.K_6,
-      right: ZxKey.K_7,
-      up: ZxKey.K_5,
-      down: ZxKey.K_8,
-      fire: ZxKey.K_0,
+      chuckieEggKeyMap,
     );
 
     loadGameAndStart();
@@ -126,12 +129,24 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
           keyboardVisible
               ? KeyboardPanel([zxSpectrum.ula])
               : SizedBox(height: 10),
-          MaterialButton(
-            height: 10,
-            color: Colors.grey,
-            onPressed: () => keyboardVisible = !keyboardVisible,
-            child: Text(keyboardVisible ? "Hide Keyboard" : "Show Keyboard"),
-          )
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              MaterialButton(
+                height: 10,
+                color: Colors.grey,
+                onPressed: () => keyboardVisible = !keyboardVisible,
+                child:
+                    Text(keyboardVisible ? "Hide Keyboard" : "Show Keyboard"),
+              ),
+              MaterialButton(
+                height: 10,
+                color: Colors.grey,
+                onPressed: () => logger.setActive(!logger.isActive()),
+                child: Text(logger.isActive() ? "No Log" : "Log"),
+              ),
+            ],
+          ),
         ],
       ),
       // Text(toHex(zxSpectrum.z80.PC), style: style),

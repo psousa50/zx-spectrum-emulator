@@ -7,7 +7,7 @@ import 'package:ZxSpectrum/Z80Snapshot.dart';
 
 void main() {
   test("", () {
-    var snapshot = File('assets/games/pacman96.z80').readAsBytesSync();
+    var snapshot = File('assets/games/GreenBeret.z80').readAsBytesSync();
 
     var z80Sna = Z80Snapshot(snapshot);
 
@@ -18,5 +18,8 @@ void main() {
     print(z80Sna.version);
     print("PC: ${zx.z80.PC}");
     print("SP: ${zx.z80.SP}");
+    print("Halted: ${zx.z80.halted}");
+    print("IM: ${zx.z80.interruptMode}");
+    print("INT enabled: ${zx.z80.interruptsEnabled}");
   });
 }
