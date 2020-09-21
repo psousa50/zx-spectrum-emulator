@@ -124,6 +124,9 @@ class Ula with PortHandler, KeyboardListener {
 
   @override
   int read(int port) {
+    if (port == 0xFE) {
+      return keyStates.values.reduce((value, element) => value & element);
+    }
     var value = keyStates[port];
     return value == null ? 0xFF : value;
   }
