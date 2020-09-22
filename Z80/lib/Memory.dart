@@ -88,7 +88,7 @@ class MemoryAsBytes extends Memory {
 
   @override
   void setRange(int address, Uint8List bytes) {
-    if (checkAddress(address, address + bytes.length)) {
+    if (checkAddress(address, bytes.length)) {
       this.bytes.setRange(address, address + bytes.length, bytes);
     }
   }
