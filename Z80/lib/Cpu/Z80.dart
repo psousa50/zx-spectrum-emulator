@@ -121,13 +121,13 @@ class Z80 {
 
   int fetch() {
     final v = memory.peek(PC);
-    PC = word(PC + 1);
+    PC = PC + 1;
     return v;
   }
 
   int fetch2() {
     final v = memory.peek2(PC);
-    PC = word(PC + 2);
+    PC = PC + 2;
     return v;
   }
 
@@ -227,14 +227,10 @@ class Z80 {
     return z80Instructions.execute(context);
   }
 
-  int byte(int v) => v % 256;
-
   int signedByte(int b) {
     var sb = byte(b);
     return (sb < 128) ? sb : sb - 256;
   }
-
-  int word(int v) => v % 65536;
 
   int getIXY(int prefix) => prefix == IX_PREFIX ? IX : IY;
 
@@ -260,8 +256,9 @@ class Z80 {
   int r16Value(int r) => 256 * registers[r] + registers[r + 1];
 
   void setR16Value(int r, int w) {
-    registers[r] = hi(w);
-    registers[r + 1] = lo(w);
+    var nw = word(w);
+    registers[r] = hi(nw);
+    registers[r + 1] = lo(nw);
   }
 
   int addWord(int w1, int w2) {
@@ -625,14 +622,14 @@ class Z80 {
     B = byte(B - 1);
     bool cond = B != 0;
     if (cond) {
-      PC = word(PC + signedByte(d));
+      PC = PC + signedByte(d);
     }
     return context.instruction.tStates(cond: cond);
   }
 
   int jr(InstructionContext context) {
     var d = fetch();
-    PC = word(PC + signedByte(d));
+    PC = PC + signedByte(d);
     return context.instruction.tStates();
   }
 
@@ -640,7 +637,7 @@ class Z80 {
     var d = fetch();
     var cond = getFlagCondition(bit345(context.opcode) - 4);
     if (cond) {
-      PC = word(PC + signedByte(d));
+      PC = PC + signedByte(d);
     }
     return context.instruction.tStates(cond: cond);
   }
@@ -712,13 +709,13 @@ class Z80 {
 
   int incR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
-    setR16Value(r16, word(r16Value(r16) + 1));
+    setR16Value(r16, r16Value(r16) + 1);
     return context.instruction.tStates();
   }
 
   int decR16(InstructionContext context) {
     int r16 = Registers.rBit45(context.opcode);
-    setR16Value(r16, word(r16Value(r16) - 1));
+    setR16Value(r16, r16Value(r16) - 1);
     return context.instruction.tStates();
   }
 
@@ -1068,12 +1065,12 @@ class Z80 {
   }
 
   int incIXY(InstructionContext context) {
-    setIXY(context.prefix, word(getIXY(context.prefix) + 1));
+    setIXY(context.prefix, getIXY(context.prefix) + 1);
     return context.instruction.tStates();
   }
 
   int decIXY(InstructionContext context) {
-    setIXY(context.prefix, word(getIXY(context.prefix) - 1));
+    setIXY(context.prefix, getIXY(context.prefix) - 1);
     return context.instruction.tStates();
   }
 

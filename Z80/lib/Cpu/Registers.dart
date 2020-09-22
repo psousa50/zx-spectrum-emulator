@@ -152,12 +152,13 @@ class Registers {
   }
 
   operator [](int i) => registers[i];
-  operator []=(int i, int value) => registers[i] = value;
+  operator []=(int i, int value) => registers[i] = byte(value);
 
   int gw(int r) => 256 * registers[r] + registers[r + 1];
   void sw(int r, int w) {
-    registers[r] = hi(w);
-    registers[r + 1] = lo(w);
+    var nw = word(w);
+    registers[r] = hi(nw);
+    registers[r + 1] = lo(nw);
   }
 
   int get A => registers[R_A];
