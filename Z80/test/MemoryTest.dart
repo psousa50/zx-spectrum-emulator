@@ -40,4 +40,10 @@ class MemoryTest extends Memory {
   @override
   Uint8List range(int start, {int end}) =>
       Uint8List.fromList(bytes.sublist(start, end));
+
+  @override
+  int get size => bytes.length;
+
+  @override
+  bool get readonly => false;
 }

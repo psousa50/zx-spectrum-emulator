@@ -70,11 +70,12 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/ChuckieEgg.z80');
+    var s = await rootBundle.load('assets/games/GreenBeret.z80');
     var z80 = Z80Snapshot(s.buffer.asUint8List());
     z80.load(zxSpectrum);
     zxSpectrum.load(0, rom.buffer.asUint8List());
     // zxSpectrum.memory.poke(35899, 0);
+    // zxSpectrum.memory.poke(47183, 0);
     zxSpectrum.start();
   }
 

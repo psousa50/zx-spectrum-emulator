@@ -37,7 +37,13 @@ class Logger {
     var i = zx.z80.getInstruction();
     var opcode = i != null ? i.name : "Invalid Instruction";
 
-    printBuffer.add("$state       $opcode                 $s");
+    log("$state       $opcode                 $s");
+  }
+
+  void log(String s) {
+    if (disabled) return;
+
+    printBuffer.add(s);
 
     if (printBuffer.length > bufferlength) {
       print("\n${printBuffer.join("\n")}");

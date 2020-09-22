@@ -22,10 +22,10 @@ class ZxSpectrumRunner {
 
   ZxSpectrumRunner() {
     zxSpectrum = ZxSpectrum(
-      onFrame: onFrame,
-      onInstruction: onInstruction,
-      onInterrupt: onInterrupt,
-    );
+        onFrame: onFrame,
+        onInstruction: onInstruction,
+        onInterrupt: onInterrupt,
+        onMemoryError: onMemoryError);
     logger = Logger();
   }
 
@@ -47,7 +47,9 @@ class ZxSpectrumRunner {
     pressed ? zxSpectrum.ula.keyDown(key) : zxSpectrum.ula.keyUp(key);
   }
 
-  void log([String s = ""]) => logger.z80State(zxSpectrum, s);
+  void logState([String s = ""]) => logger.z80State(zxSpectrum, s);
+
+  void log([String s = ""]) => logger.log(s);
 
   void clearKeys() {
     ZxKey.values.forEach((k) {
@@ -66,7 +68,11 @@ class ZxSpectrumRunner {
   void onInstruction(ZxSpectrum zx) {
     instructionCount++;
 
-    log();
+    logState();
+  }
+
+  void onMemoryError(int address) {
+    log("Memory error $address");
   }
 
   void loadRom() async {
@@ -76,15 +82,7 @@ class ZxSpectrumRunner {
 
   void start() {
     sendKeys([
-      // KeyToSend(2000, ZxKey.K_6),
-      // KeyToSend(2000, ZxKey.K_6),
-      // KeyToSend(2000, ZxKey.K_6),
-      // KeyToSend(2000, ZxKey.K_6),
-      // KeyToSend(2000, ZxKey.K_6),
-      // KeyToSend(2000, ZxKey.K_6),
-      // KeyToSend(2000, ZxKey.K_ENTER),
-      // KeyToSend(2000, ZxKey.K_7),
-      // KeyToSend(2000, ZxKey.K_ENTER),
+      KeyToSend(2000, ZxKey.K_ENTER),
     ]);
     zxSpectrum.start();
   }

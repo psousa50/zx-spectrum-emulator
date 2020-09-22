@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:Z80/Cpu/Z80.dart';
+import 'package:Z80/Memory.dart';
 import 'package:ZxSpectrum/KempstonJoystick.dart';
 
 import 'Memory48K.dart';
@@ -24,13 +25,18 @@ class ZxSpectrum {
   OnFrame onFrame;
   OnInstruction onInstruction;
   OnInterrupt onInterrupt;
+  OnMemoryError onMemoryError;
   bool running;
 
   int tStatesCounter = 0;
   int currentFrame = 0;
 
-  ZxSpectrum({this.onFrame, this.onInstruction, this.onInterrupt}) {
-    memory = Memory48K();
+  ZxSpectrum(
+      {this.onFrame,
+      this.onInstruction,
+      this.onInterrupt,
+      this.onMemoryError = onMemoryErrorDefault}) {
+    memory = Memory48K(onMemoryError: onMemoryError);
     ports = ZxSpectrumPorts();
     ula = Ula(memory);
     kempston = KempstonJoystick();

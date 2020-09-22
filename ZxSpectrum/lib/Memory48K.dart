@@ -1,47 +1,14 @@
-import 'dart:typed_data';
-
 import 'package:Z80/Memory.dart';
+import 'package:ZxSpectrum/BankedMemory.dart';
 
-import 'Util.dart';
+class Memory48K extends BankedMemory {
+  static List<MemoryBank> buildMemoryBanks(OnMemoryError onMemoryError) {
+    var rom = MemoryAsBytes(0x4000, onMemoryError, readonly: true);
+    var ram = MemoryAsBytes(0xC000, onMemoryError);
 
-class Memory48K extends Memory {
-  Uint8List bytes;
-
-  Memory48K.fromBytes(this.bytes);
-
-  Memory48K() {
-    this.bytes = Uint8List.fromList(List.filled(65536, 0));
+    return [MemoryBank(0, rom), MemoryBank(0x4000, ram)];
   }
 
-  int normalize(int address) => address % 65536;
-
-  @override
-  peek(int address) => bytes[normalize(address)];
-
-  @override
-  peek2(int address) =>
-      bytes[normalize(address)] + 256 * bytes[normalize(address + 1)];
-
-  @override
-  poke(int address, int b) {
-    if (address >= 0x4000 && address <= 0xFFFF) {
-      this.bytes[normalize(address)] = b;
-    }
-  }
-
-  @override
-  poke2(int address, int b) {
-    if (address >= 0x4000 && address <= 0xFFFF) {
-      this.bytes[normalize(address)] = lo(b);
-      this.bytes[normalize(address + 1)] = hi(b);
-    }
-  }
-
-  @override
-  void setRange(int address, Uint8List bytes) {
-    this.bytes.setRange(address, address + bytes.length, bytes);
-  }
-
-  @override
-  Uint8List range(int start, {int end}) => bytes.sublist(start, end);
+  Memory48K({OnMemoryError onMemoryError = onMemoryErrorDefault})
+      : super(buildMemoryBanks(onMemoryError), onMemoryError: onMemoryError);
 }
