@@ -58,9 +58,7 @@ class Z80Snapshot {
 
   InterruptMode get interruptMode {
     var m = bit01(gb(29));
-    return m == 0
-        ? InterruptMode.im0
-        : m == 1 ? InterruptMode.im1 : InterruptMode.im2;
+    return Z80.interruptModes[m];
   }
 
   Version get version =>
@@ -89,6 +87,8 @@ class Z80Snapshot {
 
     z80.interruptsEnabled = interruptsEnabled;
     z80.interruptMode = interruptMode;
+
+    zx.ula.borderColor = SpectrumColors[borderColor];
 
     switch (version) {
       case Version.v1:
@@ -159,7 +159,5 @@ class Z80Snapshot {
       }
       p = p + 3 + length;
     }
-
-    zx.ula.borderColor = SpectrumColors[borderColor];
   }
 }
