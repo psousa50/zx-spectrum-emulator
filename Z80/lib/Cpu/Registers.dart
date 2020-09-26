@@ -76,8 +76,10 @@ class Registers {
   static const R_Lt = 21;
   static const R_I = 22;
   static const R_R = 23;
+  static const R_PC_H = 24;
+  static const R_PC_L = 25;
 
-  static const R_COUNT = 24;
+  static const R_COUNT = 26;
 
   static const R_MHL = 1000;
   static const R_MIXd = 1001;
@@ -94,6 +96,7 @@ class Registers {
   static const R_BCt = R_Bt;
   static const R_DEt = R_Dt;
   static const R_HLt = R_Ht;
+  static const R_PC = R_PC_H;
 
   static const F_CARRY = 0x01;
   static const F_ADD_SUB = 0x02;
@@ -206,6 +209,7 @@ class Registers {
   int get BCt => gw(R_Bt);
   int get DEt => gw(R_Dt);
   int get HLt => gw(R_Ht);
+  int get PC => gw(R_PC);
 
   set AF(int w) => sw(R_A, w);
   set BC(int w) => sw(R_B, w);
@@ -218,6 +222,7 @@ class Registers {
   set BCt(int w) => sw(R_Bt, w);
   set DEt(int w) => sw(R_Dt, w);
   set HLt(int w) => sw(R_Ht, w);
+  set PC(int w) => sw(R_PC, w);
 
   bool get carryFlag => F & F_CARRY != 0;
   bool get addSubtractFlag => F & F_ADD_SUB != 0;

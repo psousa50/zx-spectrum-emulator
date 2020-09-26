@@ -21,11 +21,16 @@ class Z80 {
   final Memory memory;
   final Ports ports;
 
+  static var interruptModes = [
+    InterruptMode.im0,
+    InterruptMode.im1,
+    InterruptMode.im2,
+  ];
+
   InterruptMode interruptMode;
   bool interruptsEnabled = false;
   bool halted = false;
   var registers = Registers();
-  var PC = 0;
 
   Z80Instructions unPrefixedOpcodes;
   Z80Instructions extendedOpcodes;
@@ -47,6 +52,7 @@ class Z80 {
     buildBitOpcodes();
     buildIXYOpcodes();
     buildIXYBitOpcodes();
+    PC = 0;
   }
 
   int get A => registers.A;
@@ -92,6 +98,7 @@ class Z80 {
   int get BCt => registers.BCt;
   int get DEt => registers.DEt;
   int get HLt => registers.HLt;
+  int get PC => registers.PC;
 
   set AF(int w) => registers.AF = w;
   set BC(int w) => registers.BC = w;
@@ -104,6 +111,7 @@ class Z80 {
   set BCt(int w) => registers.BCt = w;
   set DEt(int w) => registers.DEt = w;
   set HLt(int w) => registers.HLt = w;
+  set PC(int w) => registers.PC = w;
 
   bool get carryFlag => registers.carryFlag;
   bool get addSubtractFlag => registers.addSubtractFlag;
@@ -1006,7 +1014,7 @@ class Z80 {
     return context.instruction.tStates();
   }
 
-  int exSPHL(InstructionContext context) {
+  int exmSPHL(InstructionContext context) {
     var msp = memory.peek2(SP);
     memory.poke2(SP, HL);
     HL = msp;
@@ -1557,7 +1565,7 @@ class Z80 {
     unPrefixed.build(0xDB, "IN A, (N)", inAn, 11);
     unPrefixed.build(0xDE, "SBC A, N", sbcAn, 7);
 
-    unPrefixed.build(0xE3, "EX (SP), HL", exSPHL, 19);
+    unPrefixed.build(0xE3, "EX (SP), HL", exmSPHL, 19);
     unPrefixed.build(0xE6, "AND A, N", andAn, 7);
     unPrefixed.build(0xE9, "JP (HL)", jpmHL, 4);
     unPrefixed.build(0xEB, "EX DE, HL", exDEHL, 4);
