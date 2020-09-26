@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:ZxSpectrum/KempstonJoystick.dart';
 import 'package:ZxSpectrum/KeymapJoystick.dart';
 import 'package:ZxSpectrum/Logger.dart';
+import 'package:ZxSpectrum/SNASnapshot.dart';
 import 'package:ZxSpectrum/Z80Snapshot.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
@@ -39,7 +40,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   KempstonJoystick kempstonJoystick;
   KeymapJoystick keymapJoystick;
 
-  final logger = Logger(disabled: true, bufferlength: 1);
+  final logger = Logger(disabled: true, bufferlength: 0);
 
   double sx = 0;
   double sy = 0;
@@ -70,9 +71,10 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/GreenBeret.z80');
-    var z80 = Z80Snapshot(s.buffer.asUint8List());
-    z80.load(zxSpectrum);
+    var s = await rootBundle.load('assets/games/SpaceInvaders.z80');
+    var loader = Z80Snapshot(s.buffer.asUint8List());
+    // var loader = SNASnapshot(s.buffer.asUint8List());
+    loader.load(zxSpectrum);
     zxSpectrum.load(0, rom.buffer.asUint8List());
     // zxSpectrum.memory.poke(35899, 0);
     // zxSpectrum.memory.poke(47183, 0);
@@ -82,8 +84,10 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   @override
   void initState() {
     super.initState();
-    zxSpectrum =
-        ZxSpectrum(onFrame: refreshScreen, onInstruction: onInstruction);
+    zxSpectrum = ZxSpectrum(
+        onFrame: refreshScreen,
+        onInstruction: onInstruction,
+        onInterrupt: onInterrupt);
 
     kempstonJoystick = KempstonJoystick();
     zxSpectrum.bindPort(0x00FF, 0x001F, kempstonJoystick);
@@ -95,8 +99,14 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
     loadGameAndStart();
     sendKeys([
-      // KeyToSend(1000, ZxKey.K_2),
-      // KeyToSend(1000, ZxKey.K_0),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_ENTER),
+      // KeyToSend(1000, ZxKey.K_7),
     ]);
   }
 
@@ -107,7 +117,13 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   }
 
   void onInstruction(ZxSpectrum zx) {
+    // logger.pc(zx);
     logger.z80State(zx, "");
+  }
+
+  void onInterrupt(ZxSpectrum zx) {
+    logger.z80State(zx,
+        "Interrupt ${zx.z80.interruptsEnabled} ${zx.z80.interruptMode} ${zx.z80.I}");
   }
 
   void onKeyEvent(ZxKey zxKey, bool pressed) {
@@ -123,7 +139,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     return Stack(children: [
       // SizedBox(height: 30),
       Display(screen, borderColor),
-      JoystickPanel([kempstonJoystick, keymapJoystick]),
+      // JoystickPanel([kempstonJoystick, keymapJoystick]),
       Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

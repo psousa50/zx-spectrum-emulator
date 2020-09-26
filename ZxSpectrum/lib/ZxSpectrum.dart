@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 import 'package:Z80/Cpu/Z80.dart';
 import 'package:Z80/Memory.dart';
-import 'package:ZxSpectrum/KempstonJoystick.dart';
 
 import 'Memory48K.dart';
 import 'PortHandler.dart';
@@ -20,7 +19,6 @@ class ZxSpectrum {
   ZxSpectrumPorts ports;
   Z80 z80;
   Ula ula;
-  KempstonJoystick kempston;
 
   OnFrame onFrame;
   OnInstruction onInstruction;
@@ -39,7 +37,6 @@ class ZxSpectrum {
     memory = Memory48K(onMemoryError: onMemoryError);
     ports = ZxSpectrumPorts();
     ula = Ula(memory);
-    kempston = KempstonJoystick();
 
     bindPort(0x0001, 0x0000, ula);
 

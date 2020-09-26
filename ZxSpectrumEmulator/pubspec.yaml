@@ -26,14 +26,18 @@ flutter:
     - assets/48.rom
     - assets/games/3DDeathChase.z80
     - assets/games/ADayInTheLife.z80
+    - assets/games/BruceLee.z80
     - assets/games/ChuckieEgg.z80
     - assets/games/Cube.z80
     - assets/games/CyrusIsChess.z80
     - assets/games/elite.z80
     - assets/games/galaxian.z80
     - assets/games/GreenBeret.z80
+    - assets/games/GreenBeret.sna
     - assets/games/Jetpac.z80
     - assets/games/JetSetWilly.z80
     - assets/games/ManicMiner.z80
     - assets/games/pacman.z80
     - assets/games/pacman96.z80
+    - assets/games/SpaceInvaders.z80
+    - assets/games/StopTheExpress.z80

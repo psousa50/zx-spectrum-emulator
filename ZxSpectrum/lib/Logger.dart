@@ -13,6 +13,20 @@ class Logger {
 
   var printBuffer = List<String>();
 
+  void pc(ZxSpectrum zx) {
+    if (disabled) return;
+
+    var z80 = zx.z80;
+    var state = "#${toHex2(z80.PC)}" +
+        " SP:${toHex2(z80.registers.SP)}" +
+        " MSP:${toHex2(zx.memory.peek2(z80.registers.SP))}";
+
+    var i = zx.z80.getInstruction();
+    var opcode = i != null ? i.name : "Invalid Instruction";
+
+    log("$state       $opcode");
+  }
+
   void z80State(ZxSpectrum zx, String s) {
     if (disabled) return;
 
