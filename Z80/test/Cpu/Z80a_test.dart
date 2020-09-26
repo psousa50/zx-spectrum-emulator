@@ -894,6 +894,13 @@ void main() {
             "A has wrong value after DAA (${toHex(a)} + ${toHex(n)} = ${toHex(result)})");
   }
 
+  test("DAA", () {
+    testDAA("ADD", 0x15, 0x13, 0x28);
+    testDAA("ADD", 0x15, 0x27, 0x42);
+    testDAA("SUB", 0x28, 0x13, 0x15);
+    testDAA("SUB", 0x42, 0x27, 0x15);
+  }, skip: false);
+
   test("Check hi and low register pairs", () {
     var z80 = newCPU();
 
@@ -921,13 +928,6 @@ void main() {
     z80.registers.IY_L = 100;
     expect(z80.registers.IY, 256 * 200 + 100, reason: "IY is wrong");
   }, skip: runAll);
-
-  test("DAA", () {
-    testDAA("ADD", 0x15, 0x13, 0x28);
-    testDAA("ADD", 0x15, 0x27, 0x42);
-    testDAA("SUB", 0x28, 0x13, 0x15);
-    testDAA("SUB", 0x42, 0x27, 0x15);
-  }, skip: false);
 
   test("DI, EI", () {
     var z80 = newCPU();

@@ -331,7 +331,7 @@ class Z80 {
       count += b & 0x01;
       b = b >> 1;
     }
-    return count & 0x01 == 0x01;
+    return count & 0x01 == 0x00;
   }
 
   int addA(int value) {
@@ -540,6 +540,7 @@ class Z80 {
     var sign = addSubtractFlag ? -1 : 1;
     if (halfCarryFlag || (A & 0x0F > 0x09)) A = addA(0x06 * sign);
     if (carryFlag || (A & 0xF0 > 0x90)) A = addA(0x60 * sign);
+    parityOverflowFlag = parity(A);
 
     return context.instruction.tStates();
   }
