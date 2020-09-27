@@ -73,7 +73,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/pacman96.z80');
+    var s = await rootBundle.load('assets/games/CyrusIsChess.z80');
     var loader = Z80Snapshot(s.buffer.asUint8List());
     // var loader = SNASnapshot(s.buffer.asUint8List());
     loader.load(zxSpectrum);
@@ -124,8 +124,8 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   }
 
   void onInterrupt(ZxSpectrum zx) {
-    logger.z80State(zx,
-        "Interrupt ${zx.z80.interruptsEnabled} ${zx.z80.interruptMode} ${zx.z80.I}");
+    logger.z80State(
+        zx, "Interrupt ${zx.z80.IFF1} ${zx.z80.interruptMode} ${zx.z80.I}");
   }
 
   void onKeyEvent(ZxKey zxKey, bool pressed) {

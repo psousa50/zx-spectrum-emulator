@@ -85,7 +85,7 @@ class Z80Snapshot {
     z80.IY = IY;
     z80.IX = IX;
 
-    z80.interruptsEnabled = interruptsEnabled;
+    z80.IFF1 = interruptsEnabled;
     z80.interruptMode = interruptMode;
 
     print(borderColor);

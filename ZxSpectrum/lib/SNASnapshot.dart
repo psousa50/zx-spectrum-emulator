@@ -50,7 +50,7 @@ class SNASnapshot {
 
     print(interruptMode);
     z80.interruptMode = Z80.interruptModes[interruptMode];
-    z80.interruptsEnabled = (IFF2 & 0x04) == 0x04;
+    z80.IFF1 = (IFF2 & 0x04) == 0x04;
 
     zx.ula.borderColor = SpectrumColors[borderColor];
 

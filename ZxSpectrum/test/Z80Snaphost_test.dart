@@ -20,6 +20,6 @@ void main() {
     print("SP: ${zx.z80.SP}");
     print("Halted: ${zx.z80.halted}");
     print("IM: ${zx.z80.interruptMode}");
-    print("INT enabled: ${zx.z80.interruptsEnabled}");
+    print("INT enabled: ${zx.z80.IFF1}");
   });
 }

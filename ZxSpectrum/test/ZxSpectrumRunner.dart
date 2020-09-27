@@ -62,7 +62,7 @@ class ZxSpectrumRunner {
   }
 
   void onInterrupt(ZxSpectrum zx) {
-    log("Interrupt ${zx.z80.interruptsEnabled}");
+    log("Interrupt ${zx.z80.IFF1}");
   }
 
   void onInstruction(ZxSpectrum zx) {

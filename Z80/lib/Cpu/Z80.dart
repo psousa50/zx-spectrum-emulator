@@ -28,7 +28,8 @@ class Z80 {
   ];
 
   InterruptMode interruptMode;
-  bool interruptsEnabled = false;
+  bool IFF1 = false;
+  bool IFF2 = false;
   bool halted = false;
   var registers = Registers();
 
@@ -1290,12 +1291,14 @@ class Z80 {
   }
 
   int di(InstructionContext context) {
-    interruptsEnabled = false;
+    IFF1 = false;
+    IFF2 = false;
     return context.instruction.tStates();
   }
 
   int ei(InstructionContext context) {
-    interruptsEnabled = true;
+    IFF1 = true;
+    IFF2 = true;
     return context.instruction.tStates();
   }
 
@@ -1744,19 +1747,19 @@ class Z80 {
   }
 
   void maskableInterrupt() {
-    if (!interruptsEnabled) return;
+    if (!IFF1) return;
+    IFF1 = false;
+    IFF2 = false;
 
     halted = false;
 
     switch (interruptMode) {
       case InterruptMode.im1:
-        interruptsEnabled = false;
         push2(PC);
         PC = 0x38;
         break;
 
       case InterruptMode.im2:
-        interruptsEnabled = false;
         push2(PC);
         PC = memory.peek2(I * 256 + 254);
         break;

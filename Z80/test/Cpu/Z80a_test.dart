@@ -939,13 +939,16 @@ void main() {
 
   test("DI, EI", () {
     var z80 = newCPU();
-    expect(z80.interruptsEnabled, false);
+    expect(z80.IFF1, false);
+    expect(z80.IFF2, false);
     z80.memory.poke(0, 0xFB);
     z80.step();
-    expect(z80.interruptsEnabled, true);
+    expect(z80.IFF1, true);
+    expect(z80.IFF2, true);
     z80.memory.poke(1, 0xF3);
     z80.step();
-    expect(z80.interruptsEnabled, false);
+    expect(z80.IFF1, false);
+    expect(z80.IFF2, false);
   }, skip: !runAll);
 
   test("Halt", () {
@@ -1028,7 +1031,8 @@ void main() {
     z80.step();
     z80.step();
     z80.maskableInterrupt();
-    expect(z80.interruptsEnabled, false);
+    expect(z80.IFF1, false);
+    expect(z80.IFF2, false);
     expect(z80.memory.peek2(128 - 2), 400 + 3);
     expect(z80.registers.SP, 128 - 2);
     expect(z80.PC, 0x38);
@@ -1046,7 +1050,8 @@ void main() {
     z80.step();
     z80.step();
     z80.maskableInterrupt();
-    expect(z80.interruptsEnabled, false);
+    expect(z80.IFF1, false);
+    expect(z80.IFF2, false);
     expect(z80.memory.peek2(128 - 2), 400 + 3);
     expect(z80.registers.SP, 128 - 2);
     expect(z80.PC, 12345);
@@ -1064,11 +1069,10 @@ void main() {
     z80.step();
     z80.step();
     expect(z80.halted, true, reason: "CPU should be halted");
-    expect(z80.interruptsEnabled, true, reason: "Interrupts should be enabled");
+    expect(z80.IFF1, true, reason: "Interrupts should be enabled");
     z80.maskableInterrupt();
     expect(z80.halted, false, reason: "CPU should NOT be halted");
-    expect(z80.interruptsEnabled, false,
-        reason: "Interrupts should NOT be enabled");
+    expect(z80.IFF1, false, reason: "Interrupts should NOT be enabled");
   }, skip: !runAll);
 
   test("BIT 5, (IY+2)", () {
