@@ -39,7 +39,7 @@ class Z80Snapshot {
   int get SP => gw(8);
   int get I => gb(10);
   int get R => gb(11) | ((byte12 & 0x01) << 7);
-  int get borderColor => bit123(byte12);
+  int get borderColor => bit123(byte12) >> 1;
   bool get compressed => bit5(byte12) != 0;
   int get DE => gw(13);
   int get BCt => gw(15);
@@ -88,6 +88,7 @@ class Z80Snapshot {
     z80.interruptsEnabled = interruptsEnabled;
     z80.interruptMode = interruptMode;
 
+    print(borderColor);
     zx.ula.borderColor = SpectrumColors[borderColor];
 
     switch (version) {
