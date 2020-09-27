@@ -1075,6 +1075,40 @@ void main() {
     expect(z80.IFF1, false, reason: "Interrupts should NOT be enabled");
   }, skip: !runAll);
 
+  test("LD A, I sets parity flag to IFF2", () {
+    var z80 = newCPU();
+    var program = Uint8List.fromList([
+      ...Z80Assembler.ei(),
+      ...Z80Assembler.ldAI(),
+      ...Z80Assembler.di(),
+      ...Z80Assembler.ldAI(),
+    ]);
+    z80.memory.setRange(z80.PC, program);
+    z80.step();
+    z80.step();
+    expect(z80.parityOverflowFlag, true);
+    z80.step();
+    z80.step();
+    expect(z80.parityOverflowFlag, false);
+  });
+
+  test("LD A, R sets parity flag to IFF2", () {
+    var z80 = newCPU();
+    var program = Uint8List.fromList([
+      ...Z80Assembler.ei(),
+      ...Z80Assembler.ldAR(),
+      ...Z80Assembler.di(),
+      ...Z80Assembler.ldAR(),
+    ]);
+    z80.memory.setRange(z80.PC, program);
+    z80.step();
+    z80.step();
+    expect(z80.parityOverflowFlag, true);
+    z80.step();
+    z80.step();
+    expect(z80.parityOverflowFlag, false);
+  });
+
   test("BIT 5, (IY+2)", () {
     var z80 = newCPU();
     var opcodes = Uint8List.fromList([0xFD, 0xCB, 0x02, 0x6E]);

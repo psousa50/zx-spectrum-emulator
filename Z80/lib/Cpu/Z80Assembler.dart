@@ -35,6 +35,8 @@ class Z80Assembler {
   static Uint8List im0() => u([Z80.EXTENDED_OPCODES, 0x46]);
   static Uint8List im1() => u([Z80.EXTENDED_OPCODES, 0x56]);
   static Uint8List im2() => u([Z80.EXTENDED_OPCODES, 0x5E]);
+  static Uint8List ldAI() => u([Z80.EXTENDED_OPCODES, 0x57]);
+  static Uint8List ldAR() => u([Z80.EXTENDED_OPCODES, 0x5F]);
 
   static Uint8List ldIXnn(int nn) => u([Z80.IX_PREFIX, 0x21, lo(nn), hi(nn)]);
 

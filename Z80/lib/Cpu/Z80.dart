@@ -1312,6 +1312,7 @@ class Z80 {
     setZeroAndSignFlagsOn8BitResult(A);
     addSubtractFlag = false;
     halfCarryFlag = false;
+    parityOverflowFlag = IFF2;
     return context.instruction.tStates();
   }
 
@@ -1325,6 +1326,7 @@ class Z80 {
     setZeroAndSignFlagsOn8BitResult(A);
     addSubtractFlag = false;
     halfCarryFlag = false;
+    parityOverflowFlag = IFF2;
     return context.instruction.tStates();
   }
 
