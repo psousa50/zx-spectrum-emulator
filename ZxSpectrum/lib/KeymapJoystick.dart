@@ -19,6 +19,7 @@ class KeymapJoystick with JoystickListener {
   KeymapJoystick(this.keyboardOperator, this.keyMap);
 
   void onAction(ZxKey key, bool active) {
+    if (key == null) return;
     active ? keyboardOperator.keyDown(key) : keyboardOperator.keyUp(key);
   }
 

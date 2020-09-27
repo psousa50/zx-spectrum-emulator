@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:ZxSpectrum/KempstonJoystick.dart';
 import 'package:ZxSpectrum/KeymapJoystick.dart';
 import 'package:ZxSpectrum/Logger.dart';
-import 'package:ZxSpectrum/SNASnapshot.dart';
 import 'package:ZxSpectrum/Z80Snapshot.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
@@ -21,6 +20,9 @@ KeyMap chuckieEggKeyMap = KeyMap(
     up: ZxKey.K_2,
     down: ZxKey.K_W,
     fire: ZxKey.K_M);
+
+KeyMap spaceInvadersKeyMap =
+    KeyMap(left: ZxKey.K_Z, right: ZxKey.K_X, fire: ZxKey.K_SPACE);
 
 class KeyToSend {
   int delayMs;
@@ -71,12 +73,12 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/SpaceInvaders.z80');
+    var s = await rootBundle.load('assets/games/GreenBeret.z80');
     var loader = Z80Snapshot(s.buffer.asUint8List());
     // var loader = SNASnapshot(s.buffer.asUint8List());
     loader.load(zxSpectrum);
     zxSpectrum.load(0, rom.buffer.asUint8List());
-    // zxSpectrum.memory.poke(35899, 0);
+    // zxSpectrum.memory.poke(35899, 0);xxxzx
     // zxSpectrum.memory.poke(47183, 0);
     zxSpectrum.start();
   }
@@ -94,7 +96,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
     keymapJoystick = KeymapJoystick(
       zxSpectrum.ula,
-      chuckieEggKeyMap,
+      spaceInvadersKeyMap,
     );
 
     loadGameAndStart();
@@ -139,7 +141,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     return Stack(children: [
       // SizedBox(height: 30),
       Display(screen, borderColor),
-      // JoystickPanel([kempstonJoystick, keymapJoystick]),
+      JoystickPanel([kempstonJoystick, keymapJoystick]),
       Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
