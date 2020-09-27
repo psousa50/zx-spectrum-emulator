@@ -7,6 +7,7 @@ import 'package:Z80/Util.dart';
 import 'package:Z80/Cpu/Z80.dart';
 import '../MemoryTest.dart';
 import '../PortsTest.dart';
+import '../Scenario.dart';
 import '../Scenarios.dart';
 
 var allScenarios = [
@@ -864,7 +865,7 @@ Z80 newCPU() {
 }
 
 void main() {
-  const runAll = true;
+  const runAll = false;
 
   test("All Scenarios", () {
     allScenarios.forEach((scenario) {
@@ -878,27 +879,34 @@ void main() {
     scenarios.forEach((scenario) {
       scenario.run();
     });
-  }, skip: runAll);
+  }, skip: true);
 
-  void testDAA(String op, int a, int n, int result) {
-    var z80 = newCPU();
-    z80.registers.A = a;
-    var opcode = op == "ADD" ? 0xC6 : 0xD6;
-    z80.memory.poke(0, opcode);
-    z80.memory.poke(1, n);
-    z80.memory.poke(2, 0x27);
-    z80.step();
-    z80.step();
-    expect(z80.registers.A, result,
-        reason:
-            "A has wrong value after DAA (${toHex(a)} + ${toHex(n)} = ${toHex(result)})");
+  void testDAA(String op, int a, int n, int result, String flags) {
+    var scenario = Scenario(
+      "DAA after $op",
+      [0x27],
+      initialState: State(register8Values: {Registers.R_A: a}),
+      expectedState: State(
+        register8Values: {Registers.R_A: result},
+        flags: flags,
+      ),
+      beforeRun: (z80) {
+        z80.memory.poke(0, op == "ADD" ? 0xC6 : 0xD6);
+        z80.memory.poke(1, n);
+        z80.step();
+      },
+    );
+
+    scenario.run();
   }
 
   test("DAA", () {
-    testDAA("ADD", 0x15, 0x13, 0x28);
-    testDAA("ADD", 0x15, 0x27, 0x42);
-    testDAA("SUB", 0x28, 0x13, 0x15);
-    testDAA("SUB", 0x42, 0x27, 0x15);
+    testDAA("ADD", 0x15, 0x13, 0x28, "~S ~Z ~H P ~N ~C");
+    testDAA("ADD", 0x15, 0x28, 0x43, "~S ~Z H ~P ~N ~C");
+    testDAA("ADD", 0x00, 0x00, 0x00, "~S Z ~H P ~N ~C");
+    testDAA("ADD", 0x75, 0x48, 0x23, "~S ~Z H ~P ~N C");
+    testDAA("SUB", 0x28, 0x13, 0x15, "~S ~Z ~H ~P N ~C");
+    testDAA("SUB", 0x42, 0x27, 0x15, "~S ~Z ~H ~P ~N ~C");
   }, skip: false);
 
   test("Check hi and low register pairs", () {
@@ -927,7 +935,7 @@ void main() {
     z80.registers.IY_H = 200;
     z80.registers.IY_L = 100;
     expect(z80.registers.IY, 256 * 200 + 100, reason: "IY is wrong");
-  }, skip: runAll);
+  }, skip: !runAll);
 
   test("DI, EI", () {
     var z80 = newCPU();

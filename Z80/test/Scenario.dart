@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:Z80/Cpu/Registers.dart';
 import 'package:test/test.dart';
 
@@ -37,6 +39,8 @@ class State {
   }
 }
 
+typedef void BeforeRun(Z80 z80);
+
 class Scenario {
   static const RAM_START = 10;
 
@@ -44,8 +48,10 @@ class Scenario {
   final List<int> opcodes;
   State initialState;
   State expectedState;
+  BeforeRun beforeRun;
 
-  Scenario(this.name, this.opcodes, {this.initialState, this.expectedState});
+  Scenario(this.name, this.opcodes,
+      {this.initialState, this.expectedState, this.beforeRun});
 
   String opcodesToString(List<int> opcodes) => '${opcodes.map(toHex)}';
 
@@ -89,7 +95,15 @@ class Scenario {
     var ports = setupPorts();
     var z80 = Z80(memory, ports);
 
+    z80.PC = initialState.pc;
+
     setZ80Registers(z80, initialRegisterValues);
+
+    if (beforeRun != null) beforeRun(z80);
+
+    var initialPC = z80.PC;
+
+    memory.setRange(initialPC, Uint8List.fromList(opcodes));
 
     var tStates = z80.step();
 
@@ -99,8 +113,14 @@ class Scenario {
     Map<int, int> actualRegisterValues = getZ80Registers(z80);
 
     for (var r = 0; r < Registers.R_COUNT; r++) {
-      if (![Registers.R_R, Registers.R_F, Registers.R_S, Registers.R_P, Registers.R_PC_H, Registers.R_PC_L,]
-          .contains(r)) {
+      if (![
+        Registers.R_R,
+        Registers.R_F,
+        Registers.R_S,
+        Registers.R_P,
+        Registers.R_PC_H,
+        Registers.R_PC_L,
+      ].contains(r)) {
         // FLAGS are checked later, individually
         expect(actualRegisterValues[r], expectedRegisterValues[r],
             reason: wrongRegister(opcodes, r));
@@ -133,7 +153,7 @@ class Scenario {
         reason: '${scenarioName(opcodes)}\nReason: SP is wrong');
 
     var expectedPC = expectedState.pc == null
-        ? initialState.pc + opcodes.length
+        ? initialPC + opcodes.length
         : expectedState.pc;
     expect(z80.PC, expectedPC,
         reason: '${scenarioName(opcodes)}\nReason: PC is wrong');
@@ -148,11 +168,12 @@ class Scenario {
   }
 
   void setZ80Registers(Z80 z80, Map<int, int> initialRegisterValues) {
+    int pc = z80.PC;
     initialRegisterValues.keys.forEach((r) {
       z80.setR8Value(r, initialRegisterValues[r]);
     });
 
-    z80.PC = initialState.pc;
+    z80.PC = pc;
   }
 
   void run() {
@@ -166,8 +187,6 @@ class Scenario {
       ...List<int>(RAM_START),
       ...initialState.ram,
     ];
-    memory.setRange(initialState.pc, initialState.pc + opcodes.length, opcodes);
-
     return MemoryTest.fromBytes(memory);
   }
 

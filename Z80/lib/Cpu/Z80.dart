@@ -538,8 +538,10 @@ class Z80 {
 
   int daa(InstructionContext context) {
     var sign = addSubtractFlag ? -1 : 1;
+    int oldA = A;
     if (halfCarryFlag || (A & 0x0F > 0x09)) A = addA(0x06 * sign);
     if (carryFlag || (A & 0xF0 > 0x90)) A = addA(0x60 * sign);
+    halfCarryFlag = ((oldA & 0x10) ^ (A & 0x10)) == 0x10;
     parityOverflowFlag = parity(A);
 
     return context.instruction.tStates();
