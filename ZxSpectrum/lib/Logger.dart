@@ -60,7 +60,9 @@ class Logger {
     printBuffer.add(s);
 
     if (printBuffer.length > bufferlength) {
-      print("\n${printBuffer.join("\n")}");
+      printBuffer.forEach((s) {
+        print(s);
+      });
       printBuffer.clear();
     }
   }
