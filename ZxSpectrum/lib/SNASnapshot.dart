@@ -48,7 +48,6 @@ class SNASnapshot {
     z80.I = I;
     z80.SP = SP;
 
-    print(interruptMode);
     z80.interruptMode = Z80.interruptModes[interruptMode];
     z80.IFF1 = (IFF2 & 0x04) == 0x04;
 

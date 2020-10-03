@@ -88,7 +88,6 @@ class Z80Snapshot {
     z80.IFF1 = interruptsEnabled;
     z80.interruptMode = interruptMode;
 
-    print(borderColor);
     zx.ula.borderColor = SpectrumColors[borderColor];
 
     switch (version) {
