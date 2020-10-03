@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:ZxSpectrum/JoystickListener.dart';
@@ -11,11 +13,40 @@ class JoystickPanel extends StatefulWidget {
   _JoystickPanelState createState() => _JoystickPanelState();
 }
 
-const threshold = 1;
+class Direction {
+  static double tan15 = tan(15 * pi / 180);
+  static double tan75 = tan(75 * pi / 180);
+
+  int dx;
+  int dy;
+
+  Direction(double dx, double dy) {
+    var tanDyDx = dx.abs() > 0 ? dy.abs() / dx.abs() : double.maxFinite;
+    this.dx = dx.sign.toInt() * (tanDyDx < tan75 ? 1 : 0);
+    this.dy = dy.sign.toInt() * (tanDyDx > tan15 ? 1 : 0);
+  }
+
+  bool stopped() => dx == 0 && dy == 0;
+
+  @override
+  bool operator ==(Object other) =>
+      other is Direction && other.dx == dx && other.dy == dy;
+
+  @override
+  int get hashCode => dx + dy;
+
+  @override
+  String toString() {
+    return "($dx,$dy)";
+  }
+}
 
 class _JoystickPanelState extends State<JoystickPanel> {
-  double sx = 0;
-  double sy = 0;
+  double startX = 0;
+  double startY = 0;
+  double lastX = 0;
+  double lastY = 0;
+  Direction currentDirection;
 
   void onAction(JoystickAction action, bool active) {
     widget.listeners.forEach((l) {
@@ -51,10 +82,10 @@ class _JoystickPanelState extends State<JoystickPanel> {
           flex: 3,
           child: GestureDetector(
             onPanStart: (details) {
-              setState(() {
-                sx = details.localPosition.dx;
-                sy = details.localPosition.dy;
-              });
+              startX = details.localPosition.dx;
+              startY = details.localPosition.dy;
+              lastX = startX;
+              lastY = startY;
             },
             onPanEnd: (details) {
               onAction(JoystickAction.left, false);
@@ -66,41 +97,55 @@ class _JoystickPanelState extends State<JoystickPanel> {
               double x = details.localPosition.dx;
               double y = details.localPosition.dy;
 
-              double dx = x - sx;
-              double dy = y - sy;
+              double dx = x - startX;
+              double dy = y - startY;
 
-              if (dy.abs() > threshold && dx.abs() < threshold) {
-                onAction(JoystickAction.left, false);
-                onAction(JoystickAction.right, false);
+              if (dx.abs() + dy.abs() < 5) return;
+
+              var direction = Direction(x - lastX, y - lastY);
+              lastX = x;
+              lastY = y;
+
+              if (direction.stopped()) return;
+
+              if (direction != currentDirection) {
+                startX = x;
+                startY = y;
+                currentDirection = direction;
+                return;
               }
 
-              if (dx.abs() > threshold && dy.abs() < threshold) {
-                onAction(JoystickAction.up, false);
-                onAction(JoystickAction.down, false);
+              direction = Direction(x - startX, y - startY);
+
+              switch (currentDirection.dx) {
+                case -1:
+                  onAction(JoystickAction.left, true);
+                  onAction(JoystickAction.right, false);
+                  break;
+                case 0:
+                  onAction(JoystickAction.left, false);
+                  onAction(JoystickAction.right, false);
+                  break;
+                case 1:
+                  onAction(JoystickAction.left, false);
+                  onAction(JoystickAction.right, true);
+                  break;
               }
 
-              if (dx > threshold) {
-                onAction(JoystickAction.right, true);
-                onAction(JoystickAction.left, false);
+              switch (currentDirection.dy) {
+                case -1:
+                  onAction(JoystickAction.up, true);
+                  onAction(JoystickAction.down, false);
+                  break;
+                case 0:
+                  onAction(JoystickAction.up, false);
+                  onAction(JoystickAction.down, false);
+                  break;
+                case 1:
+                  onAction(JoystickAction.up, false);
+                  onAction(JoystickAction.down, true);
+                  break;
               }
-
-              if (dx < -threshold) {
-                onAction(JoystickAction.left, true);
-                onAction(JoystickAction.right, false);
-              }
-
-              if (dy < -threshold) {
-                onAction(JoystickAction.up, true);
-                onAction(JoystickAction.down, false);
-              }
-
-              if (dy > threshold) {
-                onAction(JoystickAction.down, true);
-                onAction(JoystickAction.up, false);
-              }
-
-              sx = x;
-              sy = y;
             },
             child: Container(color: Colors.transparent),
           ),
