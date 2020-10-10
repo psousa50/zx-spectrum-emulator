@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:Z80/Memory.dart';
+import 'package:ZxSpectrum/Util.dart';
 
 class MemoryBank extends Memory {
   final int startAddress;
@@ -93,7 +94,8 @@ class BankedMemory extends Memory {
   int peek(int address) => getBank(address).peek(address);
 
   @override
-  int peek2(int address) => getBank(address).peek2(address);
+  int peek2(int address) =>
+      w(getBank(address).peek(address), getBank(address + 1).peek(address + 1));
 
   @override
   void poke(int address, int b) {

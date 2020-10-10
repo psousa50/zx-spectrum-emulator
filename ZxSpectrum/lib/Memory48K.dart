@@ -1,6 +1,8 @@
 import 'package:Z80/Memory.dart';
 import 'package:ZxSpectrum/BankedMemory.dart';
 
+import 'MemoryAsBytes.dart';
+
 class Memory48K extends BankedMemory {
   static List<MemoryBank> buildMemoryBanks(OnMemoryError onMemoryError) {
     var rom = MemoryAsBytes(0x4000, onMemoryError, readonly: true);
