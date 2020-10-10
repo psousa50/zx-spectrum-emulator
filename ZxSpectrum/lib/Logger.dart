@@ -1,8 +1,7 @@
 import "dart:async";
 
+import 'package:Z80/Util.dart';
 import "package:ZxSpectrum/ZxSpectrum.dart";
-
-import "Util.dart";
 
 class Logger {
   bool disabled;

@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:Z80/Memory.dart';
-import 'package:ZxSpectrum/Util.dart';
+import 'package:Z80/Util.dart';
 
 class MemoryBank extends Memory {
   final int startAddress;

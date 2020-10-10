@@ -1,5 +1,5 @@
 import 'package:ZxSpectrum/BankedMemory.dart';
-import 'package:ZxSpectrum/Util.dart';
+import 'package:Z80/Util.dart';
 import 'package:test/test.dart';
 
 import 'package:ZxSpectrum/MemoryAsBytes.dart';

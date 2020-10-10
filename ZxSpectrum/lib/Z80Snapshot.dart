@@ -1,10 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:Z80/Cpu/Z80.dart';
+import 'package:Z80/Util.dart';
 import 'package:ZxSpectrum/Ula.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
-
-import 'Util.dart';
 
 // ignore_for_file: non_constant_identifier_names
 
@@ -61,8 +60,11 @@ class Z80Snapshot {
     return Z80.interruptModes[m];
   }
 
-  Version get version =>
-      gw(6) == 0 ? gw(30) == 23 ? Version.v2 : Version.v3 : Version.v1;
+  Version get version => gw(6) == 0
+      ? gw(30) == 23
+          ? Version.v2
+          : Version.v3
+      : Version.v1;
 
   void load(ZxSpectrum zx) {
     var z80 = zx.z80;
