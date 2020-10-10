@@ -248,11 +248,15 @@ class Z80 {
   int getRIXY(int r8, int prefix) => prefix == IX_PREFIX
       ? r8 == Registers.R_H
           ? Registers.R_IX_H
-          : r8 == Registers.R_L ? Registers.R_IX_L : r8
+          : r8 == Registers.R_L
+              ? Registers.R_IX_L
+              : r8
       : prefix == IY_PREFIX
           ? r8 == Registers.R_H
               ? Registers.R_IY_H
-              : r8 == Registers.R_L ? Registers.R_IY_L : r8
+              : r8 == Registers.R_L
+                  ? Registers.R_IY_L
+                  : r8
           : r8;
 
   int iXYDisp(int prefix, int d) => getIXY(prefix) + signedByte(d);
@@ -1748,14 +1752,18 @@ class Z80 {
     iXYbitOpcodes.buildM8C8(0xC6, "SET [bit], (IXY + d)", setnMIXYd, 20);
   }
 
-  void maskableInterrupt() {
-    if (!IFF1) return;
+  bool maskableInterrupt() {
+    if (!IFF1) return false;
+
     IFF1 = false;
     IFF2 = false;
 
     halted = false;
 
     switch (interruptMode) {
+      case InterruptMode.im0:
+        break;
+
       case InterruptMode.im1:
         push2(PC);
         PC = 0x38;
@@ -1763,11 +1771,10 @@ class Z80 {
 
       case InterruptMode.im2:
         push2(PC);
-        PC = memory.peek2(I * 256 + 254);
-        break;
-
-      default:
+        PC = memory.peek2(I * 256 + 255);
         break;
     }
+
+    return true;
   }
 }

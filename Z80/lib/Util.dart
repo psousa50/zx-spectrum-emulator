@@ -9,11 +9,10 @@ String toBinary8(int b) {
   return result;
 }
 
-String toHex(int value) =>
-    "${value < 0x10 ? "0" : ''}${value.toRadixString(16).toUpperCase()}";
+String toHex(int value, {width: 2}) =>
+    "${value.toRadixString(16).toUpperCase().padLeft(width, "0")}";
 
-String toHex2(int value) =>
-    "${value < 0x1000 ? "0" : ''}${value < 0x100 ? "0" : ''}${value < 0x10 ? "0" : ''}${value.toRadixString(16).toUpperCase()}";
+String toHex2(int value) => toHex(value, width: 4);
 
 int lo(int w) => w % 256;
 int hi(int w) => w ~/ 256;
