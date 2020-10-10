@@ -60,7 +60,10 @@ class ZxSpectrum {
     running = false;
   }
 
-  void nextFrame() => Timer(Duration(microseconds: 0), frame);
+  void nextFrame() => Timer(Duration(microseconds: 0), () {
+        frame();
+        nextFrame();
+      });
 
   void frame() {
     if (!running) return;
@@ -72,16 +75,15 @@ class ZxSpectrum {
       }
       tStatesTotal += step();
     }
-    if (onInterrupt != null) {
+    var interrupted = z80.maskableInterrupt();
+    if (interrupted && onInterrupt != null) {
       onInterrupt(this);
     }
-    z80.maskableInterrupt();
     currentFrame++;
     ula.refreshScreen(currentFrame);
     if (onFrame != null) {
       onFrame(this, currentFrame);
     }
-    nextFrame();
   }
 
   int step() {

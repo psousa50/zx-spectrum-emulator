@@ -1,10 +1,14 @@
-import 'package:ZxSpectrum/ZxSpectrum.dart';
+import "dart:async";
 
-import 'Util.dart';
+import "package:ZxSpectrum/ZxSpectrum.dart";
+
+import "Util.dart";
 
 class Logger {
   bool disabled;
   int bufferlength;
+
+  int counter = 0;
 
   Logger({bool this.disabled = false, int this.bufferlength = 1000});
 
@@ -54,16 +58,25 @@ class Logger {
     log("$state       $opcode                 $s");
   }
 
+  void flush() {
+    printBuffer.forEach((s) {
+      print(s);
+    });
+    printBuffer.clear();
+  }
+
   void log(String s) {
     if (disabled) return;
 
-    printBuffer.add(s);
+    counter++;
 
-    if (printBuffer.length > bufferlength) {
-      printBuffer.forEach((s) {
-        print(s);
+    printBuffer.add(
+        "${counter.toString().padLeft(7, "0")} ${toTime(DateTime.now())}: $s");
+
+    if (printBuffer.length >= bufferlength) {
+      new Future(() {
+        scheduleMicrotask(flush);
       });
-      printBuffer.clear();
     }
   }
 }

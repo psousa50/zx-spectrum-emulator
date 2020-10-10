@@ -12,6 +12,7 @@ dependencies:
     path: ../Z80
   color: any
   test: any
+  synchronized: ^2.2.0+2
 
 dev_dependencies:
 

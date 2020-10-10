@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:ZxSpectrum/Logger.dart';
+import 'package:ZxSpectrum/Util.dart';
 import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 
@@ -26,7 +27,11 @@ class ZxSpectrumRunner {
         onInstruction: onInstruction,
         onInterrupt: onInterrupt,
         onMemoryError: onMemoryError);
-    logger = Logger();
+    logger = Logger(disabled: false, bufferlength: 10000);
+
+    if (Directory('tmp/frames').existsSync()) {
+      Directory('tmp/frames').deleteSync(recursive: true);
+    }
   }
 
   void sendKeys(List<KeyToSend> keysToSend) {
@@ -59,10 +64,16 @@ class ZxSpectrumRunner {
 
   void onFrame(ZxSpectrum zx, int f) {
     currentFrame = f;
+    if ((currentFrame % 48 == 0) && currentFrame < 2000) {
+      zx.ula.refreshScreen(currentFrame);
+      File("tmp/frames/frame${currentFrame}.bmp").createSync(recursive: true);
+      File("tmp/frames/frame${currentFrame}.bmp")
+          .writeAsBytesSync(zx.ula.screen);
+    }
   }
 
   void onInterrupt(ZxSpectrum zx) {
-    log("Interrupt ${zx.z80.IFF1}");
+    log("Interrupt ${zx.z80.IFF1} ${zx.z80.interruptMode} ${zx.z80.I}");
   }
 
   void onInstruction(ZxSpectrum zx) {
@@ -82,7 +93,15 @@ class ZxSpectrumRunner {
 
   void start() {
     sendKeys([
-      KeyToSend(2000, ZxKey.K_ENTER),
+      KeyToSend(3000, ZxKey.K_6),
+      KeyToSend(3000, ZxKey.K_6),
+      KeyToSend(3000, ZxKey.K_6),
+      KeyToSend(3000, ZxKey.K_6),
+      KeyToSend(3000, ZxKey.K_6),
+      KeyToSend(3000, ZxKey.K_6),
+      KeyToSend(3000, ZxKey.K_ENTER),
+      KeyToSend(3000, ZxKey.K_7),
+      KeyToSend(3000, ZxKey.K_ENTER),
     ]);
     zxSpectrum.start();
   }
