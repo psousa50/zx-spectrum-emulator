@@ -29,9 +29,9 @@ class ZxSpectrumRunner {
         onMemoryError: onMemoryError);
     logger = Logger(disabled: false, bufferlength: 10000);
 
-    if (Directory('tmp/frames').existsSync()) {
-      Directory('tmp/frames').deleteSync(recursive: true);
-    }
+    // if (Directory('tmp/frames').existsSync()) {
+    //   Directory('tmp/frames').deleteSync(recursive: true);
+    // }
   }
 
   void sendKeys(List<KeyToSend> keysToSend) {
@@ -64,12 +64,12 @@ class ZxSpectrumRunner {
 
   void onFrame(ZxSpectrum zx, int f) {
     currentFrame = f;
-    if ((currentFrame % 48 == 0) && currentFrame < 2000) {
-      zx.ula.refreshScreen(currentFrame);
-      File("tmp/frames/frame${currentFrame}.bmp").createSync(recursive: true);
-      File("tmp/frames/frame${currentFrame}.bmp")
-          .writeAsBytesSync(zx.ula.screen);
-    }
+    // if ((currentFrame % 48 == 0) && currentFrame < 2000) {
+    //   zx.ula.refreshScreen(currentFrame);
+    //   File("tmp/frames/frame${currentFrame}.bmp").createSync(recursive: true);
+    //   File("tmp/frames/frame${currentFrame}.bmp")
+    //       .writeAsBytesSync(zx.ula.screen);
+    // }
   }
 
   void onInterrupt(ZxSpectrum zx) {

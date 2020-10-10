@@ -31,6 +31,7 @@ flutter:
     - assets/games/Cube.z80
     - assets/games/CyrusIsChess.z80
     - assets/games/elite.z80
+    - assets/games/FullThrottle.z80
     - assets/games/galaxian.z80
     - assets/games/GreenBeret.z80
     - assets/games/GreenBeret.sna

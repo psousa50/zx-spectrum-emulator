@@ -42,7 +42,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   KempstonJoystick kempstonJoystick;
   KeymapJoystick keymapJoystick;
 
-  final logger = Logger(disabled: true, bufferlength: 0);
+  final logger = Logger(disabled: true, bufferlength: 100000);
 
   double sx = 0;
   double sy = 0;
@@ -73,7 +73,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/CyrusIsChess.z80');
+    var s = await rootBundle.load('assets/games/FullThrottle.z80');
     var loader = Z80Snapshot(s.buffer.asUint8List());
     // var loader = SNASnapshot(s.buffer.asUint8List());
     loader.load(zxSpectrum);
@@ -113,19 +113,18 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   }
 
   void refreshScreen(ZxSpectrum zx, int currentFrame) {
+    logger.log("FRAME");
     setState(() {
       screen = zx.ula.screen;
     });
   }
 
   void onInstruction(ZxSpectrum zx) {
-    // logger.pc(zx);
     logger.z80State(zx, "");
   }
 
   void onInterrupt(ZxSpectrum zx) {
-    logger.z80State(
-        zx, "Interrupt ${zx.z80.IFF1} ${zx.z80.interruptMode} ${zx.z80.I}");
+    logger.log("Interrupt ${zx.z80.IFF1} ${zx.z80.interruptMode} ${zx.z80.I}");
   }
 
   void onKeyEvent(ZxKey zxKey, bool pressed) {
@@ -134,12 +133,10 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   @override
   Widget build(BuildContext context) {
-    // var style = TextStyle(fontSize: 20, decoration: TextDecoration.none);
     var rgb = zxSpectrum.ula.borderColor.toRgbColor();
     Color borderColor = Color.fromRGBO(rgb.r, rgb.g, rgb.b, 1);
 
     return Stack(children: [
-      // SizedBox(height: 30),
       Display(screen, borderColor),
       JoystickPanel([kempstonJoystick, keymapJoystick]),
       Column(
@@ -168,8 +165,6 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
           ),
         ],
       ),
-      // Text(toHex(zxSpectrum.z80.PC), style: style),
-      // Text(toHex(zxSpectrum.z80.ports.inPort(0xF7FE)), style: style),
     ]);
   }
 }
