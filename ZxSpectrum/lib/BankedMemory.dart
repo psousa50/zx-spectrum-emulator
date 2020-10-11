@@ -94,8 +94,8 @@ class BankedMemory extends Memory {
   int peek(int address) => getBank(address).peek(address);
 
   @override
-  int peek2(int address) =>
-      w(getBank(address).peek(address), getBank(address + 1).peek(address + 1));
+  int peek2(int address) => littleEndian(
+      getBank(address).peek(address), getBank(address + 1).peek(address + 1));
 
   @override
   void poke(int address, int b) {

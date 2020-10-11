@@ -300,7 +300,7 @@ class Z80 {
 
   int pop2() {
     SP = SP + 2;
-    return w(memory.peek(SP - 2), memory.peek(SP - 1));
+    return littleEndian(memory.peek(SP - 2), memory.peek(SP - 1));
   }
 
   bool sameSign8(int b1, int b2) => (b1 & 0x80) ^ (b2 & 0x80) == 0;
@@ -998,13 +998,13 @@ class Z80 {
   }
 
   int outnA(InstructionContext context) {
-    var port = w(fetch(), A);
+    var port = littleEndian(fetch(), A);
     ports.outPort(port, A);
     return context.instruction.tStates();
   }
 
   int inAn(InstructionContext context) {
-    var port = w(fetch(), A);
+    var port = littleEndian(fetch(), A);
     A = ports.inPort(port);
     return context.instruction.tStates();
   }

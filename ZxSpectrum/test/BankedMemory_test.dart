@@ -31,6 +31,6 @@ void main() {
 
     var memory = BankedMemory(banks);
 
-    expect(memory.peek2(0xFFFF), w(200, 100));
+    expect(memory.peek2(0xFFFF), littleEndian(200, 100));
   });
 }

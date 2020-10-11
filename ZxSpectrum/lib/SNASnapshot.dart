@@ -12,7 +12,7 @@ class SNASnapshot {
   SNASnapshot(this.bytes);
 
   int gb(int pos) => bytes[pos];
-  int gw(int pos) => w(bytes[pos], bytes[pos + 1]);
+  int gw(int pos) => littleEndian(bytes[pos], bytes[pos + 1]);
 
   int get I => gb(0x00);
   int get HLt => gw(0x01);

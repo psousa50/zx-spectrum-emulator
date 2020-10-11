@@ -20,9 +20,9 @@ class Logger {
     if (disabled) return;
 
     var z80 = zx.z80;
-    var state = "#${toHex2(z80.PC)}" +
-        " SP:${toHex2(z80.registers.SP)}" +
-        " MSP:${toHex2(zx.memory.peek2(z80.registers.SP))}";
+    var state = "#${toHex16(z80.PC)}" +
+        " SP:${toHex16(z80.registers.SP)}" +
+        " MSP:${toHex16(zx.memory.peek2(z80.registers.SP))}";
 
     var i = zx.z80.getInstruction();
     var opcode = i != null ? i.name : "Invalid Instruction";
@@ -34,15 +34,15 @@ class Logger {
     if (disabled) return;
 
     var z80 = zx.z80;
-    var state = "#${toHex2(z80.PC)} " +
+    var state = "#${toHex16(z80.PC)} " +
         " A:${toHex(z80.registers.A)}" +
-        " BC:${toHex2(z80.registers.BC)}" +
-        " DE:${toHex2(z80.registers.DE)}" +
-        " HL:${toHex2(z80.registers.HL)}" +
-        " IX:${toHex2(z80.registers.IX)}" +
-        " IY:${toHex2(z80.registers.IY)}" +
-        " SP:${toHex2(z80.registers.SP)}" +
-        " MSP:${toHex2(zx.memory.peek2(z80.registers.SP))}" +
+        " BC:${toHex16(z80.registers.BC)}" +
+        " DE:${toHex16(z80.registers.DE)}" +
+        " HL:${toHex16(z80.registers.HL)}" +
+        " IX:${toHex16(z80.registers.IX)}" +
+        " IY:${toHex16(z80.registers.IY)}" +
+        " SP:${toHex16(z80.registers.SP)}" +
+        " MSP:${toHex16(zx.memory.peek2(z80.registers.SP))}" +
         " ${z80.registers.signFlag ? "S" : " "}" +
         " ${z80.registers.zeroFlag ? "Z" : " "}" +
         " ${z80.registers.halfCarryFlag ? "H" : " "}" +

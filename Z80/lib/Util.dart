@@ -4,9 +4,9 @@ Function eq = const ListEquality().equals;
 
 int binary(String b) => int.parse(b, radix: 2);
 
-String toBinary8(int b) {
+String toBinary(int b, {int length: 8}) {
   var result = "";
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < length; i++) {
     result = "${b & 0x01 == 0x01 ? '1' : '0'}$result";
     b = b >> 1;
   }
@@ -16,17 +16,17 @@ String toBinary8(int b) {
 String toHex(int value, {width: 2}) =>
     "${value.toRadixString(16).toUpperCase().padLeft(width, "0")}";
 
-String toHex2(int value) => toHex(value, width: 4);
+String toHex16(int value) => toHex(value, width: 4);
 
 String toTime(DateTime dateTime) =>
     dateTime.toIso8601String().split("T")[1].substring(0, 8);
 
 int lo(int w) => w % 256;
 int hi(int w) => w ~/ 256;
-int w(int lo, int hi) => lo + 256 * hi;
+int littleEndian(int lo, int hi) => lo + 256 * hi;
 
-int byte(int v) => v % 256;
-int word(int v) => v % 65536;
+int byte(int b) => b % 256;
+int word(int w) => w % 65536;
 
 int bit01(int byte) => byte & 0x03;
 int bit012(int byte) => byte & 0x07;

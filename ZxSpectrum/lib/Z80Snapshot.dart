@@ -26,7 +26,7 @@ class Z80Snapshot {
   Z80Snapshot(this.bytes);
 
   int gb(int pos) => bytes[pos];
-  int gw(int pos) => w(bytes[pos], bytes[pos + 1]);
+  int gw(int pos) => littleEndian(bytes[pos], bytes[pos + 1]);
 
   int get byte12 => gb(12) == 255 ? 1 : gb(12);
 
@@ -44,7 +44,7 @@ class Z80Snapshot {
   int get BCt => gw(15);
   int get DEt => gw(17);
   int get HLt => gw(19);
-  int get AFt => w(bytes[22], bytes[21]);
+  int get AFt => littleEndian(bytes[22], bytes[21]);
 
   int get IY => gw(23);
   int get IX => gw(25);

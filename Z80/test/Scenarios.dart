@@ -133,7 +133,7 @@ List<Scenario> ldR16MNN(int opcode, int r16, {int prefix}) => [
           ram: [12, 34],
         ),
         expectedState: State(
-          register16Values: {r16: w(12, 34)},
+          register16Values: {r16: littleEndian(12, 34)},
           ram: [12, 34],
         ),
       )
@@ -627,7 +627,7 @@ List<Scenario> callNN(int opcode) => [
         expectedState: State(
           register16Values: {Registers.R_SP: Scenario.RAM_START + 0},
           ram: [lo(8), hi(8), 0],
-          pc: w(12, 34),
+          pc: littleEndian(12, 34),
         ),
       )
     ];
@@ -663,7 +663,7 @@ Scenario callCCNNJump(int opcode, String flag) => Scenario(
       expectedState: State(
         register16Values: {Registers.R_SP: Scenario.RAM_START + 0},
         ram: [lo(8), hi(8), 0],
-        pc: w(12, 34),
+        pc: littleEndian(12, 34),
       ),
     );
 
@@ -716,7 +716,7 @@ Scenario jpCCNNJump(int opcode, String flag) => Scenario(
         flags: flag,
       ),
       expectedState: State(
-        pc: w(12, 34),
+        pc: littleEndian(12, 34),
       ),
     );
 
@@ -740,7 +740,7 @@ List<Scenario> jpNN(int opcode) => [
         [opcode, 12, 34],
         initialState: State(),
         expectedState: State(
-          pc: w(12, 34),
+          pc: littleEndian(12, 34),
         ),
       )
     ];
@@ -1238,7 +1238,7 @@ List<Scenario> exMSPHL(int opcode, int rhxy) => [
         ),
         expectedState: State(
           register16Values: {
-            rhxy: w(12, 34),
+            rhxy: littleEndian(12, 34),
           },
           ram: [lo(10000), hi(10000)],
         ),
@@ -1343,7 +1343,7 @@ List<Scenario> ldIXYMN(int opcode, rxy) => [
           ram: [12, 34],
         ),
         expectedState: State(
-          register16Values: {rxy: w(12, 34)},
+          register16Values: {rxy: littleEndian(12, 34)},
           ram: [12, 34],
         ),
       )
@@ -1420,13 +1420,20 @@ List<Scenario> outCR8(int opcode, int r8) => [
           register8Values: {
             Registers.R_B: 10,
             Registers.R_C: 254,
-            r8: r8 == Registers.R_B ? 10 : r8 == Registers.R_C ? 254 : 12
+            r8: r8 == Registers.R_B
+                ? 10
+                : r8 == Registers.R_C
+                    ? 254
+                    : 12
           },
         ),
         expectedState: State(
           outPorts: {
-            w(254, 10):
-                r8 == Registers.R_B ? 10 : r8 == Registers.R_C ? 254 : 12
+            littleEndian(254, 10): r8 == Registers.R_B
+                ? 10
+                : r8 == Registers.R_C
+                    ? 254
+                    : 12
           },
         ),
       )
@@ -1440,7 +1447,7 @@ List<Scenario> outNA(int opcode) => [
           register8Values: {Registers.R_A: 12},
         ),
         expectedState: State(
-          outPorts: {w(253, 12): 12},
+          outPorts: {littleEndian(253, 12): 12},
         ),
       )
     ];
@@ -1524,7 +1531,7 @@ List<Scenario> neg(int opcode) => [
 
 Scenario bitNR8R8Spec(int opcode, int bit, int r8, int value, String flags) =>
     Scenario(
-      "BIT $bit, ${Registers.r8Names[r8]} (${toBinary8(value)})",
+      "BIT $bit, ${Registers.r8Names[r8]} (${toBinary(value)})",
       [Z80.BIT_OPCODES, opcode],
       initialState: State(
         register8Values: {r8: value},
@@ -1533,7 +1540,7 @@ Scenario bitNR8R8Spec(int opcode, int bit, int r8, int value, String flags) =>
     );
 
 Scenario bitNR8HLSpec(int opcode, int bit, int value, String flags) => Scenario(
-      "BIT $bit, (HL) (${toBinary8(value)})",
+      "BIT $bit, (HL) (${toBinary(value)})",
       [Z80.BIT_OPCODES, opcode],
       initialState: State(
         register16Values: {Registers.R_HL: Scenario.RAM_START + 1},
