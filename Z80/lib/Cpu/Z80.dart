@@ -651,7 +651,7 @@ class Z80 {
 
   int jrcc(InstructionContext context) {
     var d = fetch();
-    var cond = getFlagCondition(bit345(context.opcode) - 4);
+    var cond = getFlagCondition((bit345(context.opcode) >> 3) - 4);
     if (cond) {
       PC = PC + signedByte(d);
     }
@@ -971,7 +971,7 @@ class Z80 {
   }
 
   int callccnn(InstructionContext context) {
-    var cond = getFlagCondition(bit345(context.opcode));
+    var cond = getFlagCondition(bit345(context.opcode) >> 3);
     var address = fetch2();
     if (cond) {
       push2(PC);
@@ -981,7 +981,7 @@ class Z80 {
   }
 
   int retcc(InstructionContext context) {
-    var cond = getFlagCondition(bit345(context.opcode));
+    var cond = getFlagCondition(bit345(context.opcode) >> 3);
     if (cond) {
       PC = pop2();
     }
@@ -989,7 +989,7 @@ class Z80 {
   }
 
   int jpccnn(InstructionContext context) {
-    var cond = getFlagCondition(bit345(context.opcode));
+    var cond = getFlagCondition(bit345(context.opcode) >> 3);
     var address = fetch2();
     if (cond) {
       PC = address;
@@ -1047,13 +1047,13 @@ class Z80 {
   }
 
   int pushR16(InstructionContext context) {
-    int r16 = Registers.r16AFTable[bit45(context.opcode)];
+    int r16 = Registers.r16AFTable[bit45(context.opcode) >> 4];
     push2(r16Value(r16));
     return context.instruction.tStates();
   }
 
   int popR16(InstructionContext context) {
-    int r16 = Registers.r16AFTable[bit45(context.opcode)];
+    int r16 = Registers.r16AFTable[bit45(context.opcode) >> 4];
     setR16Value(r16, pop2());
     return context.instruction.tStates();
   }
@@ -1237,14 +1237,14 @@ class Z80 {
 
   int bitnMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var bit = bit345(context.opcode);
+    var bit = bit345(context.opcode) >> 3;
     bitNR8Op(bit, memory.peek(iXYDisp(context.prefix, d)));
     return context.instruction.tStates();
   }
 
   int resnMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var bit = bit345(context.opcode);
+    var bit = bit345(context.opcode) >> 3;
     var address = iXYDisp(context.prefix, d);
     memory.poke(address, resNR8Op(bit, memory.peek(address)));
     return context.instruction.tStates();
@@ -1252,28 +1252,28 @@ class Z80 {
 
   int setnMIXYd(InstructionContext context) {
     var d = context.displacement;
-    var bit = bit345(context.opcode);
+    var bit = bit345(context.opcode) >> 3;
     var address = iXYDisp(context.prefix, d);
     memory.poke(address, setNR8Op(bit, memory.peek(address)));
     return context.instruction.tStates();
   }
 
   int bitnR8(InstructionContext context) {
-    var bit = bit345(context.opcode);
+    var bit = bit345(context.opcode) >> 3;
     int r8 = Registers.rBit012(context.opcode);
     bitNR8Op(bit, r8Value(r8));
     return context.instruction.tStates();
   }
 
   int resnR8(InstructionContext context) {
-    var bit = bit345(context.opcode);
+    var bit = bit345(context.opcode) >> 3;
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, resNR8Op(bit, r8Value(r8)));
     return context.instruction.tStates();
   }
 
   int setnR8(InstructionContext context) {
-    var bit = bit345(context.opcode);
+    var bit = bit345(context.opcode) >> 3;
     int r8 = Registers.rBit012(context.opcode);
     setR8Value(r8, setNR8Op(bit, r8Value(r8)));
     return context.instruction.tStates();
