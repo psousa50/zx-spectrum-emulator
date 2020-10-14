@@ -42,3 +42,4 @@ flutter:
     - assets/games/pacman96.z80
     - assets/games/SpaceInvaders.z80
     - assets/games/StopTheExpress.z80
+    - assets/games/RType.z80
