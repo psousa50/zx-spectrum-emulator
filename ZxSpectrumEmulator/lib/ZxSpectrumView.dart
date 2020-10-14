@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:ZxSpectrum/KempstonJoystick.dart';
+import 'package:ZxSpectrum/KempstonJoystickAutoUp.dart';
 import 'package:ZxSpectrum/KeymapJoystick.dart';
 import 'package:ZxSpectrum/Logger.dart';
 import 'package:ZxSpectrum/Z80Snapshot.dart';
@@ -73,7 +74,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/pacman96.z80');
+    var s = await rootBundle.load('assets/games/FullThrottle.z80');
     var loader = Z80Snapshot(s.buffer.asUint8List());
     // var loader = SNASnapshot(s.buffer.asUint8List());
     loader.load(zxSpectrum);
@@ -91,7 +92,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
         onInstruction: onInstruction,
         onInterrupt: onInterrupt);
 
-    kempstonJoystick = KempstonJoystick();
+    kempstonJoystick = KempstonJoystickAutoUp();
     zxSpectrum.bindPort(0x00FF, 0x001F, kempstonJoystick);
 
     keymapJoystick = KeymapJoystick(
