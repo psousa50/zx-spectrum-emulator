@@ -1,6 +1,6 @@
 import 'package:Z80/Memory.dart';
-import 'package:ZxSpectrum/BankedMemory.dart';
 
+import 'BankedMemory.dart';
 import 'MemoryAsBytes.dart';
 
 class Memory48K extends BankedMemory {

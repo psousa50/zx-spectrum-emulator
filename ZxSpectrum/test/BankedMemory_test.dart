@@ -1,8 +1,8 @@
-import 'package:ZxSpectrum/BankedMemory.dart';
-import 'package:Z80/Util.dart';
+import 'package:ZxSpectrum/Memory/BankedMemory.dart';
+import 'package:ZxSpectrum/Memory/MemoryAsBytes.dart';
 import 'package:test/test.dart';
 
-import 'package:ZxSpectrum/MemoryAsBytes.dart';
+import 'package:Z80/Util.dart';
 
 void main() {
   test("should read memory from each bank", () {

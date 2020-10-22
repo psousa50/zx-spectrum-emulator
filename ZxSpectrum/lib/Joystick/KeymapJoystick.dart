@@ -1,6 +1,6 @@
-import 'package:ZxSpectrum/JoystickListener.dart';
-import 'package:ZxSpectrum/KeyboardListener.dart';
-import 'package:ZxSpectrum/ZxKeys.dart';
+import 'JoystickListener.dart';
+import '../Keyboard/KeyboardListener.dart';
+import '../Keyboard/ZxKeys.dart';
 
 class KeyMap {
   final ZxKey left;

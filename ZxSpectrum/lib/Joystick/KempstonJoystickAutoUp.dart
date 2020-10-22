@@ -1,5 +1,5 @@
-import 'package:ZxSpectrum/KempstonJoystick.dart';
-import 'package:ZxSpectrum/PortHandler.dart';
+import 'KempstonJoystick.dart';
+import '../Ports/PortHandler.dart';
 
 import 'JoystickListener.dart';
 

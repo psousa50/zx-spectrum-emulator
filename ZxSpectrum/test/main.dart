@@ -1,6 +1,6 @@
 import "dart:io";
 
-import "package:ZxSpectrum/Z80Snapshot.dart";
+import 'package:ZxSpectrum/Loaders/Z80Snapshot.dart';
 
 import "ZxSpectrumRunner.dart";
 

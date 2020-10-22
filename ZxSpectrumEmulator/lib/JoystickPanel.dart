@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import 'package:ZxSpectrum/JoystickListener.dart';
+import 'package:ZxSpectrum/Joystick/JoystickListener.dart';
 
 class JoystickPanel extends StatefulWidget {
   final List<JoystickListener> listeners;

@@ -1,7 +1,6 @@
+import 'package:ZxSpectrum/Keyboard/KeyboardListener.dart';
+import 'package:ZxSpectrum/Keyboard/ZxKeys.dart';
 import 'package:flutter/material.dart';
-
-import 'package:ZxSpectrum/KeyboardListener.dart';
-import 'package:ZxSpectrum/ZxKeys.dart';
 
 import 'ZxKey.dart';
 

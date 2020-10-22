@@ -1,5 +1,4 @@
-import 'package:ZxSpectrum/PortHandler.dart';
-
+import 'package:ZxSpectrum/Ports/PortHandler.dart';
 import 'JoystickListener.dart';
 
 class KempstonJoystick with PortHandler, JoystickListener {

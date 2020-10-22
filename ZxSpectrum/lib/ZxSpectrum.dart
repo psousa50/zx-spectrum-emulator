@@ -5,10 +5,10 @@ import 'dart:typed_data';
 import 'package:Z80/Cpu/Z80.dart';
 import 'package:Z80/Memory.dart';
 
-import 'Memory48K.dart';
-import 'PortHandler.dart';
+import 'Memory/Memory48K.dart';
+import 'Ports/PortHandler.dart';
+import 'Ports/ZxSpectrumPorts.dart';
 import 'Ula.dart';
-import 'ZxSpectrumPorts.dart';
 
 typedef void OnFrame(ZxSpectrum zx, int frameCounter);
 typedef void OnInstruction(ZxSpectrum zx);

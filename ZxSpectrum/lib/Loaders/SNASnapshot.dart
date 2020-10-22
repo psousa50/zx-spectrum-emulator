@@ -2,9 +2,8 @@ import 'dart:typed_data';
 
 import 'package:Z80/Cpu/Z80.dart';
 import 'package:Z80/Util.dart';
-
-import 'Ula.dart';
-import 'ZxSpectrum.dart';
+import '../Colors.dart';
+import '../ZxSpectrum.dart';
 
 class SNASnapshot {
   final Uint8List bytes;

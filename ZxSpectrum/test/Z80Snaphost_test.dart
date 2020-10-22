@@ -1,9 +1,7 @@
 import 'dart:io';
-
+import 'package:ZxSpectrum/Loaders/Z80Snapshot.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:test/test.dart';
-
-import 'package:ZxSpectrum/Z80Snapshot.dart';
 
 void main() {
   test("", () {

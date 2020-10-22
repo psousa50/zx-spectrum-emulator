@@ -2,8 +2,9 @@ import 'dart:typed_data';
 
 import 'package:Z80/Cpu/Z80.dart';
 import 'package:Z80/Util.dart';
-import 'package:ZxSpectrum/Ula.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
+
+import '../Colors.dart';
 
 // ignore_for_file: non_constant_identifier_names
 

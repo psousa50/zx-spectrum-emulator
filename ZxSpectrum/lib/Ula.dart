@@ -1,30 +1,12 @@
 import 'dart:typed_data';
 
-import 'package:ZxSpectrum/KeyboardListener.dart';
-import 'package:ZxSpectrum/PortHandler.dart';
-import 'package:color/color.dart';
 import 'package:Z80/Memory.dart';
+import 'package:color/color.dart';
 
-import 'ZxKeys.dart';
-
-const SpectrumColors = [
-  Color.rgb(0x00, 0x00, 0x00),
-  Color.rgb(0x00, 0x00, 0xD7),
-  Color.rgb(0xD7, 0x00, 0x00),
-  Color.rgb(0xD7, 0x00, 0xD7),
-  Color.rgb(0x00, 0xD7, 0x00),
-  Color.rgb(0x00, 0xD7, 0xD7),
-  Color.rgb(0xD7, 0xD7, 0x00),
-  Color.rgb(0xD7, 0xD7, 0xD7),
-  Color.rgb(0x00, 0x00, 0x00),
-  Color.rgb(0x00, 0x00, 0xFF),
-  Color.rgb(0xFF, 0x00, 0x00),
-  Color.rgb(0xFF, 0x00, 0xFF),
-  Color.rgb(0x00, 0xFF, 0x00),
-  Color.rgb(0x00, 0xFF, 0xFF),
-  Color.rgb(0xFF, 0xFF, 0x00),
-  Color.rgb(0xFF, 0xFF, 0xFF),
-];
+import 'Colors.dart';
+import 'Keyboard/KeyboardListener.dart';
+import 'Keyboard/ZxKeys.dart';
+import 'Ports/PortHandler.dart';
 
 class Ula with PortHandler, KeyboardListener {
   static Uint8List palette;

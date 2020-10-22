@@ -1,10 +1,10 @@
+import 'package:ZxSpectrum/Colors.dart';
+import 'package:ZxSpectrum/Keyboard/ZxKeys.dart';
+import 'package:ZxSpectrum/Memory/Memory48K.dart';
+import 'package:ZxSpectrum/Ula.dart';
 import 'package:test/test.dart';
 
 import 'package:Z80/Util.dart';
-import 'package:ZxSpectrum/Memory48K.dart';
-import 'package:ZxSpectrum/ZxKeys.dart';
-
-import 'package:ZxSpectrum/Ula.dart';
 
 Ula newUla() => Ula(Memory48K());
 
@@ -26,16 +26,10 @@ void main() {
     expect(ula.read(0x7FFE), binary("11111111"));
   });
 
-  test("Reading from port other that 0xFE should returning 0", () {
+  test("Reading from port other that 0xFE should returning 0xFF", () {
     var ula = newUla();
 
-    expect(ula.read(0xF7FD), 0x00);
-  });
-
-  test("Reading from port other that 0xFE should returning 0", () {
-    var ula = newUla();
-
-    expect(ula.read(0xF7FD), 0x00);
+    expect(ula.read(0xF7FD), 0xFF);
   });
 
   test("Writing to port 0xFE should changer the border color", () {

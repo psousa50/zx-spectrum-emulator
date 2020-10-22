@@ -1,11 +1,11 @@
 import 'dart:typed_data';
+import 'package:ZxSpectrum/Keyboard/ZxKeys.dart';
+import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:test/test.dart';
 
 import 'package:Z80/Cpu/Registers.dart';
 import 'package:Z80/Cpu/Z80Assembler.dart';
 import 'package:Z80/Util.dart';
-import 'package:ZxSpectrum/ZxKeys.dart';
-import 'package:ZxSpectrum/ZxSpectrum.dart';
 
 void main() {
   test("Reading from port 0xFE should returning key state", () {

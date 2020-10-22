@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:ZxSpectrum/KempstonJoystick.dart';
-import 'package:ZxSpectrum/KempstonJoystickAutoUp.dart';
-import 'package:ZxSpectrum/KeymapJoystick.dart';
+import 'package:ZxSpectrum/Joystick/KempstonJoystick.dart';
+import 'package:ZxSpectrum/Joystick/KempstonJoystickAutoUp.dart';
+import 'package:ZxSpectrum/Joystick/KeymapJoystick.dart';
+import 'package:ZxSpectrum/Keyboard/ZxKeys.dart';
+import 'package:ZxSpectrum/Loaders/Z80Snapshot.dart';
 import 'package:ZxSpectrum/Logger.dart';
-import 'package:ZxSpectrum/Z80Snapshot.dart';
-import 'package:ZxSpectrum/ZxKeys.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:ZxSpectrumEmulator/JoystickPanel.dart';
 import 'package:flutter/services.dart';

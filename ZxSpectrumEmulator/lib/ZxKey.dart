@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'package:ZxSpectrum/ZxKeys.dart';
+import 'package:ZxSpectrum/Keyboard/ZxKeys.dart';
 
 typedef void OnKeyEvent(ZxKey zxKey, bool pressed);
 
