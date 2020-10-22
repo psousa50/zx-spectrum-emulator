@@ -32,7 +32,7 @@ void main() {
     expect(ula.read(0xF7FD), 0xFF);
   });
 
-  test("Writing to port 0xFE should changer the border color", () {
+  test("Writing to port 0xFE should change the border color", () {
     var ula = newUla();
 
     ula.write(0xFE, 2);
