@@ -9,6 +9,7 @@ import 'package:ZxSpectrum/Loaders/Z80Snapshot.dart';
 import 'package:ZxSpectrum/Logger.dart';
 import 'package:ZxSpectrum/ZxSpectrum.dart';
 import 'package:ZxSpectrumEmulator/JoystickPanel.dart';
+import 'package:ZxSpectrumEmulator/Sound.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
@@ -42,16 +43,39 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   Uint8List screen;
   KempstonJoystick kempstonJoystick;
   KeymapJoystick keymapJoystick;
-
+  bool keyboardVisible = true;
+  final Sound sound = Sound();
   final logger = Logger(disabled: true, bufferlength: 100000);
 
-  double sx = 0;
-  double sy = 0;
-  double x = 0;
-  double y = 0;
-  bool movingLeft = false;
-  bool movingRight = false;
-  bool keyboardVisible = true;
+  @override
+  void initState() {
+    super.initState();
+    zxSpectrum = ZxSpectrum(
+        onFrame: refreshScreen,
+        onInstruction: onInstruction,
+        onInterrupt: onInterrupt,
+        onSoundSample: onSoundSample);
+
+    kempstonJoystick = KempstonJoystickAutoUp();
+    zxSpectrum.bindPort(0x00FF, 0x001F, kempstonJoystick);
+
+    keymapJoystick = KeymapJoystick(
+      zxSpectrum.ula,
+      spaceInvadersKeyMap,
+    );
+
+    loadGameAndStart();
+    sendKeys([
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(1000, ZxKey.K_ENTER),
+      // KeyToSend(1000, ZxKey.K_7),
+    ]);
+  }
 
   void sendKeys(List<KeyToSend> keysToSend) {
     if (keysToSend.length > 0) {
@@ -84,35 +108,6 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     zxSpectrum.start();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    zxSpectrum = ZxSpectrum(
-        onFrame: refreshScreen,
-        onInstruction: onInstruction,
-        onInterrupt: onInterrupt);
-
-    kempstonJoystick = KempstonJoystickAutoUp();
-    zxSpectrum.bindPort(0x00FF, 0x001F, kempstonJoystick);
-
-    keymapJoystick = KeymapJoystick(
-      zxSpectrum.ula,
-      spaceInvadersKeyMap,
-    );
-
-    loadGameAndStart();
-    sendKeys([
-      // KeyToSend(1000, ZxKey.K_6),
-      // KeyToSend(1000, ZxKey.K_6),
-      // KeyToSend(1000, ZxKey.K_6),
-      // KeyToSend(1000, ZxKey.K_6),
-      // KeyToSend(1000, ZxKey.K_6),
-      // KeyToSend(1000, ZxKey.K_6),
-      // KeyToSend(1000, ZxKey.K_ENTER),
-      // KeyToSend(1000, ZxKey.K_7),
-    ]);
-  }
-
   void refreshScreen(ZxSpectrum zx, int currentFrame) {
     logger.log("FRAME");
     setState(() {
@@ -126,6 +121,10 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void onInterrupt(ZxSpectrum zx) {
     logger.log("Interrupt ${zx.z80.IFF1} ${zx.z80.interruptMode} ${zx.z80.I}");
+  }
+
+  void onSoundSample(int value) {
+    sound.addSample((value * 2 - 1) * 32767);
   }
 
   void onKeyEvent(ZxKey zxKey, bool pressed) {

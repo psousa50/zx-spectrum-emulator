@@ -26,6 +26,7 @@ class Ula with PortHandler, KeyboardListener {
   };
 
   Color borderColor = Color.rgb(0, 0, 0);
+  int speakerState = 0;
 
   static const screenWidth = 256;
   static const screenHeight = 192;
@@ -117,6 +118,7 @@ class Ula with PortHandler, KeyboardListener {
   void write(int port, int value) {
     if (port & 0xFF == 0xFE) {
       borderColor = SpectrumColors[value & 0x07];
+      speakerState = (value & 0x10) == 0x10 ? 0 : 1;
     }
   }
 

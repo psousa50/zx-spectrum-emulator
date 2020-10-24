@@ -12,6 +12,7 @@ import 'Ula.dart';
 
 typedef void OnFrame(ZxSpectrum zx, int frameCounter);
 typedef void OnInstruction(ZxSpectrum zx);
+typedef void OnSoundSample(int value);
 typedef void OnInterrupt(ZxSpectrum zx);
 
 const VideoFrequency = 50.08;
@@ -24,21 +25,26 @@ class ZxSpectrum {
 
   final OnFrame onFrame;
   final OnInstruction onInstruction;
+  final OnSoundSample onSoundSample;
   final OnInterrupt onInterrupt;
   final OnMemoryError onMemoryError;
   final int frequency;
   final int soundSampleRate;
 
-  bool running;
-  int tStatesCounter = 0;
-  int currentFrame = 0;
   int videoFrameTStates;
   int soundFrameTStates;
+
+  bool running;
+  int currentVideoFrame = 0;
+  int currentSOundFrame = 0;
+
+  int soundFramesCounter = 0;
 
   ZxSpectrum(
       {this.onFrame,
       this.onInstruction,
       this.onInterrupt,
+      this.onSoundSample,
       this.onMemoryError = onMemoryErrorDefault,
       this.frequency = 3500000,
       this.soundSampleRate = 48000}) {
@@ -85,21 +91,26 @@ class ZxSpectrum {
         onInstruction(this);
       }
       tStatesTotal += step();
+
+      soundFramesCounter++;
+      if (soundFramesCounter >= soundFrameTStates) {
+        soundFramesCounter = 0;
+        onSoundSample(ula.speakerState);
+      }
     }
     tStatesTotal += z80.maskableInterrupt();
     if (z80.interruptsEnabled && onInterrupt != null) {
       onInterrupt(this);
     }
-    currentFrame++;
-    ula.refreshScreen(currentFrame);
+    currentVideoFrame++;
+    ula.refreshScreen(currentVideoFrame);
     if (onFrame != null) {
-      onFrame(this, currentFrame);
+      onFrame(this, currentVideoFrame);
     }
   }
 
   int step() {
     var tStates = z80.step();
-    tStatesCounter += tStates;
     var expectedElapsedMicroseconds = tStates * (1 / 3.5);
     var actualElapsedMicroseconds = tStates * 0.007;
     var timeToWaitMicroseconds =
