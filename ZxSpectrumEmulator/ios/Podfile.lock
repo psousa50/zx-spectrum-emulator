@@ -1,0 +1,39 @@
+PODS:
+  - Flutter (1.0.0)
+  - "flutter_sound (6.3.0+4)":
+    - Flutter
+    - mobile-ffmpeg-audio (= 4.3.1.LTS)
+    - "TauEngine (= 6.3.0+4)"
+  - mobile-ffmpeg-audio (4.3.1.LTS)
+  - path_provider (0.0.1):
+    - Flutter
+  - "TauEngine (6.3.0+4)"
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_sound (from `.symlinks/plugins/flutter_sound/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+
+SPEC REPOS:
+  trunk:
+    - mobile-ffmpeg-audio
+    - TauEngine
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_sound:
+    :path: ".symlinks/plugins/flutter_sound/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_sound: f4af9aaba1b6c3d23bfed738cbca47863cc349fb
+  mobile-ffmpeg-audio: adc36047b8032bc0f8e5c4e6ab7cb110189d9b37
+  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+  TauEngine: 59de9448a5c947bd1eaf4c7dcb263dae8578bd40
+
+PODFILE CHECKSUM: fe0e1ee7f3d1f7d00b11b474b62dd62134535aea
+
+COCOAPODS: 1.9.3
