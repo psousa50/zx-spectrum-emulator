@@ -14,29 +14,40 @@ typedef void OnFrame(ZxSpectrum zx, int frameCounter);
 typedef void OnInstruction(ZxSpectrum zx);
 typedef void OnInterrupt(ZxSpectrum zx);
 
+const VideoFrequency = 50.08;
+
 class ZxSpectrum {
   Memory48K memory;
   ZxSpectrumPorts ports;
   Z80 z80;
   Ula ula;
 
-  OnFrame onFrame;
-  OnInstruction onInstruction;
-  OnInterrupt onInterrupt;
-  OnMemoryError onMemoryError;
-  bool running;
+  final OnFrame onFrame;
+  final OnInstruction onInstruction;
+  final OnInterrupt onInterrupt;
+  final OnMemoryError onMemoryError;
+  final int frequency;
+  final int soundSampleRate;
 
+  bool running;
   int tStatesCounter = 0;
   int currentFrame = 0;
+  int videoFrameTStates;
+  int soundFrameTStates;
 
   ZxSpectrum(
       {this.onFrame,
       this.onInstruction,
       this.onInterrupt,
-      this.onMemoryError = onMemoryErrorDefault}) {
+      this.onMemoryError = onMemoryErrorDefault,
+      this.frequency = 3500000,
+      this.soundSampleRate = 48000}) {
     memory = Memory48K(onMemoryError: onMemoryError);
     ports = ZxSpectrumPorts();
     ula = Ula(memory);
+
+    videoFrameTStates = (frequency / VideoFrequency).round();
+    soundFrameTStates = (frequency / soundSampleRate).round();
 
     bindPort(0x0001, 0x0000, ula);
 
@@ -69,7 +80,7 @@ class ZxSpectrum {
     if (!running) return;
 
     int tStatesTotal = 0;
-    while (tStatesTotal < 69888) {
+    while (tStatesTotal < videoFrameTStates) {
       if (onInstruction != null) {
         onInstruction(this);
       }

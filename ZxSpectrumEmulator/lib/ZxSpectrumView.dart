@@ -74,7 +74,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/FullThrottle.z80');
+    var s = await rootBundle.load('assets/games/ManicMiner.z80');
     var loader = Z80Snapshot(s.buffer.asUint8List());
     // var loader = SNASnapshot(s.buffer.asUint8List());
     loader.load(zxSpectrum);
