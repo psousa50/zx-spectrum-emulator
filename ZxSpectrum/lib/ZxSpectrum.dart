@@ -75,8 +75,8 @@ class ZxSpectrum {
       }
       tStatesTotal += step();
     }
-    var interrupted = z80.maskableInterrupt();
-    if (interrupted && onInterrupt != null) {
+    tStatesTotal += z80.maskableInterrupt();
+    if (z80.interruptsEnabled && onInterrupt != null) {
       onInterrupt(this);
     }
     currentFrame++;

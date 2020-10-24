@@ -128,6 +128,8 @@ class Z80 {
   set zeroFlag(bool b) => registers.zeroFlag = b;
   set signFlag(bool b) => registers.signFlag = b;
 
+  bool get interruptsEnabled => IFF1;
+
   int fetch() {
     final v = memory.peek(PC);
     PC = PC + 1;
@@ -1752,8 +1754,9 @@ class Z80 {
     iXYbitOpcodes.buildM8C8(0xC6, "SET [bit], (IXY + d)", setnMIXYd, 20);
   }
 
-  bool maskableInterrupt() {
-    if (!IFF1) return false;
+  int maskableInterrupt() {
+    var tStates = 0;
+    if (!interruptsEnabled) return tStates;
 
     IFF1 = false;
     IFF2 = false;
@@ -1767,14 +1770,16 @@ class Z80 {
       case InterruptMode.im1:
         push2(PC);
         PC = 0x38;
+        tStates = 13;
         break;
 
       case InterruptMode.im2:
         push2(PC);
         PC = memory.peek2(I * 256 + 255);
+        tStates = 19;
         break;
     }
 
-    return true;
+    return tStates;
   }
 }
