@@ -49,7 +49,8 @@ class Logger {
         " ${z80.registers.parityOverflowFlag ? "P" : " "}" +
         " ${z80.registers.addSubtractFlag ? "N" : " "}" +
         " ${z80.registers.carryFlag ? "C" : " "}" +
-        " ${z80.memory.range(z80.PC, end: z80.PC + 4).map(toHex)}";
+        " ${z80.memory.range(z80.PC, end: z80.PC + 4).map(toHex)}" +
+        " ${zx.tStatesTotalCounter}";
 
     var i = zx.z80.getInstruction();
     var opcode = i != null ? i.name : "Invalid Instruction";

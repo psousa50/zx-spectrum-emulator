@@ -23,7 +23,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/google.scr
     - assets/48.rom
     - assets/games/3DDeathChase.z80
     - assets/games/ADayInTheLife.z80
@@ -41,6 +40,7 @@ flutter:
     - assets/games/ManicMiner.z80
     - assets/games/pacman.z80
     - assets/games/pacman96.z80
+    - assets/games/RainbowIslands.z80
     - assets/games/SpaceInvaders.z80
     - assets/games/StopTheExpress.z80
     - assets/games/RType.z80

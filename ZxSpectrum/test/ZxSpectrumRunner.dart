@@ -25,6 +25,7 @@ class ZxSpectrumRunner {
         onFrame: onFrame,
         onInstruction: onInstruction,
         onInterrupt: onInterrupt,
+        onSoundSample: onSoundSample,
         onMemoryError: onMemoryError);
     logger = Logger(disabled: false, bufferlength: 10000);
 
@@ -78,7 +79,12 @@ class ZxSpectrumRunner {
   void onInstruction(ZxSpectrum zx) {
     instructionCount++;
 
-    logState();
+    // logState();
+  }
+
+  void onSoundSample(ZxSpectrum zx, int value) {
+    print("$value");
+    // log("Sound: ${zx.tStatesTotalCounter} => $value");
   }
 
   void onMemoryError(int address) {
@@ -91,17 +97,17 @@ class ZxSpectrumRunner {
   }
 
   void start() {
-    sendKeys([
-      KeyToSend(3000, ZxKey.K_6),
-      KeyToSend(3000, ZxKey.K_6),
-      KeyToSend(3000, ZxKey.K_6),
-      KeyToSend(3000, ZxKey.K_6),
-      KeyToSend(3000, ZxKey.K_6),
-      KeyToSend(3000, ZxKey.K_6),
-      KeyToSend(3000, ZxKey.K_ENTER),
-      KeyToSend(3000, ZxKey.K_7),
-      KeyToSend(3000, ZxKey.K_ENTER),
-    ]);
+    // sendKeys([
+    //   KeyToSend(3000, ZxKey.K_6),
+    //   KeyToSend(3000, ZxKey.K_6),
+    //   KeyToSend(3000, ZxKey.K_6),
+    //   KeyToSend(3000, ZxKey.K_6),
+    //   KeyToSend(3000, ZxKey.K_6),
+    //   KeyToSend(3000, ZxKey.K_6),
+    //   KeyToSend(3000, ZxKey.K_ENTER),
+    //   KeyToSend(3000, ZxKey.K_7),
+    //   KeyToSend(3000, ZxKey.K_ENTER),
+    // ]);
     zxSpectrum.start();
   }
 }

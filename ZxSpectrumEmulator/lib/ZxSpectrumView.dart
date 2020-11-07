@@ -64,9 +64,23 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
       spaceInvadersKeyMap,
     );
 
+    startSound();
+
     loadGameAndStart();
+    // loadRomAndStart();
     sendKeys([
-      // KeyToSend(1000, ZxKey.K_6),
+      // KeyToSend(5000, ZxKey.K_1),
+      // KeyToSend(500, ZxKey.K_0),
+      // KeyToSend(500, ZxKey.K_SYM),
+      // KeyToSend(0, ZxKey.K_CAPS),
+      // KeyToSend(500, ZxKey.K_SYM),
+      // KeyToSend(0, ZxKey.K_Z),
+      // KeyToSend(500, ZxKey.K_2),
+      // KeyToSend(500, ZxKey.K_SYM),
+      // KeyToSend(0, ZxKey.K_N),
+      // KeyToSend(500, ZxKey.K_2),
+      // KeyToSend(500, ZxKey.K_ENTER),
+
       // KeyToSend(1000, ZxKey.K_6),
       // KeyToSend(1000, ZxKey.K_6),
       // KeyToSend(1000, ZxKey.K_6),
@@ -75,6 +89,20 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
       // KeyToSend(1000, ZxKey.K_ENTER),
       // KeyToSend(1000, ZxKey.K_7),
     ]);
+  }
+
+  @override
+  void dispose() {
+    stopSound();
+    super.dispose();
+  }
+
+  void startSound() async {
+    await sound.start();
+  }
+
+  void stopSound() async {
+    await sound.stop();
   }
 
   void sendKeys(List<KeyToSend> keysToSend) {
@@ -98,7 +126,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
 
   void loadGameAndStart() async {
     var rom = await rootBundle.load('assets/48.rom');
-    var s = await rootBundle.load('assets/games/ManicMiner.z80');
+    var s = await rootBundle.load('assets/games/FullThrottle.z80');
     var loader = Z80Snapshot(s.buffer.asUint8List());
     // var loader = SNASnapshot(s.buffer.asUint8List());
     loader.load(zxSpectrum);
@@ -123,8 +151,8 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
     logger.log("Interrupt ${zx.z80.IFF1} ${zx.z80.interruptMode} ${zx.z80.I}");
   }
 
-  void onSoundSample(int value) {
-    sound.addSample((value * 2 - 1) * 32767);
+  void onSoundSample(ZxSpectrum _, int value) async {
+    sound.addSample(value * 32767);
   }
 
   void onKeyEvent(ZxKey zxKey, bool pressed) {
