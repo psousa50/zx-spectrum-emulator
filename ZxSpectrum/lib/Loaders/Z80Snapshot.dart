@@ -109,7 +109,7 @@ class Z80Snapshot {
   }
 
   Uint8List decompress(Uint8List b) {
-    var decompressed = List<int>();
+    var decompressed = <int>[];
 
     List<int> fetch(int start, int size) =>
         start + size <= b.length ? b.sublist(start, start + size).toList() : [];

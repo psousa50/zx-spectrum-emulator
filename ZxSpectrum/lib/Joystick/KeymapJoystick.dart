@@ -9,7 +9,12 @@ class KeyMap {
   final ZxKey down;
   final ZxKey fire;
 
-  KeyMap({this.left, this.right, this.up, this.down, this.fire});
+  KeyMap(
+      {this.left = ZxKey.K_0,
+      this.right = ZxKey.K_0,
+      this.up = ZxKey.K_0,
+      this.down = ZxKey.K_0,
+      this.fire = ZxKey.K_0});
 }
 
 class KeymapJoystick with JoystickListener {
@@ -19,7 +24,6 @@ class KeymapJoystick with JoystickListener {
   KeymapJoystick(this.keyboardOperator, this.keyMap);
 
   void onAction(ZxKey key, bool active) {
-    if (key == null) return;
     active ? keyboardOperator.keyDown(key) : keyboardOperator.keyUp(key);
   }
 

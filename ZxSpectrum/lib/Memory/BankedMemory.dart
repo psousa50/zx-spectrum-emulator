@@ -26,8 +26,8 @@ class MemoryBank extends Memory {
   }
 
   @override
-  Uint8List range(int address, {int end}) =>
-      memory.range(address - startAddress, end: end - startAddress);
+  Uint8List range(int address, {int? end = 0}) =>
+      memory.range(address - startAddress, end: (end ?? 0) - startAddress);
 
   @override
   bool get readonly => memory.readonly;
@@ -59,7 +59,7 @@ class InvalidMemory extends ReadOnlyMemory {
   }
 
   @override
-  Uint8List range(int address, {int end}) {
+  Uint8List range(int address, {int? end}) {
     onMemoryError(address);
     return Uint8List(0);
   }
@@ -70,7 +70,7 @@ class InvalidMemory extends ReadOnlyMemory {
 
 class BankedMemory extends Memory {
   final List<MemoryBank> banks;
-  final OnMemoryError onMemoryError;
+  final OnMemoryError? onMemoryError;
 
   BankedMemory(this.banks, {this.onMemoryError});
 
@@ -81,7 +81,8 @@ class BankedMemory extends Memory {
     MemoryBank bank = banks.firstWhere(
         (bank) =>
             a >= bank.startAddress && a < bank.startAddress + bank.memory.size,
-        orElse: () => MemoryBank(0, InvalidMemory(this.onMemoryError)));
+        orElse: () => MemoryBank(
+            0, InvalidMemory(this.onMemoryError ?? onMemoryErrorDefault)));
 
     return bank;
   }
@@ -108,7 +109,7 @@ class BankedMemory extends Memory {
   }
 
   @override
-  Uint8List range(int address, {int end}) =>
+  Uint8List range(int address, {int? end}) =>
       getBank(address).range(address, end: end);
 
   @override

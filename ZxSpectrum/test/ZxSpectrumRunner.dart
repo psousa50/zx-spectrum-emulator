@@ -13,8 +13,8 @@ class KeyToSend {
 }
 
 class ZxSpectrumRunner {
-  ZxSpectrum zxSpectrum;
-  Logger logger;
+  late ZxSpectrum zxSpectrum;
+  late Logger logger;
 
   int currentFrame = 0;
   int instructionCount = 0;

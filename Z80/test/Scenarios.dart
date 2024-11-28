@@ -51,7 +51,7 @@ List<Scenario> ldR8N(int opcode, int r8) => [
       )
     ];
 
-List<Scenario> ldMNNR16(int opcode, int r16, {int prefix}) => [
+List<Scenario> ldMNNR16(int opcode, int r16, {int? prefix}) => [
       Scenario(
         'LD (NN), ${Registers.r16Names[r16]}',
         [
@@ -120,7 +120,7 @@ List<Scenario> ldMHLN(int opcode) => [
       )
     ];
 
-List<Scenario> ldR16MNN(int opcode, int r16, {int prefix}) => [
+List<Scenario> ldR16MNN(int opcode, int r16, {int? prefix}) => [
       Scenario(
         'LD HL, (NN)',
         [
@@ -152,7 +152,7 @@ List<Scenario> ldR16NN(int opcode, int r16) => [
 
 Scenario changeR16R16Spec(String name, int opcode, int rhxy, int r16,
         int hxyValue, int r16Value, int result, String flags,
-        {String inFlags = "", int prefix}) =>
+        {String inFlags = "", int? prefix}) =>
     Scenario(
       "$name ${Registers.r16Names[rhxy]}, ${Registers.r16Names[r16]} => ($hxyValue $r16Value)",
       [...ixyPrefix(rhxy), if (prefix != null) prefix, opcode],
@@ -217,7 +217,7 @@ List<Scenario> decR16(int opcode, int rhxy) => [
 
 Scenario changeR8R8(
         String name, int opcode, int r8, int value, int result, String flags,
-        {String inFlags = "", int prefix}) =>
+        {String inFlags = "", int? prefix}) =>
     Scenario(
       '$name ${Registers.r8Names[r8]} ($value $result)',
       [...ixyPrefix(r8), if (prefix != null) prefix, opcode],
@@ -233,7 +233,7 @@ Scenario changeR8R8(
 
 Scenario changeR8HL(
         String name, int opcode, int value, int result, String flags,
-        {String inFlags = "", int prefix}) =>
+        {String inFlags = "", int? prefix}) =>
     Scenario(
       '$name (HL)',
       [if (prefix != null) prefix, opcode],
@@ -250,7 +250,7 @@ Scenario changeR8HL(
 
 Scenario changeR8IXYd(
         String name, int opcode, int rxy, int value, int result, String flags,
-        {String inFlags = "", int prefix}) =>
+        {String inFlags = "", int? prefix}) =>
     Scenario(
       '$name (IX+d)',
       isIXIY(rxy) && prefix != null
@@ -269,7 +269,7 @@ Scenario changeR8IXYd(
 
 Scenario changeR8(
         String name, int opcode, int r8, int value, int result, String flags,
-        {String inFlags = "", int prefix}) =>
+        {String inFlags = "", int? prefix}) =>
     isMIXIY(r8)
         ? changeR8IXYd(name, opcode, rMIXY(r8), value, result, flags,
             inFlags: inFlags, prefix: prefix)
@@ -381,7 +381,7 @@ List<Scenario> rra(int opcode) => [
           inFlags: "C"),
     ];
 
-List<Scenario> rlR8Spec(String name, int opcode, int r8, {int prefix}) => [
+List<Scenario> rlR8Spec(String name, int opcode, int r8, {int? prefix}) => [
       changeR8(name, opcode, r8, binary("00010011"), binary("00100110"),
           "~S ~Z ~H ~P ~N ~C",
           inFlags: "~C", prefix: prefix),
@@ -399,7 +399,7 @@ List<Scenario> rlR8Spec(String name, int opcode, int r8, {int prefix}) => [
           inFlags: "C", prefix: prefix),
     ];
 
-List<Scenario> rrR8Spec(String name, int opcode, int r8, {int prefix}) => [
+List<Scenario> rrR8Spec(String name, int opcode, int r8, {int? prefix}) => [
       changeR8(name, opcode, r8, binary("10100010"), binary("01010001"),
           "~S ~Z ~H ~P ~N ~C",
           inFlags: "~C", prefix: prefix),
@@ -417,7 +417,7 @@ List<Scenario> rrR8Spec(String name, int opcode, int r8, {int prefix}) => [
           inFlags: "C", prefix: prefix),
     ];
 
-List<Scenario> rlcR8Spec(String name, int opcode, int r8, {int prefix}) => [
+List<Scenario> rlcR8Spec(String name, int opcode, int r8, {int? prefix}) => [
       changeR8(name, opcode, r8, binary("00100010"), binary("01000100"),
           "~S ~Z ~H P ~N ~C",
           prefix: prefix),
@@ -429,7 +429,7 @@ List<Scenario> rlcR8Spec(String name, int opcode, int r8, {int prefix}) => [
           prefix: prefix),
     ];
 
-List<Scenario> rrcR8Spec(String name, int opcode, int r8, {int prefix}) => [
+List<Scenario> rrcR8Spec(String name, int opcode, int r8, {int? prefix}) => [
       changeR8(name, opcode, r8, binary("00100010"), binary("00010001"),
           "~S ~Z ~H P ~N ~C",
           prefix: prefix),
@@ -441,7 +441,7 @@ List<Scenario> rrcR8Spec(String name, int opcode, int r8, {int prefix}) => [
           prefix: prefix),
     ];
 
-List<Scenario> slaR8Spec(String name, int opcode, int r8, {int prefix}) => [
+List<Scenario> slaR8Spec(String name, int opcode, int r8, {int? prefix}) => [
       changeR8(name, opcode, r8, binary("00100110"), binary("01001100"),
           "~S ~Z ~H ~P ~N ~C",
           prefix: prefix),
@@ -453,7 +453,7 @@ List<Scenario> slaR8Spec(String name, int opcode, int r8, {int prefix}) => [
           prefix: prefix),
     ];
 
-List<Scenario> sraR8Spec(String name, int opcode, int r8, {int prefix}) => [
+List<Scenario> sraR8Spec(String name, int opcode, int r8, {int? prefix}) => [
       changeR8(name, opcode, r8, binary("00100110"), binary("00010011"),
           "~S ~Z ~H ~P ~N ~C",
           prefix: prefix),
@@ -471,7 +471,7 @@ List<Scenario> sraR8Spec(String name, int opcode, int r8, {int prefix}) => [
           prefix: prefix),
     ];
 
-List<Scenario> srlR8Spec(String name, int opcode, int r8, {int prefix}) => [
+List<Scenario> srlR8Spec(String name, int opcode, int r8, {int? prefix}) => [
       changeR8(name, opcode, r8, binary("00100110"), binary("00010011"),
           "~S ~Z ~H ~P ~N ~C",
           prefix: prefix),
@@ -632,7 +632,7 @@ List<Scenario> callNN(int opcode) => [
       )
     ];
 
-Scenario retSpec(String name, int opcode, {int prefix}) => Scenario(
+Scenario retSpec(String name, int opcode, {int? prefix}) => Scenario(
       name,
       [if (prefix != null) prefix, opcode],
       initialState: State(
@@ -831,7 +831,7 @@ List<Scenario> rstNN(int opcode, int rst) => [
       )
     ];
 
-Scenario djnzJumpSpec(int opcode, int jump, int initialPC, int finalPC) =>
+Scenario djnzJumpSpec(int opcode, int jump, int initialPC, int? finalPC) =>
     Scenario(
       "DJNZ n",
       [opcode, jump],
@@ -867,7 +867,7 @@ List<Scenario> djnzN(int opcode) => [
     ];
 
 Scenario jrNSpec(String name, int opcode, String flag, int jump, int initialPC,
-        int finalPC) =>
+        int? finalPC) =>
     Scenario(
       name,
       [opcode, jump],
@@ -1669,7 +1669,7 @@ List<Scenario> ldAR(int opcode) => [
     ];
 
 Scenario ldIncDecSpec(String name, int opcode, int inc, int bc, String flags,
-        {int finalPC}) =>
+        {int? finalPC}) =>
     Scenario(
       name,
       [Z80.EXTENDED_OPCODES, opcode],
@@ -1705,7 +1705,7 @@ List<Scenario> ldd(int opcode) => [
 
 Scenario cpIncDecSpec(String name, int opcode, int inc, int a, int value,
         int bc, String flags,
-        {int finalPC}) =>
+        {int? finalPC}) =>
     Scenario(
       name,
       [Z80.EXTENDED_OPCODES, opcode],
@@ -1743,7 +1743,7 @@ List<Scenario> cpd(int opcode) => [
     ];
 
 Scenario inIncDecSpec(String name, int opcode, int inc, int b, String flags,
-        {int finalPC}) =>
+        {int? finalPC}) =>
     Scenario(
       name,
       [Z80.EXTENDED_OPCODES, opcode],
@@ -1773,7 +1773,7 @@ List<Scenario> ind(int opcode) => [
     ];
 
 Scenario outIncDecSpec(String name, int opcode, int inc, int b, String flags,
-        {int finalPC}) =>
+        {int? finalPC}) =>
     Scenario(
       name,
       [Z80.EXTENDED_OPCODES, opcode],

@@ -88,17 +88,15 @@ void main() {
 
   void printOpcode(int opcode, Z80Instruction instruction,
       {bool printIfNotDefined = false}) {
-    if (instruction != null || printIfNotDefined) {
-      if (instruction != null) {
-        var tsFalse = instruction.tStates(cond: false);
-        var tsTrue = instruction.tStates(cond: true);
-        var ts = "$tsFalse${tsTrue != null ? ' $tsTrue' : ''}";
-        var hex = toHex(opcode);
-        var s = " " * (40 - hex.length - instruction.name.length);
-        print("$hex => ${instruction.name}$s($ts)");
-      } else
-        print("(-------------- NOT DEFINED)");
-    }
+    if (printIfNotDefined) {
+      var tsFalse = instruction.tStates(cond: false);
+      var tsTrue = instruction.tStates(cond: true);
+      var ts = "$tsFalse$tsTrue";
+      var hex = toHex(opcode);
+      var s = " " * (40 - hex.length - instruction.name.length);
+      print("$hex => ${instruction.name}$s($ts)");
+    } else
+      print("(-------------- NOT DEFINED)");
   }
 
   test('Show opcodes', () {
@@ -111,20 +109,20 @@ void main() {
         Z80.IY_PREFIX,
         Z80.EXTENDED_OPCODES,
       ].contains(opcode)) {
-        printOpcode(opcode, z80.unPrefixedOpcodes[opcode],
+        printOpcode(opcode, z80.unPrefixedOpcodes[opcode]!,
             printIfNotDefined: true);
       }
     }
 
     print("********* Bit *********");
     for (var opcode = 0; opcode < 256; opcode++) {
-      printOpcode(opcode, z80.bitOpcodes[opcode], printIfNotDefined: true);
+      printOpcode(opcode, z80.bitOpcodes[opcode]!, printIfNotDefined: true);
     }
 
     print("********* Extended *********");
     for (var opcode = 0; opcode < 256; opcode++) {
       if (opcode >= 0x40 && opcode < 0x80 || opcode >= 0xA0 && opcode < 0xC0)
-        printOpcode(opcode, z80.extendedOpcodes[opcode]);
+        printOpcode(opcode, z80.extendedOpcodes[opcode]!);
     }
 
     print("********* IXY *********");
@@ -132,7 +130,7 @@ void main() {
       if (![
         Z80.BIT_OPCODES,
       ].contains(opcode)) {
-        printOpcode(opcode, z80.iXYOpcodes[opcode]);
+        printOpcode(opcode, z80.iXYOpcodes[opcode]!);
       }
     }
 
@@ -140,7 +138,7 @@ void main() {
     for (var opcode = 0; opcode < 256; opcode++) {
       var o = toHex(opcode);
       if (o[o.length - 1] == "6" || o[o.length - 1] == "E") {
-        printOpcode(opcode, z80.iXYbitOpcodes[opcode]);
+        printOpcode(opcode, z80.iXYbitOpcodes[opcode]!);
       }
     }
   }, skip: true);

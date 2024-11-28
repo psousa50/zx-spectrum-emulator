@@ -7,7 +7,7 @@ const BUFFER_SIZE = 10000;
 class Sound {
   final int sampleRate;
 
-  FlutterSoundPlayer player;
+  late FlutterSoundPlayer player;
   var buffer = Uint8List(BUFFER_SIZE);
   var bufferPos = 0;
 
@@ -16,8 +16,7 @@ class Sound {
   }
 
   Future<void> start() async {
-    print("Sound START ${player.isInited}");
-    await player.openAudioSession(focus: AudioFocus.requestFocusAndStopOthers);
+    await player.openPlayer();
     return player.startPlayerFromStream(
       codec: Codec.pcm16,
       numChannels: 1,
@@ -27,7 +26,7 @@ class Sound {
 
   Future<void> stop() {
     print("Sound STOP");
-    return player.closeAudioSession();
+    return player.closePlayer();
   }
 
   void addBuffer(Uint8List buffer) async {
@@ -37,14 +36,12 @@ class Sound {
 
   void addSample(int value) {
     try {
-      if (player != null) {
-        buffer[bufferPos++] = value % 256;
-        buffer[bufferPos++] = value ~/ 256;
-        if (bufferPos + 1 >= 1000) {
-          addBuffer(buffer.sublist(0, 1000));
-          // print(buffer.sublist(0, 10));
-          bufferPos = 0;
-        }
+      buffer[bufferPos++] = value % 256;
+      buffer[bufferPos++] = value ~/ 256;
+      if (bufferPos + 1 >= 1000) {
+        addBuffer(buffer.sublist(0, 1000));
+        // print(buffer.sublist(0, 10));
+        bufferPos = 0;
       }
     } catch (e) {
       print(e.toString());

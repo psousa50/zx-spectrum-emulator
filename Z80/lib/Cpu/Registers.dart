@@ -1,7 +1,5 @@
 import '../Util.dart';
 
-// ignore_for_file: non_constant_identifier_names
-
 class Registers {
   static const r8Names = {
     R_A: "A",
@@ -52,38 +50,38 @@ class Registers {
     F_CARRY: "C",
   };
 
-  static const R_A = 0;
-  static const R_F = 1;
-  static const R_B = 2;
-  static const R_C = 3;
-  static const R_D = 4;
-  static const R_E = 5;
-  static const R_H = 6;
-  static const R_L = 7;
-  static const R_S = 8;
-  static const R_P = 9;
-  static const R_IX_H = 10;
-  static const R_IX_L = 11;
-  static const R_IY_H = 12;
-  static const R_IY_L = 13;
-  static const R_At = 14;
-  static const R_Ft = 15;
-  static const R_Bt = 16;
-  static const R_Ct = 17;
-  static const R_Dt = 18;
-  static const R_Et = 19;
-  static const R_Ht = 20;
-  static const R_Lt = 21;
-  static const R_I = 22;
-  static const R_R = 23;
-  static const R_PC_H = 24;
-  static const R_PC_L = 25;
+  // Register constants
+  static const int R_A = 0;
+  static const int R_F = 1;
+  static const int R_B = 2;
+  static const int R_C = 3;
+  static const int R_D = 4;
+  static const int R_E = 5;
+  static const int R_H = 6;
+  static const int R_L = 7;
+  static const int R_S = 8;
+  static const int R_P = 9;
+  static const int R_IX_H = 10;
+  static const int R_IX_L = 11;
+  static const int R_IY_H = 12;
+  static const int R_IY_L = 13;
+  static const int R_At = 14;
+  static const int R_Ft = 15;
+  static const int R_Bt = 16;
+  static const int R_Ct = 17;
+  static const int R_Dt = 18;
+  static const int R_Et = 19;
+  static const int R_Ht = 20;
+  static const int R_Lt = 21;
+  static const int R_I = 22;
+  static const int R_R = 23;
+  static const int R_PC_H = 24;
+  static const int R_PC_L = 25;
+  static const int R_COUNT = 26;
 
-  static const R_COUNT = 26;
-
-  static const R_MHL = 1000;
-  static const R_MIXd = 1001;
-  static const R_MIYd = 1002;
+  static const int R_MHL = 1000;
+  static const int R_MIXd = 1001;
+  static const int R_MIYd = 1002;
 
   static const R_AF = R_A;
   static const R_BC = R_B;
@@ -97,15 +95,14 @@ class Registers {
   static const R_DEt = R_Dt;
   static const R_HLt = R_Ht;
   static const R_PC = R_PC_H;
+  static const int F_CARRY = 0x01;
+  static const int F_ADD_SUB = 0x02;
+  static const int F_PARITY = 0x04;
+  static const int F_HALF_CARRY = 0x08;
+  static const int F_ZERO = 0x10;
+  static const int F_SIGN = 0x20;
 
-  static const F_CARRY = 0x01;
-  static const F_ADD_SUB = 0x02;
-  static const F_PARITY = 0x04;
-  static const F_HALF_CARRY = 0x08;
-  static const F_ZERO = 0x10;
-  static const F_SIGN = 0x20;
-
-  static const r8Table = {
+  static const Map<int, int> r8Table = {
     0: R_B,
     1: R_C,
     2: R_D,
@@ -116,7 +113,7 @@ class Registers {
     7: R_A,
   };
 
-  static const r8TableBack = {
+  static const Map<int, int> r8TableBack = {
     R_B: 0,
     R_C: 1,
     R_D: 2,
@@ -127,39 +124,41 @@ class Registers {
     R_A: 7,
   };
 
-  static const r16SPTable = {
+  static const Map<int, int> r16SPTable = {
     0: R_BC,
     1: R_DE,
     2: R_HL,
     3: R_SP,
   };
 
-  static const r16SPTableBack = {
+  static const Map<int, int> r16SPTableBack = {
     R_BC: 0,
     R_DE: 1,
     R_HL: 2,
     R_SP: 3,
   };
 
-  static const r16AFTable = {
+  static const Map<int, int> r16AFTable = {
     0: R_BC,
     1: R_DE,
     2: R_HL,
     3: R_AF,
   };
 
-  List<int> registers;
+  late final List<int> registers;
 
   Registers() {
     registers = List<int>.filled(R_COUNT, 0);
   }
 
-  operator [](int i) => registers[i];
-  operator []=(int i, int value) => registers[i] = byte(value);
+  int operator [](int i) => registers[i];
+  void operator []=(int i, int value) {
+    registers[i] = byte(value);
+  }
 
   int gw(int r) => 256 * registers[r] + registers[r + 1];
   void sw(int r, int w) {
-    var nw = word(w);
+    final nw = word(w);
     registers[r] = hi(nw);
     registers[r + 1] = lo(nw);
   }
@@ -238,7 +237,7 @@ class Registers {
   set zeroFlag(bool b) => F = b ? F | F_ZERO : F & ~F_ZERO;
   set signFlag(bool b) => F = b ? F | F_SIGN : F & ~F_SIGN;
 
-  static int rBit012(int opcode) => Registers.r8Table[bit012(opcode)];
-  static int rBit345(int opcode) => Registers.r8Table[bit345(opcode) >> 3];
-  static int rBit45(int opcode) => Registers.r16SPTable[bit45(opcode) >> 4];
+  static int rBit012(int opcode) => Registers.r8Table[bit012(opcode)]!;
+  static int rBit345(int opcode) => Registers.r8Table[bit345(opcode) >> 3]!;
+  static int rBit45(int opcode) => Registers.r16SPTable[bit45(opcode) >> 4]!;
 }

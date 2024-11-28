@@ -11,7 +11,7 @@ class PortBinding {
 }
 
 class ZxSpectrumPorts extends Ports {
-  var bindings = List<PortBinding>();
+  var bindings = <PortBinding>[];
 
   void bind(int bitMask, int value, PortHandler handler) {
     bindings.add(PortBinding(bitMask, value, handler));
@@ -19,13 +19,13 @@ class ZxSpectrumPorts extends Ports {
 
   PortHandler handler(int port) {
     var h = bindings.firstWhere((b) => (port & b.bitMask) == b.value,
-        orElse: () => null);
-    return h == null ? nullPortHandler : h.portHandler;
+        orElse: () => PortBinding(0, 0, nullPortHandler));
+    return h.portHandler;
   }
 
   @override
   int inPort(int port) => handler(port).read(port);
 
   @override
-  void outPort(int port, int value) => handler(port)?.write(port, value);
+  void outPort(int port, int value) => handler(port).write(port, value);
 }

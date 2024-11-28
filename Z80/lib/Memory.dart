@@ -13,7 +13,7 @@ abstract class Memory {
   int peek(int address);
   int peek2(int address);
 
-  Uint8List range(int address, {int end});
+  Uint8List range(int address, {int? end});
 
   void poke(int address, int b);
   void poke2(int address, int w);

@@ -19,7 +19,7 @@ void main() {
   zxSpectrumRunner.zxSpectrum.memory.setRange(30000, program);
   zxSpectrumRunner.zxSpectrum.z80.PC = 30000;
 
-  // z80Sna.load(zxSpectrumRunner.zxSpectrum);
+  z80Sna.load(zxSpectrumRunner.zxSpectrum);
 
   // var memory = [
   //   ...zxSpectrumRunner.zxSpectrum.memory.range(0x0000),

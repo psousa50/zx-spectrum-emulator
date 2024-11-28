@@ -4,7 +4,7 @@ import 'package:Z80/Memory.dart';
 import 'package:Z80/Util.dart';
 
 class MemoryTest extends Memory {
-  List<int> bytes;
+  List<int> bytes = [];
 
   MemoryTest.fromBytes(this.bytes);
 
@@ -38,7 +38,7 @@ class MemoryTest extends Memory {
   }
 
   @override
-  Uint8List range(int start, {int end}) =>
+  Uint8List range(int start, {int? end}) =>
       Uint8List.fromList(bytes.sublist(start, end));
 
   @override

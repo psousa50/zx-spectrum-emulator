@@ -14,7 +14,7 @@ class Logger {
   void setActive(bool active) => disabled = !active;
   bool isActive() => !disabled;
 
-  var printBuffer = List<String>();
+  var printBuffer = <String>[];
 
   void pc(ZxSpectrum zx) {
     if (disabled) return;
@@ -25,7 +25,7 @@ class Logger {
         " MSP:${toHex16(zx.memory.peek2(z80.registers.SP))}";
 
     var i = zx.z80.getInstruction();
-    var opcode = i != null ? i.name : "Invalid Instruction";
+    var opcode = i.name;
 
     log("$state       $opcode");
   }
@@ -53,7 +53,7 @@ class Logger {
         " ${zx.tStatesTotalCounter}";
 
     var i = zx.z80.getInstruction();
-    var opcode = i != null ? i.name : "Invalid Instruction";
+    var opcode = i.name;
 
     log("$state       $opcode                 $s");
   }

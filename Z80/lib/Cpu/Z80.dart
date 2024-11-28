@@ -27,17 +27,17 @@ class Z80 {
     InterruptMode.im2,
   ];
 
-  InterruptMode interruptMode;
+  InterruptMode interruptMode = InterruptMode.im0;
   bool IFF1 = false;
   bool IFF2 = false;
   bool halted = false;
   var registers = Registers();
 
-  Z80Instructions unPrefixedOpcodes;
-  Z80Instructions extendedOpcodes;
-  Z80Instructions bitOpcodes;
-  Z80Instructions iXYOpcodes;
-  Z80Instructions iXYbitOpcodes;
+  Z80Instructions unPrefixedOpcodes = Z80Instructions();
+  Z80Instructions extendedOpcodes = Z80Instructions();
+  Z80Instructions bitOpcodes = Z80Instructions();
+  Z80Instructions iXYOpcodes = Z80Instructions();
+  Z80Instructions iXYbitOpcodes = Z80Instructions();
 
   static const IX_PREFIX = 0xDD;
   static const IY_PREFIX = 0xFD;
@@ -186,25 +186,25 @@ class Z80 {
       case IY_PREFIX:
         switch (d1) {
           case BIT_OPCODES:
-            i = iXYbitOpcodes[d3];
+            i = iXYbitOpcodes[d3]!;
             break;
 
           default:
-            i = iXYOpcodes[d1];
+            i = iXYOpcodes[d1]!;
             break;
         }
         break;
 
       case EXTENDED_OPCODES:
-        i = extendedOpcodes[d1];
+        i = extendedOpcodes[d1]!;
         break;
 
       case BIT_OPCODES:
-        i = bitOpcodes[d1];
+        i = bitOpcodes[d1]!;
         break;
 
       default:
-        i = unPrefixedOpcodes[d0];
+        i = unPrefixedOpcodes[d0]!;
         break;
     }
 
@@ -308,7 +308,7 @@ class Z80 {
   bool sameSign8(int b1, int b2) => (b1 & 0x80) ^ (b2 & 0x80) == 0;
 
   bool getFlagCondition(int b) {
-    bool flag;
+    bool flag = false;
     switch (b ~/ 2) {
       case 0:
         flag = zeroFlag;
@@ -1049,13 +1049,13 @@ class Z80 {
   }
 
   int pushR16(InstructionContext context) {
-    int r16 = Registers.r16AFTable[bit45(context.opcode) >> 4];
+    int r16 = Registers.r16AFTable[bit45(context.opcode) >> 4]!;
     push2(r16Value(r16));
     return context.instruction.tStates();
   }
 
   int popR16(InstructionContext context) {
-    int r16 = Registers.r16AFTable[bit45(context.opcode) >> 4];
+    int r16 = Registers.r16AFTable[bit45(context.opcode) >> 4]!;
     setR16Value(r16, pop2());
     return context.instruction.tStates();
   }

@@ -4,7 +4,7 @@ import 'package:Z80/Memory.dart';
 import 'package:Z80/Util.dart';
 
 class MemoryAsBytes extends Memory {
-  Uint8List bytes;
+  Uint8List bytes = Uint8List.fromList([]);
   final bool readonly;
   final OnMemoryError onMemoryError;
 
@@ -34,7 +34,7 @@ class MemoryAsBytes extends Memory {
       : 0;
 
   @override
-  Uint8List range(int address, {int end}) =>
+  Uint8List range(int address, {int? end}) =>
       checkAddress(address, (end ?? bytes.length) - address)
           ? bytes.sublist(word(address), end)
           : Uint8List(0);

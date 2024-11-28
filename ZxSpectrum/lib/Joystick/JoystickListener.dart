@@ -6,6 +6,6 @@ enum JoystickAction {
   fire,
 }
 
-abstract class JoystickListener {
+mixin JoystickListener {
   void onJoystickAction(JoystickAction action, bool active);
 }

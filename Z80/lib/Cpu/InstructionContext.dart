@@ -2,12 +2,13 @@ import 'Z80Instruction.dart';
 
 class InstructionContext {
   int opcode;
-  Z80Instruction instruction;
-  int prefix;
-  int displacement;
+  Z80Instruction instruction = Z80Instruction();
+  int prefix = 0;
+  int displacement = 0;
 
   InstructionContext(this.opcode);
-  InstructionContext.withPrefix(this.opcode, this.prefix);
+  InstructionContext.withPrefix(this.opcode, this.prefix)
+      : this.displacement = 0;
   InstructionContext.withPrefixAndDisplacement(
       this.opcode, this.prefix, this.displacement);
 

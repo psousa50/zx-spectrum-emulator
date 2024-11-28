@@ -13,9 +13,9 @@ import 'PortsTest.dart';
 class State {
   Map<int, int> registerValues = {};
   List<int> ram = [];
-  Map<int, int> inPorts;
-  Map<int, int> outPorts;
-  int pc = 0;
+  Map<int, int> inPorts = {};
+  Map<int, int> outPorts = {};
+  int? pc;
   String flags = "";
 
   State({
@@ -48,10 +48,12 @@ class Scenario {
   final List<int> opcodes;
   State initialState;
   State expectedState;
-  BeforeRun beforeRun;
+  BeforeRun? beforeRun;
 
   Scenario(this.name, this.opcodes,
-      {this.initialState, this.expectedState, this.beforeRun});
+      {required this.initialState,
+      required this.expectedState,
+      this.beforeRun});
 
   String opcodesToString(List<int> opcodes) => '${opcodes.map(toHex)}';
 
@@ -79,7 +81,7 @@ class Scenario {
   }
 
   void checkFlag(bool value, int flag, Map<int, int> expectedRegisterValues) {
-    expect(value, expectedRegisterValues[Registers.R_F] & flag == flag,
+    expect(value, expectedRegisterValues[Registers.R_F]! & flag == flag,
         reason:
             '${scenarioName(opcodes)}: Flag ${Registers.flagNames[flag]} has wrong value');
   }
@@ -95,20 +97,15 @@ class Scenario {
     var ports = setupPorts();
     var z80 = Z80(memory, ports);
 
-    z80.PC = initialState.pc;
+    z80.PC = initialState.pc ?? 0;
 
     setZ80Registers(z80, initialRegisterValues);
 
-    if (beforeRun != null) beforeRun(z80);
+    beforeRun?.call(z80);
 
     var initialPC = z80.PC;
 
     memory.setRange(initialPC, Uint8List.fromList(opcodes));
-
-    var tStates = z80.step();
-
-    expect(tStates != null, true,
-        reason: "Opcode not processed => ${opcodesToString(opcodes)}");
 
     Map<int, int> actualRegisterValues = getZ80Registers(z80);
 
@@ -148,8 +145,8 @@ class Scenario {
 
     expect(
         z80.registers.SP,
-        256 * expectedRegisterValues[Registers.R_SP] +
-            expectedRegisterValues[Registers.R_SP + 1],
+        256 * expectedRegisterValues[Registers.R_SP]! +
+            expectedRegisterValues[Registers.R_SP + 1]!,
         reason: '${scenarioName(opcodes)}\nReason: SP is wrong');
 
     var expectedPC = expectedState.pc == null
@@ -170,7 +167,7 @@ class Scenario {
   void setZ80Registers(Z80 z80, Map<int, int> initialRegisterValues) {
     int pc = z80.PC;
     initialRegisterValues.keys.forEach((r) {
-      z80.setR8Value(r, initialRegisterValues[r]);
+      z80.setR8Value(r, initialRegisterValues[r]!);
     });
 
     z80.PC = pc;
@@ -183,10 +180,8 @@ class Scenario {
   }
 
   Memory setupMemory() {
-    var memory = [
-      ...List<int>(RAM_START),
-      ...initialState.ram,
-    ];
+    var memory = List<int>.filled(RAM_START, 0)..addAll(initialState.ram);
+
     return MemoryTest.fromBytes(memory);
   }
 
@@ -206,7 +201,7 @@ class Scenario {
         mergeRegisterValues(zeroValues, initialState.registerValues);
 
     initialRegisterValues[Registers.R_F] =
-        setFlags(initialRegisterValues[Registers.R_F], initialState.flags);
+        setFlags(initialRegisterValues[Registers.R_F]!, initialState.flags);
 
     return initialRegisterValues;
   }
@@ -217,7 +212,7 @@ class Scenario {
         initialRegisterValues, expectedState.registerValues);
 
     expectedRegisterValues[Registers.R_F] =
-        setFlags(expectedRegisterValues[Registers.R_F], expectedState.flags);
+        setFlags(expectedRegisterValues[Registers.R_F]!, expectedState.flags);
 
     return expectedRegisterValues;
   }

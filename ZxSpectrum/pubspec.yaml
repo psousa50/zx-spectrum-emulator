@@ -1,20 +1,22 @@
 name: ZxSpectrum
 description: A new Flutter package project.
 version: 0.0.1
-author:
 homepage:
 
+publish_to: none
+
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   Z80:
     path: ../Z80
-  color: any
+  color: 3.0.0
   test: any
-  synchronized: ^2.2.0+2
+  synchronized: ^3.3.0+3
 
 dev_dependencies:
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

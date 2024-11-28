@@ -4,7 +4,7 @@ Function eq = const ListEquality().equals;
 
 int binary(String b) => int.parse(b, radix: 2);
 
-String toBinary(int b, {int length: 8}) {
+String toBinary(int b, {int length = 8}) {
   var result = "";
   for (var i = 0; i < length; i++) {
     result = "${b & 0x01 == 0x01 ? '1' : '0'}$result";
@@ -13,7 +13,7 @@ String toBinary(int b, {int length: 8}) {
   return result;
 }
 
-String toHex(int value, {width: 2}) =>
+String toHex(int value, {width = 2}) =>
     "${value.toRadixString(16).toUpperCase().padLeft(width, "0")}";
 
 String toHex16(int value) => toHex(value, width: 4);

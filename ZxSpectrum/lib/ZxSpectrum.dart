@@ -18,23 +18,24 @@ typedef void OnInterrupt(ZxSpectrum zx);
 const VideoFrequency = 50.08;
 
 class ZxSpectrum {
-  Memory48K memory;
-  ZxSpectrumPorts ports;
-  Z80 z80;
-  Ula ula;
+  late Memory48K memory;
+  late ZxSpectrumPorts ports;
+  late Z80 z80;
+  late Ula ula;
 
-  final OnFrame onFrame;
-  final OnInstruction onInstruction;
-  final OnSoundSample onSoundSample;
-  final OnInterrupt onInterrupt;
-  final OnMemoryError onMemoryError;
+  late final OnFrame? onFrame;
+  late final OnInstruction? onInstruction;
+  late final OnSoundSample? onSoundSample;
+  late final OnInterrupt? onInterrupt;
+  late final OnMemoryError? onMemoryError;
+
   final int frequency;
   final int soundSampleRate;
 
-  int videoFrameTStates;
-  int soundFrameTStates;
+  int videoFrameTStates = 0;
+  int soundFrameTStates = 0;
 
-  bool running;
+  bool running = false;
   int currentVideoFrame = 0;
   int currentSOundFrame = 0;
 
@@ -50,7 +51,7 @@ class ZxSpectrum {
       this.onMemoryError = onMemoryErrorDefault,
       this.frequency = 3500000,
       this.soundSampleRate = 48000}) {
-    memory = Memory48K(onMemoryError: onMemoryError);
+    memory = Memory48K(onMemoryError: onMemoryError ?? onMemoryErrorDefault);
     ports = ZxSpectrumPorts();
     ula = Ula(memory);
 
@@ -89,31 +90,27 @@ class ZxSpectrum {
 
     int tStatesCounter = 0;
     while (tStatesCounter < videoFrameTStates) {
-      if (onInstruction != null) {
-        onInstruction(this);
-      }
+      onInstruction?.call(this);
       var tStates = step();
       tStatesCounter += tStates;
       tStatesTotalCounter += tStates;
       soundFramesCounter += tStates;
       if (soundFramesCounter >= soundFrameTStates) {
         soundFramesCounter = 0;
-        onSoundSample(this, ula.speakerState);
+        onSoundSample?.call(this, ula.speakerState);
       }
     }
 
     var tStates = z80.maskableInterrupt();
     tStatesCounter += tStates;
     tStatesTotalCounter += tStates;
-    if (z80.interruptsEnabled && onInterrupt != null) {
-      onInterrupt(this);
+    if (z80.interruptsEnabled) {
+      onInterrupt?.call(this);
     }
 
     currentVideoFrame++;
     ula.refreshScreen(currentVideoFrame);
-    if (onFrame != null) {
-      onFrame(this, currentVideoFrame);
-    }
+    onFrame?.call(this, currentVideoFrame);
   }
 
   int step() {

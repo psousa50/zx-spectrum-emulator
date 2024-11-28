@@ -9,9 +9,9 @@ import 'Keyboard/ZxKeys.dart';
 import 'Ports/PortHandler.dart';
 
 class Ula with PortHandler, KeyboardListener {
-  static Uint8List palette;
+  static Uint8List palette = Uint8List.fromList([]);
 
-  Uint8List screen;
+  Uint8List screen = Uint8List.fromList([]);
   Memory memory;
 
   var keyStates = {
@@ -40,16 +40,14 @@ class Ula with PortHandler, KeyboardListener {
   }
 
   Uint8List buildImage(Uint8List zxScreen, int currentFrame) {
-    if (palette == null) {
-      palette = Uint8List(paletteSize);
-      int p = 0;
-      for (var spectrumColor in SpectrumColors) {
-        var rgb = spectrumColor.toRgbColor();
-        palette[p++] = rgb.b;
-        palette[p++] = rgb.g;
-        palette[p++] = rgb.r;
-        palette[p++] = 0;
-      }
+    palette = Uint8List(paletteSize);
+    int p = 0;
+    for (var spectrumColor in SpectrumColors) {
+      var rgb = spectrumColor.toRgbColor();
+      palette[p++] = rgb.b.toInt();
+      palette[p++] = rgb.g.toInt();
+      palette[p++] = rgb.r.toInt();
+      palette[p++] = 0;
     }
 
     final fileLength = bmpHeaderSize + paletteSize + screenWidth * screenHeight;
@@ -70,11 +68,11 @@ class Ula with PortHandler, KeyboardListener {
     bd.setUint32(30, 0, Endian.little); // compression
     bd.setUint32(34, 0, Endian.little); // bitmap size
 
-    var p = bmpHeaderSize;
+    var bmhSize = bmpHeaderSize;
 
-    bitmap.setRange(p, p + paletteSize, palette);
+    bitmap.setRange(bmhSize, bmhSize + paletteSize, palette);
 
-    p = p + paletteSize;
+    bmhSize = bmhSize + paletteSize;
 
     for (int y = 0; y < 192; y++) {
       var lineAddress =
@@ -97,7 +95,7 @@ class Ula with PortHandler, KeyboardListener {
         for (var b = 0; b < 8; b++) {
           var bitSet = zxByte & 0x80 == 0x80;
           zxByte = zxByte << 1;
-          bitmap[p++] = bitSet ? inkColorIdx : paperColorIdx;
+          bitmap[bmhSize++] = bitSet ? inkColorIdx : paperColorIdx;
         }
       }
     }
@@ -124,13 +122,13 @@ class Ula with PortHandler, KeyboardListener {
 
   @override
   void keyDown(ZxKey key) {
-    var k = keys[key];
-    keyStates[k.address] = keyStates[k.address] & (0xFF ^ k.bitMask);
+    var k = keys[key]!;
+    keyStates[k.address] = keyStates[k.address]! & (0xFF ^ k.bitMask);
   }
 
   @override
   void keyUp(ZxKey key) {
-    var k = keys[key];
-    keyStates[k.address] = keyStates[k.address] | (k.bitMask);
+    var k = keys[key]!;
+    keyStates[k.address] = keyStates[k.address]! | (k.bitMask);
   }
 }

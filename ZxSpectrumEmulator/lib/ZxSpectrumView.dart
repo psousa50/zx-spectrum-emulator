@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:ZxSpectrum/Joystick/KempstonJoystick.dart';
 import 'package:ZxSpectrum/Joystick/KempstonJoystickAutoUp.dart';
@@ -39,10 +38,10 @@ class ZxSpectrumView extends StatefulWidget {
 }
 
 class _ZxSpectrumViewState extends State<ZxSpectrumView> {
-  ZxSpectrum zxSpectrum;
-  Uint8List screen;
-  KempstonJoystick kempstonJoystick;
-  KeymapJoystick keymapJoystick;
+  late ZxSpectrum zxSpectrum;
+  late Uint8List screen;
+  late KempstonJoystick kempstonJoystick;
+  late KeymapJoystick keymapJoystick;
   bool keyboardVisible = true;
   final Sound sound = Sound();
   final logger = Logger(disabled: true, bufferlength: 100000);
@@ -56,7 +55,7 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
         onInterrupt: onInterrupt,
         onSoundSample: onSoundSample);
 
-    kempstonJoystick = KempstonJoystickAutoUp();
+    kempstonJoystick = KempstonJoystick();
     zxSpectrum.bindPort(0x00FF, 0x001F, kempstonJoystick);
 
     keymapJoystick = KeymapJoystick(
@@ -162,7 +161,8 @@ class _ZxSpectrumViewState extends State<ZxSpectrumView> {
   @override
   Widget build(BuildContext context) {
     var rgb = zxSpectrum.ula.borderColor.toRgbColor();
-    Color borderColor = Color.fromRGBO(rgb.r, rgb.g, rgb.b, 1);
+    Color borderColor =
+        Color.fromRGBO(rgb.r.toInt(), rgb.g.toInt(), rgb.b.toInt(), 1);
 
     return Stack(children: [
       Display(screen, borderColor),

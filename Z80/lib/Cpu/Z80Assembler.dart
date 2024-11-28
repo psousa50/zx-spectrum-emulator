@@ -7,18 +7,18 @@ class Z80Assembler {
   static Uint8List u(List<int> bytes) => Uint8List.fromList(bytes);
 
   static Uint8List ldR8R8(int r1, int r2) =>
-      u([Registers.r8TableBack[r1] << 3 | Registers.r8TableBack[r2]]);
+      u([Registers.r8TableBack[r1]! << 3 | Registers.r8TableBack[r2]!]);
 
   static Uint8List ldR8n(int r8, int n) =>
-      u([0x06 | (Registers.r8TableBack[r8] << 3), n]);
+      u([0x06 | (Registers.r8TableBack[r8]! << 3), n]);
 
   static Uint8List bitBR8(int bit, int r8) =>
-      u([Z80.BIT_OPCODES, 0x40 | (bit << 3) | (Registers.r8TableBack[r8])]);
+      u([Z80.BIT_OPCODES, 0x40 | (bit << 3) | (Registers.r8TableBack[r8]!)]);
 
   static Uint8List bitBIXd(int bit, int d) => u([
         Z80.IX_PREFIX,
         d,
-        0x40 | (bit << 3) | (Registers.r8TableBack[Registers.R_MHL])
+        0x40 | (bit << 3) | (Registers.r8TableBack[Registers.R_MHL]!)
       ]);
 
   static Uint8List incA() => u([0x3C]);
@@ -28,7 +28,7 @@ class Z80Assembler {
   static Uint8List decmHL() => u([0x35]);
 
   static Uint8List ldR16nn(int r16, int nn) =>
-      u([0x01 | (Registers.r16SPTableBack[r16] << 4), lo(nn), hi(nn)]);
+      u([0x01 | (Registers.r16SPTableBack[r16]! << 4), lo(nn), hi(nn)]);
 
   static Uint8List inAC() => u([Z80.EXTENDED_OPCODES, 0x78]);
 

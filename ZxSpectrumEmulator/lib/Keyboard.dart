@@ -1,11 +1,11 @@
-import 'package:ZxSpectrum/Keyboard/KeyboardListener.dart';
 import 'package:ZxSpectrum/Keyboard/ZxKeys.dart';
 import 'package:flutter/material.dart';
 
 import 'ZxKey.dart';
+import 'package:ZxSpectrum/Keyboard/KeyboardListener.dart' as ZXSpectrum;
 
 class KeyboardPanel extends StatelessWidget {
-  final List<KeyboardListener> listeners;
+  final List<ZXSpectrum.KeyboardListener> listeners;
 
   KeyboardPanel(this.listeners);
 

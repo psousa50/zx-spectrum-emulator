@@ -17,8 +17,8 @@ class Direction {
   static double tan15 = tan(15 * pi / 180);
   static double tan75 = tan(75 * pi / 180);
 
-  int dx;
-  int dy;
+  int dx = 0;
+  int dy = 0;
 
   Direction(double dx, double dy) {
     var tanDyDx = dx.abs() > 0 ? dy.abs() / dx.abs() : double.maxFinite;
@@ -46,7 +46,7 @@ class _JoystickPanelState extends State<JoystickPanel> {
   double startY = 0;
   double lastX = 0;
   double lastY = 0;
-  Direction currentDirection;
+  Direction currentDirection = Direction(0, 0);
 
   void onAction(JoystickAction action, bool active) {
     widget.listeners.forEach((l) {

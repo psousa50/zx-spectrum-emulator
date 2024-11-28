@@ -16,16 +16,13 @@ class Display extends StatelessWidget {
             child: Container(
               color: borderColor,
               child: FractionallySizedBox(
-                widthFactor: 1 - 48 / 352,
-                heightFactor: 1 - 48 / 296,
-                child: screen != null
-                    ? Image.memory(
-                        screen,
-                        gaplessPlayback: true,
-                        fit: BoxFit.contain,
-                      )
-                    : Container(),
-              ),
+                  widthFactor: 1 - 48 / 352,
+                  heightFactor: 1 - 48 / 296,
+                  child: Image.memory(
+                    screen,
+                    gaplessPlayback: true,
+                    fit: BoxFit.contain,
+                  )),
             ),
           ),
         ),
